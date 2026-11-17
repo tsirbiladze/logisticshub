@@ -1,0 +1,379 @@
+{
+  "note": "Synthetic demo data. All companies, people and numbers are fictional.",
+  "packs": [
+    {
+      "id": "ka-office-furniture",
+      "language": "ka",
+      "title": {
+        "ka": "საოფისე ავეჯი · ქაისერი → თბილისი",
+        "en": "Office furniture · Kayseri → Tbilisi"
+      },
+      "documents": [
+        "invoice",
+        "packing-list",
+        "cmr",
+        "contract"
+      ],
+      "variants": [
+        {
+          "id": "clean",
+          "title": {
+            "ka": "სუფთა ნაკრები",
+            "en": "Clean set"
+          },
+          "expected": []
+        },
+        {
+          "id": "words-mismatch",
+          "title": {
+            "ka": "სიტყვიერი თანხა ციფრებს არ ემთხვევა",
+            "en": "Amount in words does not match figures"
+          },
+          "expected": [
+            "AMT-01.mismatch"
+          ]
+        },
+        {
+          "id": "packages-mismatch",
+          "title": {
+            "ka": "CMR-ზე ნაკლები ყუთია",
+            "en": "CMR shows fewer packages"
+          },
+          "expected": [
+            "QTY-01.packages"
+          ]
+        },
+        {
+          "id": "gross-below-net",
+          "title": {
+            "ka": "ბრუტო წონა ნეტოზე ნაკლებია",
+            "en": "Gross weight below net weight"
+          },
+          "expected": [
+            "WGT-01.gross-below-net",
+            "WGT-02.gross"
+          ]
+        },
+        {
+          "id": "vat-not-in-total",
+          "title": {
+            "ka": "დღგ გადასახდელ თანხაში არ არის ჩათვლილი",
+            "en": "VAT left out of the total"
+          },
+          "expected": [
+            "SUM-02.total"
+          ]
+        },
+        {
+          "id": "scanned-cmr",
+          "title": {
+            "ka": "დასკანერებული CMR, რომელშიც სხვა ბრუტო წონა წერია",
+            "en": "A scanned CMR that shows a different gross weight"
+          },
+          "expected": [
+            "WGT-02.gross"
+          ],
+          "layout": {
+            "scanned": [
+              "cmr"
+            ]
+          }
+        },
+        {
+          "id": "cmr-missing-particulars",
+          "title": {
+            "ka": "CMR-ს სავალდებულო ველები აკლია",
+            "en": "CMR is missing required particulars"
+          },
+          "expected": [
+            "CMR-01.missing",
+            "CMR-01.missing"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "en-led-lighting",
+      "language": "en",
+      "title": {
+        "ka": "LED განათება · ტალინი → თბილისი",
+        "en": "LED lighting · Tallinn → Tbilisi"
+      },
+      "documents": [
+        "invoice",
+        "packing-list",
+        "cmr",
+        "contract"
+      ],
+      "variants": [
+        {
+          "id": "clean",
+          "title": {
+            "ka": "სუფთა ნაკრები",
+            "en": "Clean set"
+          },
+          "expected": []
+        },
+        {
+          "id": "vat-and-charges",
+          "title": {
+            "ka": "სუფთა ნაკრები: ინვოისზე დღგ და შეფუთვის ხარჯია",
+            "en": "Clean set with VAT and a packing charge"
+          },
+          "expected": []
+        },
+        {
+          "id": "line-arithmetic",
+          "title": {
+            "ka": "სტრიქონის ჯამი არასწორადაა დათვლილი",
+            "en": "Line total miscalculated"
+          },
+          "expected": [
+            "SUM-01.line",
+            "SUM-02.subtotal"
+          ]
+        },
+        {
+          "id": "two-page-invoice",
+          "title": {
+            "ka": "ორგვერდიანი ინვოისი: მეორე გვერდზე სტრიქონის ჯამი არასწორია",
+            "en": "Two-page invoice with a wrong line total on page 2"
+          },
+          "expected": [
+            "SUM-01.line",
+            "SUM-02.subtotal"
+          ],
+          "layout": {
+            "invoiceBreakBefore": 2
+          }
+        },
+        {
+          "id": "mixed-number-conventions",
+          "title": {
+            "ka": "შეფუთვის ფურცელში რიცხვები ორნაირადაა ჩაწერილი (2.4 და 1.500)",
+            "en": "Packing list writes numbers two ways (2.4 and 1.500)"
+          },
+          "expected": [],
+          "expectedIssues": [
+            "EXT_QUOTE_MISMATCH documents[1].lines[1].quantity"
+          ]
+        },
+        {
+          "id": "month-first-dates",
+          "title": {
+            "ka": "სუფთა ნაკრები: თარიღებში თვე პირველია (10/14/2026)",
+            "en": "Clean set with month-first dates (10/14/2026)"
+          },
+          "expected": []
+        },
+        {
+          "id": "second-invoice",
+          "title": {
+            "ka": "ნაკრებში ორი ინვოისია",
+            "en": "Two invoices in the set"
+          },
+          "expected": [
+            "DOC-01.multiple"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "invoice-2.pdf"
+          ]
+        },
+        {
+          "id": "two-documents-in-one-pdf",
+          "title": {
+            "ka": "ინვოისი და შეფუთვის ფურცელი ერთ PDF-შია; შეფუთვის ფურცელი სხვა ინვოისს უთითებს",
+            "en": "Invoice and packing list in one PDF; the packing list refers to another invoice"
+          },
+          "expected": [
+            "REF-01.invoice-number"
+          ],
+          "layout": {
+            "combined": [
+              "invoice",
+              "packing-list"
+            ]
+          },
+          "files": [
+            "invoice-and-packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf"
+          ]
+        },
+        {
+          "id": "wrong-invoice-ref",
+          "title": {
+            "ka": "შეფუთვის ფურცელი სხვა ინვოისს უთითებს",
+            "en": "Packing list refers to another invoice"
+          },
+          "expected": [
+            "REF-01.invoice-number"
+          ]
+        },
+        {
+          "id": "currency-in-words",
+          "title": {
+            "ka": "სიტყვიერ თანხაში სხვა ვალუტაა",
+            "en": "Different currency in words"
+          },
+          "expected": [
+            "AMT-01.currency"
+          ]
+        },
+        {
+          "id": "sea-term-on-road",
+          "title": {
+            "ka": "საზღვაო პირობა (FOB) საავტომობილო გადაზიდვაზე",
+            "en": "Sea-only term (FOB) on a road shipment"
+          },
+          "expected": [
+            "INC-02.sea-term-road"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ru-textile",
+      "language": "ru",
+      "title": {
+        "ka": "საოჯახო ტექსტილი · ალმათი → თბილისი",
+        "en": "Home textiles · Almaty → Tbilisi"
+      },
+      "documents": [
+        "invoice",
+        "packing-list",
+        "cmr",
+        "contract"
+      ],
+      "variants": [
+        {
+          "id": "clean",
+          "title": {
+            "ka": "სუფთა ნაკრები",
+            "en": "Clean set"
+          },
+          "expected": []
+        },
+        {
+          "id": "words-mismatch",
+          "title": {
+            "ka": "სიტყვიერი თანხა ციფრებს არ ემთხვევა",
+            "en": "Amount in words does not match figures"
+          },
+          "expected": [
+            "AMT-01.mismatch"
+          ]
+        },
+        {
+          "id": "weight-mismatch",
+          "title": {
+            "ka": "CMR-ზე სხვა ბრუტო წონაა",
+            "en": "CMR shows a different gross weight"
+          },
+          "expected": [
+            "WGT-02.gross"
+          ]
+        },
+        {
+          "id": "contract-date",
+          "title": {
+            "ka": "ხელშეკრულება ინვოისის შემდეგაა დათარიღებული",
+            "en": "Contract dated after the invoice"
+          },
+          "expected": [
+            "REF-01.contract-date",
+            "DATE-01.contract-after-invoice"
+          ]
+        },
+        {
+          "id": "invoice-after-shipment",
+          "title": {
+            "ka": "ინვოისი ტვირთის მიღების შემდეგაა დათარიღებული",
+            "en": "Invoice dated after the goods were taken over"
+          },
+          "expected": [
+            "DATE-01.invoice-after-shipment"
+          ]
+        },
+        {
+          "id": "quantity-mismatch",
+          "title": {
+            "ka": "შეფუთვის ფურცელში სხვა რაოდენობაა",
+            "en": "Packing list shows a different quantity"
+          },
+          "expected": [
+            "QTY-01.line"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-ceramics",
+      "language": "tr",
+      "title": {
+        "ka": "კერამიკული ფილა · იზმირი → ბათუმი",
+        "en": "Ceramic tiles · İzmir → Batumi"
+      },
+      "documents": [
+        "invoice",
+        "packing-list",
+        "cmr",
+        "contract"
+      ],
+      "variants": [
+        {
+          "id": "clean",
+          "title": {
+            "ka": "სუფთა ნაკრები",
+            "en": "Clean set"
+          },
+          "expected": []
+        },
+        {
+          "id": "words-mismatch",
+          "title": {
+            "ka": "სიტყვიერი თანხა ციფრებს არ ემთხვევა",
+            "en": "Amount in words does not match figures"
+          },
+          "expected": [
+            "AMT-01.mismatch"
+          ]
+        },
+        {
+          "id": "cip-without-insurance",
+          "title": {
+            "ka": "CIP პირობა დაზღვევის გარეშე",
+            "en": "CIP without insurance"
+          },
+          "expected": [
+            "INC-03.no-insurance"
+          ]
+        },
+        {
+          "id": "consignee-mismatch",
+          "title": {
+            "ka": "CMR-ზე სხვა მიმღებია",
+            "en": "Different consignee on the CMR"
+          },
+          "expected": [
+            "PTY-01.name"
+          ]
+        },
+        {
+          "id": "cmr-missing-invoice",
+          "title": {
+            "ka": "CMR-ის თანდართულ დოკუმენტებში ინვოისი არ წერია",
+            "en": "Invoice not listed on the CMR"
+          },
+          "expected": [
+            "REF-01.cmr-missing-document"
+          ]
+        }
+      ]
+    }
+  ]
+}

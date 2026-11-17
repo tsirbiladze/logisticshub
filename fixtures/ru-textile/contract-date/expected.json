@@ -1,0 +1,20 @@
+[
+  {
+    "rule": "REF-01",
+    "severity": "error",
+    "key": "REF-01.contract-date",
+    "params": {
+      "expected": "2026-10-12",
+      "found": "2026-09-21"
+    }
+  },
+  {
+    "rule": "DATE-01",
+    "severity": "error",
+    "key": "DATE-01.contract-after-invoice",
+    "params": {
+      "contract": "2026-10-12",
+      "invoice": "2026-10-05"
+    }
+  }
+]

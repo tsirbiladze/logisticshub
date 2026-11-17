@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AMT-01",
+    "severity": "error",
+    "key": "AMT-01.mismatch",
+    "params": {
+      "words": "ცამეტი ათას ხუთასი ევრო და ნული ცენტი",
+      "wordsAmount": "13500.00",
+      "amount": "13300.00"
+    }
+  }
+]

@@ -1,0 +1,713 @@
+{
+  "schemaVersion": "2",
+  "documents": [
+    {
+      "type": "commercial_invoice",
+      "id": "invoice",
+      "sourceFile": "invoice.pdf",
+      "language": "ru",
+      "number": {
+        "value": "AT-2026/118",
+        "quote": "AT-2026/118",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-05",
+        "quote": "05.10.2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "ТОО «Алтын Текстиль»",
+          "quote": "ТОО «Алтын Текстиль»",
+          "page": 1
+        },
+        "address": {
+          "value": "ул. Тимирязева, 42, 050057 Алматы",
+          "quote": "ул. Тимирязева, 42, 050057 Алматы",
+          "page": 1
+        },
+        "country": {
+          "value": "Казахстан",
+          "quote": "Казахстан",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "ООО «Колхида Хоум»",
+          "quote": "ООО «Колхида Хоум»",
+          "page": 1
+        },
+        "address": {
+          "value": "пр. Руставели, 7, 0108 Тбилиси",
+          "quote": "пр. Руставели, 7, 0108 Тбилиси",
+          "page": 1
+        },
+        "country": {
+          "value": "Грузия",
+          "quote": "Грузия",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "address": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        }
+      },
+      "contractRef": {
+        "number": {
+          "value": "AT-K-2026/07",
+          "quote": "AT-K-2026/07",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-09-21",
+          "quote": "21.09.2026",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "CPT",
+          "quote": "CPT",
+          "page": 1
+        },
+        "place": {
+          "value": "Тбилиси, Грузия",
+          "quote": "Тбилиси, Грузия",
+          "page": 1
+        },
+        "version": {
+          "value": "Инкотермс 2020",
+          "quote": "Инкотермс 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "USD",
+        "quote": "USD",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "Полотенце махровое 70×140 см, хлопок 100%",
+            "quote": "Полотенце махровое 70×140 см, хлопок 100%",
+            "page": 1
+          },
+          "model": {
+            "value": "AT-TWL-70",
+            "quote": "AT-TWL-70",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "2400",
+            "quote": "2 400",
+            "page": 1
+          },
+          "unit": {
+            "value": "шт",
+            "quote": "шт",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "4.80",
+            "quote": "4,80",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "11520.00",
+            "quote": "11 520,00",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "Комплект постельного белья 200×220 см, сатин",
+            "quote": "Комплект постельного белья 200×220 см, сатин",
+            "page": 1
+          },
+          "model": {
+            "value": "AT-BED-200",
+            "quote": "AT-BED-200",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "600",
+            "quote": "600",
+            "page": 1
+          },
+          "unit": {
+            "value": "компл.",
+            "quote": "компл.",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "15.50",
+            "quote": "15,50",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "9300.00",
+            "quote": "9 300,00",
+            "page": 1
+          }
+        }
+      ],
+      "subtotal": {
+        "value": "20820.00",
+        "quote": "USD 20 820,00",
+        "page": 1
+      },
+      "discount": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "discountPercent": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "freight": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "insurance": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "otherCharges": [],
+      "tax": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "total": {
+        "value": "20820.00",
+        "quote": "USD 20 820,00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "Двадцать тысяч двести восемьдесят долларов США 00 центов",
+        "quote": "Двадцать тысяч двести восемьдесят долларов США 00 центов",
+        "page": 1
+      },
+      "packages": {
+        "value": "78",
+        "quote": "78 коробок",
+        "page": 1
+      },
+      "netWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "grossWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "countryOfOrigin": {
+        "value": "Казахстан",
+        "quote": "Казахстан",
+        "page": 1
+      }
+    },
+    {
+      "type": "packing_list",
+      "id": "packing-list",
+      "sourceFile": "packing-list.pdf",
+      "language": "ru",
+      "number": {
+        "value": "AT-2026/118-УЛ",
+        "quote": "AT-2026/118-УЛ",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-06",
+        "quote": "06.10.2026",
+        "page": 1
+      },
+      "shipper": {
+        "name": {
+          "value": "ТОО «Алтын Текстиль»",
+          "quote": "ТОО «Алтын Текстиль»",
+          "page": 1
+        },
+        "address": {
+          "value": "ул. Тимирязева, 42, 050057 Алматы",
+          "quote": "ул. Тимирязева, 42, 050057 Алматы",
+          "page": 1
+        },
+        "country": {
+          "value": "Казахстан",
+          "quote": "Казахстан",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": "ООО «Колхида Хоум»",
+          "quote": "ООО «Колхида Хоум»",
+          "page": 1
+        },
+        "address": {
+          "value": "пр. Руставели, 7, 0108 Тбилиси",
+          "quote": "пр. Руставели, 7, 0108 Тбилиси",
+          "page": 1
+        },
+        "country": {
+          "value": "Грузия",
+          "quote": "Грузия",
+          "page": 1
+        }
+      },
+      "invoiceRef": {
+        "number": {
+          "value": "AT-2026/118",
+          "quote": "AT-2026/118",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-10-05",
+          "quote": "05.10.2026",
+          "page": 1
+        }
+      },
+      "packingMethod": {
+        "value": "коробки",
+        "quote": "коробки",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "Полотенце махровое 70×140 см, хлопок 100%",
+            "quote": "Полотенце махровое 70×140 см, хлопок 100%",
+            "page": 1
+          },
+          "model": {
+            "value": "AT-TWL-70",
+            "quote": "AT-TWL-70",
+            "page": 1
+          },
+          "quantity": {
+            "value": "2400",
+            "quote": "2 400",
+            "page": 1
+          },
+          "unit": {
+            "value": "шт",
+            "quote": "шт",
+            "page": 1
+          },
+          "packages": {
+            "value": "48",
+            "quote": "48",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "1440",
+            "quote": "1 440",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "1536",
+            "quote": "1 536",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "6.72",
+            "quote": "6,72",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "Комплект постельного белья 200×220 см, сатин",
+            "quote": "Комплект постельного белья 200×220 см, сатин",
+            "page": 1
+          },
+          "model": {
+            "value": "AT-BED-200",
+            "quote": "AT-BED-200",
+            "page": 1
+          },
+          "quantity": {
+            "value": "600",
+            "quote": "600",
+            "page": 1
+          },
+          "unit": {
+            "value": "компл.",
+            "quote": "компл.",
+            "page": 1
+          },
+          "packages": {
+            "value": "30",
+            "quote": "30",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "900",
+            "quote": "900",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "960",
+            "quote": "960",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "3.60",
+            "quote": "3,60",
+            "page": 1
+          }
+        }
+      ],
+      "totalQuantity": {
+        "value": "3000",
+        "quote": "3 000",
+        "page": 1
+      },
+      "totalPackages": {
+        "value": "78",
+        "quote": "78",
+        "page": 1
+      },
+      "totalNetWeightKg": {
+        "value": "2340",
+        "quote": "2 340",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "2496",
+        "quote": "2 496",
+        "page": 1
+      },
+      "totalVolumeM3": {
+        "value": "10.32",
+        "quote": "10,32",
+        "page": 1
+      }
+    },
+    {
+      "type": "cmr",
+      "id": "cmr",
+      "sourceFile": "cmr.pdf",
+      "language": "ru",
+      "number": {
+        "value": "KZ 0471925",
+        "quote": "KZ 0471925",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-07",
+        "quote": "07.10.2026",
+        "page": 1
+      },
+      "placeOfIssue": {
+        "value": "Алматы",
+        "quote": "Алматы",
+        "page": 1
+      },
+      "sender": {
+        "name": {
+          "value": "ТОО «Алтын Текстиль»",
+          "quote": "ТОО «Алтын Текстиль»",
+          "page": 1
+        },
+        "address": {
+          "value": "ул. Тимирязева, 42, 050057 Алматы",
+          "quote": "ул. Тимирязева, 42, 050057 Алматы",
+          "page": 1
+        },
+        "country": {
+          "value": "Казахстан",
+          "quote": "Казахстан",
+          "page": 1
+        }
+      },
+      "carrier": {
+        "name": {
+          "value": "ТОО «Шёлковый Путь Транс»",
+          "quote": "ТОО «Шёлковый Путь Транс»",
+          "page": 1
+        },
+        "address": {
+          "value": "пр. Райымбека, 210, Алматы",
+          "quote": "пр. Райымбека, 210, Алматы",
+          "page": 1
+        },
+        "country": {
+          "value": "Казахстан",
+          "quote": "Казахстан",
+          "page": 1
+        }
+      },
+      "placeOfTakingOver": {
+        "value": "ул. Тимирязева, 42, Алматы, Казахстан",
+        "quote": "ул. Тимирязева, 42, Алматы, Казахстан",
+        "page": 1
+      },
+      "dateOfTakingOver": {
+        "value": "2026-10-07",
+        "quote": "07.10.2026",
+        "page": 1
+      },
+      "placeOfDelivery": {
+        "value": "пр. Руставели, 7, Тбилиси, Грузия",
+        "quote": "пр. Руставели, 7, Тбилиси, Грузия",
+        "page": 1
+      },
+      "consignee": {
+        "name": {
+          "value": "ООО «Колхида Хоум»",
+          "quote": "ООО «Колхида Хоум»",
+          "page": 1
+        },
+        "address": {
+          "value": "пр. Руставели, 7, 0108 Тбилиси",
+          "quote": "пр. Руставели, 7, 0108 Тбилиси",
+          "page": 1
+        },
+        "country": {
+          "value": "Грузия",
+          "quote": "Грузия",
+          "page": 1
+        }
+      },
+      "goods": [
+        {
+          "marksAndNumbers": {
+            "value": "АТ/118/1-48",
+            "quote": "АТ/118/1-48",
+            "page": 1
+          },
+          "packages": {
+            "value": "48",
+            "quote": "48",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "коробки",
+            "quote": "коробки",
+            "page": 1
+          },
+          "description": {
+            "value": "Полотенце махровое 70×140 см, хлопок 100%",
+            "quote": "Полотенце махровое 70×140 см, хлопок 100%",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "1536",
+            "quote": "1 536",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "6.72",
+            "quote": "6,72",
+            "page": 1
+          }
+        },
+        {
+          "marksAndNumbers": {
+            "value": "АТ/118/49-78",
+            "quote": "АТ/118/49-78",
+            "page": 1
+          },
+          "packages": {
+            "value": "30",
+            "quote": "30",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "коробки",
+            "quote": "коробки",
+            "page": 1
+          },
+          "description": {
+            "value": "Комплект постельного белья 200×220 см, сатин",
+            "quote": "Комплект постельного белья 200×220 см, сатин",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "960",
+            "quote": "960",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "3.60",
+            "quote": "3,60",
+            "page": 1
+          }
+        }
+      ],
+      "dangerousGoods": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "totalPackages": {
+        "value": "78",
+        "quote": "78",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "2496",
+        "quote": "2 496",
+        "page": 1
+      },
+      "carriageCharges": {
+        "value": "Фрахт оплачивает отправитель (CPT)",
+        "quote": "Фрахт оплачивает отправитель (CPT)",
+        "page": 1
+      },
+      "customsInstructions": {
+        "value": "Экспортное оформление: Алматы. Импортное оформление: Тбилиси",
+        "quote": "Экспортное оформление: Алматы. Импортное оформление: Тбилиси",
+        "page": 1
+      },
+      "convention": {
+        "value": "Настоящая перевозка, независимо от любой оговорки об ином, регулируется Конвенцией о договоре международной дорожной перевозки грузов (КДПГ/CMR).",
+        "quote": "Настоящая перевозка, независимо от любой оговорки об ином, регулируется Конвенцией о договоре международной дорожной перевозки грузов (КДПГ/CMR).",
+        "page": 1
+      },
+      "attachedDocuments": [
+        {
+          "value": "Инвойс AT-2026/118",
+          "quote": "Инвойс AT-2026/118",
+          "page": 1
+        },
+        {
+          "value": "Упаковочный лист AT-2026/118-УЛ",
+          "quote": "Упаковочный лист AT-2026/118-УЛ",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "type": "contract",
+      "id": "contract",
+      "sourceFile": "contract.pdf",
+      "language": "ru",
+      "number": {
+        "value": "AT-K-2026/07",
+        "quote": "AT-K-2026/07",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-09-21",
+        "quote": "21.09.2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "ТОО «Алтын Текстиль»",
+          "quote": "ТОО «Алтын Текстиль»",
+          "page": 1
+        },
+        "address": {
+          "value": "ул. Тимирязева, 42, 050057 Алматы",
+          "quote": "ул. Тимирязева, 42, 050057 Алматы",
+          "page": 1
+        },
+        "country": {
+          "value": "Казахстан",
+          "quote": "Казахстан",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "ООО «Колхида Хоум»",
+          "quote": "ООО «Колхида Хоум»",
+          "page": 1
+        },
+        "address": {
+          "value": "пр. Руставели, 7, 0108 Тбилиси",
+          "quote": "пр. Руставели, 7, 0108 Тбилиси",
+          "page": 1
+        },
+        "country": {
+          "value": "Грузия",
+          "quote": "Грузия",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "CPT",
+          "quote": "CPT",
+          "page": 1
+        },
+        "place": {
+          "value": "Тбилиси, Грузия",
+          "quote": "Тбилиси, Грузия",
+          "page": 1
+        },
+        "version": {
+          "value": "Инкотермс 2020",
+          "quote": "Инкотермс 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "USD",
+        "quote": "USD",
+        "page": 1
+      },
+      "totalAmount": {
+        "value": "20820.00",
+        "quote": "USD 20 820,00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "Двадцать тысяч восемьсот двадцать долларов США 00 центов",
+        "quote": "Двадцать тысяч восемьсот двадцать долларов США 00 центов",
+        "page": 1
+      },
+      "goodsDescription": {
+        "value": "Текстильные изделия: махровые полотенца и постельное бельё",
+        "quote": "Текстильные изделия: махровые полотенца и постельное бельё",
+        "page": 1
+      }
+    }
+  ]
+}

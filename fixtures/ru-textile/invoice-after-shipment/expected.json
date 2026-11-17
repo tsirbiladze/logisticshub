@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "DATE-01",
+    "severity": "warning",
+    "key": "DATE-01.invoice-after-shipment",
+    "params": {
+      "invoice": "2026-10-09",
+      "shipment": "2026-10-07"
+    }
+  }
+]

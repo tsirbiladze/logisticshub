@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "QTY-01",
+    "severity": "error",
+    "key": "QTY-01.packages",
+    "params": {
+      "values": "[[\"commercial_invoice\",\"100\"],[\"packing_list\",\"100\"],[\"cmr\",\"90\"]]"
+    }
+  }
+]

@@ -1,0 +1,194 @@
+{
+  "how": "Parts to copy into extraction.json; this file is not an extraction. \"file\" is the frame. Put one copy of a document from \"documents\" into the frame's \"documents\" array for each document you read, and one copy of an item from \"items\" into that document's list for each line the document prints. Fill in what is printed and leave the rest null.",
+  "file": {
+    "schemaVersion": "2",
+    "documents": []
+  },
+  "documents": {
+    "commercial_invoice": {
+      "type": "commercial_invoice",
+      "id": "invoice",
+      "sourceFile": null,
+      "language": null,
+      "number": { "value": null, "quote": null, "page": null },
+      "date": { "value": null, "quote": null, "page": null },
+      "seller": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "buyer": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "consignee": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "contractRef": {
+        "number": { "value": null, "quote": null, "page": null },
+        "date": { "value": null, "quote": null, "page": null }
+      },
+      "incoterm": {
+        "code": { "value": null, "quote": null, "page": null },
+        "place": { "value": null, "quote": null, "page": null },
+        "version": { "value": null, "quote": null, "page": null }
+      },
+      "currency": { "value": null, "quote": null, "page": null },
+      "lines": [],
+      "subtotal": { "value": null, "quote": null, "page": null },
+      "discount": { "value": null, "quote": null, "page": null },
+      "discountPercent": { "value": null, "quote": null, "page": null },
+      "freight": { "value": null, "quote": null, "page": null },
+      "insurance": { "value": null, "quote": null, "page": null },
+      "otherCharges": [],
+      "tax": { "value": null, "quote": null, "page": null },
+      "total": { "value": null, "quote": null, "page": null },
+      "totalInWords": { "value": null, "quote": null, "page": null },
+      "packages": { "value": null, "quote": null, "page": null },
+      "netWeightKg": { "value": null, "quote": null, "page": null },
+      "grossWeightKg": { "value": null, "quote": null, "page": null },
+      "countryOfOrigin": { "value": null, "quote": null, "page": null }
+    },
+    "packing_list": {
+      "type": "packing_list",
+      "id": "packing-list",
+      "sourceFile": null,
+      "language": null,
+      "number": { "value": null, "quote": null, "page": null },
+      "date": { "value": null, "quote": null, "page": null },
+      "shipper": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "consignee": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "invoiceRef": {
+        "number": { "value": null, "quote": null, "page": null },
+        "date": { "value": null, "quote": null, "page": null }
+      },
+      "packingMethod": { "value": null, "quote": null, "page": null },
+      "lines": [],
+      "totalQuantity": { "value": null, "quote": null, "page": null },
+      "totalPackages": { "value": null, "quote": null, "page": null },
+      "totalNetWeightKg": { "value": null, "quote": null, "page": null },
+      "totalGrossWeightKg": { "value": null, "quote": null, "page": null },
+      "totalVolumeM3": { "value": null, "quote": null, "page": null }
+    },
+    "cmr": {
+      "type": "cmr",
+      "id": "cmr",
+      "sourceFile": null,
+      "language": null,
+      "number": { "value": null, "quote": null, "page": null },
+      "date": { "value": null, "quote": null, "page": null },
+      "placeOfIssue": { "value": null, "quote": null, "page": null },
+      "sender": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "carrier": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "placeOfTakingOver": { "value": null, "quote": null, "page": null },
+      "dateOfTakingOver": { "value": null, "quote": null, "page": null },
+      "placeOfDelivery": { "value": null, "quote": null, "page": null },
+      "consignee": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "goods": [],
+      "dangerousGoods": { "value": null, "quote": null, "page": null },
+      "totalPackages": { "value": null, "quote": null, "page": null },
+      "totalGrossWeightKg": { "value": null, "quote": null, "page": null },
+      "carriageCharges": { "value": null, "quote": null, "page": null },
+      "customsInstructions": { "value": null, "quote": null, "page": null },
+      "convention": { "value": null, "quote": null, "page": null },
+      "attachedDocuments": []
+    },
+    "contract": {
+      "type": "contract",
+      "id": "contract",
+      "sourceFile": null,
+      "language": null,
+      "number": { "value": null, "quote": null, "page": null },
+      "date": { "value": null, "quote": null, "page": null },
+      "seller": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "buyer": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null }
+      },
+      "incoterm": {
+        "code": { "value": null, "quote": null, "page": null },
+        "place": { "value": null, "quote": null, "page": null },
+        "version": { "value": null, "quote": null, "page": null }
+      },
+      "currency": { "value": null, "quote": null, "page": null },
+      "totalAmount": { "value": null, "quote": null, "page": null },
+      "totalInWords": { "value": null, "quote": null, "page": null },
+      "goodsDescription": { "value": null, "quote": null, "page": null }
+    },
+    "other": {
+      "type": "other",
+      "id": "other",
+      "sourceFile": null,
+      "language": null,
+      "number": { "value": null, "quote": null, "page": null },
+      "date": { "value": null, "quote": null, "page": null },
+      "title": { "value": null, "quote": null, "page": null }
+    }
+  },
+  "items": {
+    "commercial_invoice": {
+      "lines": {
+        "description": { "value": null, "quote": null, "page": null },
+        "model": { "value": null, "quote": null, "page": null },
+        "hsCode": { "value": null, "quote": null, "page": null },
+        "quantity": { "value": null, "quote": null, "page": null },
+        "unit": { "value": null, "quote": null, "page": null },
+        "unitPrice": { "value": null, "quote": null, "page": null },
+        "lineTotal": { "value": null, "quote": null, "page": null }
+      },
+      "otherCharges": { "value": null, "quote": null, "page": null }
+    },
+    "packing_list": {
+      "lines": {
+        "description": { "value": null, "quote": null, "page": null },
+        "model": { "value": null, "quote": null, "page": null },
+        "quantity": { "value": null, "quote": null, "page": null },
+        "unit": { "value": null, "quote": null, "page": null },
+        "packages": { "value": null, "quote": null, "page": null },
+        "packingMethod": { "value": null, "quote": null, "page": null },
+        "netWeightKg": { "value": null, "quote": null, "page": null },
+        "grossWeightKg": { "value": null, "quote": null, "page": null },
+        "volumeM3": { "value": null, "quote": null, "page": null }
+      }
+    },
+    "cmr": {
+      "goods": {
+        "marksAndNumbers": { "value": null, "quote": null, "page": null },
+        "packages": { "value": null, "quote": null, "page": null },
+        "packingMethod": { "value": null, "quote": null, "page": null },
+        "description": { "value": null, "quote": null, "page": null },
+        "grossWeightKg": { "value": null, "quote": null, "page": null },
+        "volumeM3": { "value": null, "quote": null, "page": null }
+      },
+      "attachedDocuments": { "value": null, "quote": null, "page": null }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "DOC-01",
+    "severity": "warning",
+    "key": "DOC-01.multiple",
+    "params": {
+      "document": "commercial_invoice",
+      "count": "2"
+    }
+  }
+]

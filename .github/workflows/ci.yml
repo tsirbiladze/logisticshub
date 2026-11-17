@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify (Node.js ${{ matrix.node }}, Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The oldest Node.js and Python the skill and the CLI document (README: Node.js 22+, Python 3.9+)…
+          - node: 22
+            python: "3.9"
+          # …and the ones the repo is developed on.
+          - node: 24
+            python: "3.x"
+    env:
+      # The suite runs TypeScript sources with Node's own type stripping, which Node.js 22 still reports as
+      # experimental on stderr; several tests compare stderr exactly.
+      NODE_OPTIONS: --disable-warning=ExperimentalWarning
+      # The parity tests fail, instead of being skipped, when this interpreter is not the one on the PATH.
+      LOGISTICSHUB_PYTHON_VERSION: ${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: node --version && python3 --version
+      # The root package asks for Node.js 24 to develop on; on 22 pnpm warns about it and installs.
+      - run: pnpm install --frozen-lockfile
+      # Typecheck + all tests: exact planted findings on the 29 variants of the 4 synthetic packs, the built check.mjs and check.py
+      # run as separate processes (byte-identical reports), CLI/MCP, PDF marking.
+      - run: pnpm verify
+      # The committed skill must match a fresh build. Building is a development task: current Node.js only.
+      - if: matrix.node == 24
+        run: pnpm build:skill && git diff --exit-code -- skills/
+      - if: matrix.node == 24
+        run: pnpm build:cli

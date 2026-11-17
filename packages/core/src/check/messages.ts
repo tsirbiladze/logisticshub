@@ -1,0 +1,613 @@
+/**
+ * Finding texts in the four report languages.
+ *
+ * Rules put machine values into params; this module localizes them:
+ * - document, present, missing, aDocument, bDocument: document type codes
+ *   (each also gives {<name>In}: "in the invoice", „ინვოისში“, «в инвойсе», "faturada")
+ * - metric, role: codes (see VOCAB)
+ * - item, fields: CMR Art. 6(1) letter and the missing field paths (add
+ *   {particular}: the part that is missing, or the whole particular)
+ * - dates (see DATE_PARAMS): YYYY-MM-DD -> the way the language writes a date
+ * - where: "commercial_invoice" | "packing_list:total" | "packing_list:line:<n>"
+ * - values: JSON [[type, value], …] -> "invoice 100, CMR 90"
+ * - currencies, codes: JSON [[type, value], …] -> "EUR (invoice), USD (contract)"
+ * - reason: amount-in-words error code (adds {reason}, with {word} filled in)
+ * - count: a number of documents (adds {docs}, the noun in the right plural form)
+ * - numbers (see NUMBER_PARAMS): "15694.00" -> "15,694.00", „15 694,00“, the
+ *   way the language groups thousands, with the currency or "kg" where the
+ *   rule knows it. The params themselves stay canonical.
+ */
+import { isIsoDate } from "../dates.ts";
+import type { DocumentType } from "../schema.ts";
+import type { WordsErrorCode } from "../words/index.ts";
+
+export const REPORT_LANGUAGES = ["en", "ka", "ru", "tr"] as const;
+export type ReportLanguage = (typeof REPORT_LANGUAGES)[number];
+
+export type Metric = "quantity" | "packages" | "netWeightKg" | "grossWeightKg" | "volumeM3";
+export type Role = "seller" | "buyer" | "consignee";
+
+/** Noun forms after a number: 1 / 2–4 / 5+ (Russian); English uses one/many, Georgian and Turkish one form. */
+export type PluralForms = { one: string; few: string; many: string };
+
+/**
+ * The parts of each CMR Art. 6(1) particular, as field paths without line
+ * numbers. When only some are missing, CMR-01 names those parts.
+ */
+export const CMR_PARTS: Record<string, readonly CmrPart[]> = {
+  a: ["date", "placeOfIssue"],
+  b: ["sender.name", "sender.address"],
+  c: ["carrier.name", "carrier.address"],
+  d: ["placeOfTakingOver", "dateOfTakingOver", "placeOfDelivery"],
+  e: ["consignee.name", "consignee.address"],
+  f: ["goods.description", "goods.packingMethod"],
+  g: ["totalPackages", "goods.marksAndNumbers"],
+};
+
+export type CmrPart =
+  | "date"
+  | "placeOfIssue"
+  | "sender.name"
+  | "sender.address"
+  | "carrier.name"
+  | "carrier.address"
+  | "placeOfTakingOver"
+  | "dateOfTakingOver"
+  | "placeOfDelivery"
+  | "consignee.name"
+  | "consignee.address"
+  | "goods.description"
+  | "goods.packingMethod"
+  | "totalPackages"
+  | "goods.marksAndNumbers";
+
+/** Params that carry a date (YYYY-MM-DD), per message. They are shown the way the report's language writes dates. */
+export const DATE_PARAMS: Partial<Record<string, readonly string[]>> = {
+  "REF-01.invoice-date": ["found", "expected"],
+  "REF-01.contract-date": ["found", "expected"],
+  "DATE-01.contract-after-invoice": ["contract", "invoice"],
+  "DATE-01.invoice-after-shipment": ["invoice", "shipment"],
+};
+
+/** How a number is shown in a message: plain, with the finding's currency, with "kg", or as a formula of several numbers. */
+export type NumberKind = "number" | "money" | "kg" | "formula";
+
+/**
+ * Params that carry a number (a canonical decimal, or a list of them in
+ * `values`), per message. They are shown the way the report's language writes
+ * a number. "money" adds the currency the rule gave for that param
+ * (Finding.units), "kg" adds the unit.
+ */
+export const NUMBER_PARAMS: Partial<Record<string, Readonly<Record<string, NumberKind>>>> = {
+  "AMT-01.mismatch": { wordsAmount: "money", amount: "money" },
+  "SUM-01.line": { quantity: "number", unitPrice: "number", expected: "money", found: "money" },
+  "SUM-02.subtotal": { expected: "money", found: "money" },
+  "SUM-02.total": { expected: "money", formula: "formula", found: "money" },
+  "SUM-03.total": { expected: "number", found: "number" },
+  "QTY-01.quantity": { invoice: "number", packingList: "number" },
+  "QTY-01.line": { invoice: "number", packingList: "number" },
+  "QTY-01.packages": { values: "number" },
+  "WGT-01.gross-below-net": { gross: "number", net: "number" },
+  "WGT-02.gross": { values: "kg" },
+  "WGT-02.net": { values: "kg" },
+};
+
+interface Vocab {
+  /** Thousands separator and decimal sign: "15,694.00" in English, "15 694,00" in Georgian and Russian, "15.694,00" in Turkish. */
+  number: { group: string; decimal: string };
+  /** The unit after a weight. */
+  kg: string;
+  doc: Record<DocumentType, string>;
+  /** "in the <document>", for sentences that say where something is or is not. */
+  docIn: Record<DocumentType, string>;
+  metric: Record<Metric, string>;
+  role: Record<Role, string>;
+  particular: Record<string, string>;
+  /** One part of a CMR particular, for when only that part is missing. */
+  cmrField: Record<CmrPart, string>;
+  /** Month names for dates written "5 October 2026"; null where dates are written 05.10.2026. */
+  months: readonly string[] | null;
+  /** Value lists name the document with docIn („ინვოისში 100, CMR-ში 90“) rather than doc ("invoice 100, CMR 90"). */
+  listIn: boolean;
+  /** Why an amount in words could not be read; "{word}" is the word or phrase concerned. */
+  reason: Record<WordsErrorCode, string>;
+  documentCount: PluralForms;
+  total: string;
+  line: string;
+}
+
+export const VOCAB: Record<ReportLanguage, Vocab> = {
+  en: {
+    number: { group: ",", decimal: "." },
+    kg: "kg",
+    doc: { commercial_invoice: "invoice", packing_list: "packing list", cmr: "CMR", contract: "contract", other: "document" },
+    docIn: { commercial_invoice: "in the invoice", packing_list: "in the packing list", cmr: "in the CMR", contract: "in the contract", other: "in the document" },
+    metric: { quantity: "quantity", packages: "packages", netWeightKg: "net weight, kg", grossWeightKg: "gross weight, kg", volumeM3: "volume, m³" },
+    role: { seller: "Seller", buyer: "Buyer", consignee: "Consignee" },
+    particular: {
+      a: "date and place the CMR was made out",
+      b: "name and address of the sender",
+      c: "name and address of the carrier",
+      d: "place and date of taking over, place of delivery",
+      e: "name and address of the consignee",
+      f: "description of the goods and method of packing",
+      g: "number of packages, marks and numbers",
+      h: "gross weight",
+      i: "carriage charges",
+      j: "instructions for customs",
+      k: "statement that the CMR Convention applies",
+    },
+    cmrField: {
+      date: "date the CMR was made out",
+      placeOfIssue: "place the CMR was made out",
+      "sender.name": "name of the sender",
+      "sender.address": "address of the sender",
+      "carrier.name": "name of the carrier",
+      "carrier.address": "address of the carrier",
+      placeOfTakingOver: "place of taking over",
+      dateOfTakingOver: "date of taking over",
+      placeOfDelivery: "place of delivery",
+      "consignee.name": "name of the consignee",
+      "consignee.address": "address of the consignee",
+      "goods.description": "description of the goods",
+      "goods.packingMethod": "method of packing",
+      totalPackages: "number of packages",
+      "goods.marksAndNumbers": "marks and numbers",
+    },
+    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    listIn: false,
+    reason: {
+      EMPTY: "no amount found",
+      UNKNOWN_WORD: "unknown word \"{word}\"",
+      INVALID_SEQUENCE: "\"{word}\" is not a valid number",
+      AMBIGUOUS: "the words can be read in more than one way",
+      MINOR_OUT_OF_RANGE: "the cents are 100 or more",
+    },
+    documentCount: { one: "document", few: "documents", many: "documents" },
+    total: "total",
+    line: "line",
+  },
+  ka: {
+    number: { group: "\u00a0", decimal: "," },
+    kg: "კგ",
+    doc: { commercial_invoice: "ინვოისი", packing_list: "შეფუთვის ფურცელი", cmr: "CMR", contract: "ხელშეკრულება", other: "დოკუმენტი" },
+    docIn: { commercial_invoice: "ინვოისში", packing_list: "შეფუთვის ფურცელში", cmr: "CMR-ში", contract: "ხელშეკრულებაში", other: "დოკუმენტში" },
+    metric: { quantity: "რაოდენობა", packages: "ადგილების რაოდენობა", netWeightKg: "ნეტო, კგ", grossWeightKg: "ბრუტო, კგ", volumeM3: "მოცულობა, მ³" },
+    role: { seller: "გამყიდველი", buyer: "მყიდველი", consignee: "მიმღები" },
+    particular: {
+      a: "შედგენის თარიღი და ადგილი",
+      b: "გამგზავნის სახელი და მისამართი",
+      c: "გადამზიდველის სახელი და მისამართი",
+      d: "ტვირთის მიღების ადგილი და თარიღი, მიწოდების ადგილი",
+      e: "მიმღების სახელი და მისამართი",
+      f: "საქონლის აღწერა და შეფუთვის სახე",
+      g: "ადგილების რაოდენობა, მარკირება და ნომრები",
+      h: "ბრუტო წონა",
+      i: "გადაზიდვის ხარჯები",
+      j: "მითითებები საბაჟოსთვის",
+      k: "ჩანაწერი, რომ გადაზიდვას CMR კონვენცია არეგულირებს",
+    },
+    cmrField: {
+      date: "შედგენის თარიღი",
+      placeOfIssue: "შედგენის ადგილი",
+      "sender.name": "გამგზავნის სახელი",
+      "sender.address": "გამგზავნის მისამართი",
+      "carrier.name": "გადამზიდველის სახელი",
+      "carrier.address": "გადამზიდველის მისამართი",
+      placeOfTakingOver: "ტვირთის მიღების ადგილი",
+      dateOfTakingOver: "ტვირთის მიღების თარიღი",
+      placeOfDelivery: "მიწოდების ადგილი",
+      "consignee.name": "მიმღების სახელი",
+      "consignee.address": "მიმღების მისამართი",
+      "goods.description": "საქონლის აღწერა",
+      "goods.packingMethod": "შეფუთვის სახე",
+      totalPackages: "ადგილების რაოდენობა",
+      "goods.marksAndNumbers": "მარკირება და ნომრები",
+    },
+    months: null,
+    listIn: true,
+    reason: {
+      EMPTY: "თანხა არ ჩანს",
+      UNKNOWN_WORD: "უცნობი სიტყვა „{word}“",
+      INVALID_SEQUENCE: "„{word}“ სწორი რიცხვი არ არის",
+      AMBIGUOUS: "ტექსტი ცალსახად არ იკითხება",
+      MINOR_OUT_OF_RANGE: "ცენტები (თეთრები) 100 ან მეტია",
+    },
+    documentCount: { one: "დოკუმენტი", few: "დოკუმენტი", many: "დოკუმენტი" },
+    total: "ჯამი",
+    line: "სტრიქონი",
+  },
+  ru: {
+    number: { group: "\u00a0", decimal: "," },
+    kg: "кг",
+    doc: { commercial_invoice: "инвойс", packing_list: "упаковочный лист", cmr: "CMR", contract: "договор", other: "документ" },
+    docIn: { commercial_invoice: "в инвойсе", packing_list: "в упаковочном листе", cmr: "в CMR", contract: "в договоре", other: "в документе" },
+    metric: { quantity: "количество", packages: "места", netWeightKg: "нетто, кг", grossWeightKg: "брутто, кг", volumeM3: "объём, м³" },
+    role: { seller: "Продавец", buyer: "Покупатель", consignee: "Грузополучатель" },
+    particular: {
+      a: "дата и место составления",
+      b: "наименование и адрес отправителя",
+      c: "наименование и адрес перевозчика",
+      d: "место и дата принятия груза, место доставки",
+      e: "наименование и адрес получателя",
+      f: "описание груза и вид упаковки",
+      g: "число мест, их маркировка и номера",
+      h: "вес брутто",
+      i: "расходы, связанные с перевозкой",
+      j: "указания для таможенных формальностей",
+      k: "указание, что перевозка регулируется Конвенцией CMR",
+    },
+    cmrField: {
+      date: "дата составления",
+      placeOfIssue: "место составления",
+      "sender.name": "наименование отправителя",
+      "sender.address": "адрес отправителя",
+      "carrier.name": "наименование перевозчика",
+      "carrier.address": "адрес перевозчика",
+      placeOfTakingOver: "место принятия груза",
+      dateOfTakingOver: "дата принятия груза",
+      placeOfDelivery: "место доставки",
+      "consignee.name": "наименование получателя",
+      "consignee.address": "адрес получателя",
+      "goods.description": "описание груза",
+      "goods.packingMethod": "вид упаковки",
+      totalPackages: "число мест",
+      "goods.marksAndNumbers": "маркировка и номера мест",
+    },
+    months: null,
+    listIn: true,
+    reason: {
+      EMPTY: "сумма не найдена",
+      UNKNOWN_WORD: "неизвестное слово «{word}»",
+      INVALID_SEQUENCE: "«{word}» — недопустимое число",
+      AMBIGUOUS: "текст можно прочитать по-разному",
+      MINOR_OUT_OF_RANGE: "центов (копеек) 100 или больше",
+    },
+    documentCount: { one: "документ", few: "документа", many: "документов" },
+    total: "итого",
+    line: "строка",
+  },
+  tr: {
+    number: { group: ".", decimal: "," },
+    kg: "kg",
+    doc: { commercial_invoice: "fatura", packing_list: "çeki listesi", cmr: "CMR", contract: "sözleşme", other: "belge" },
+    docIn: { commercial_invoice: "faturada", packing_list: "çeki listesinde", cmr: "CMR'de", contract: "sözleşmede", other: "belgede" },
+    metric: { quantity: "miktar", packages: "kap", netWeightKg: "net, kg", grossWeightKg: "brüt, kg", volumeM3: "hacim, m³" },
+    role: { seller: "Satıcı", buyer: "Alıcı", consignee: "Alıcı (teslim alan)" },
+    particular: {
+      a: "düzenlenme tarihi ve yeri",
+      b: "göndericinin adı ve adresi",
+      c: "taşıyıcının adı ve adresi",
+      d: "yükleme yeri ve tarihi, teslim yeri",
+      e: "alıcının adı ve adresi",
+      f: "eşyanın tanımı ve ambalaj şekli",
+      g: "kap sayısı, marka ve numaraları",
+      h: "brüt ağırlık",
+      i: "taşıma masrafları",
+      j: "gümrük işlemleri için talimatlar",
+      k: "taşımanın CMR Sözleşmesine tabi olduğu kaydı",
+    },
+    cmrField: {
+      date: "düzenlenme tarihi",
+      placeOfIssue: "düzenlenme yeri",
+      "sender.name": "göndericinin adı",
+      "sender.address": "göndericinin adresi",
+      "carrier.name": "taşıyıcının adı",
+      "carrier.address": "taşıyıcının adresi",
+      placeOfTakingOver: "yükleme yeri",
+      dateOfTakingOver: "yükleme tarihi",
+      placeOfDelivery: "teslim yeri",
+      "consignee.name": "alıcının adı",
+      "consignee.address": "alıcının adresi",
+      "goods.description": "eşyanın tanımı",
+      "goods.packingMethod": "ambalaj şekli",
+      totalPackages: "kap sayısı",
+      "goods.marksAndNumbers": "marka ve numaralar",
+    },
+    months: null,
+    listIn: true,
+    reason: {
+      EMPTY: "tutar bulunamadı",
+      UNKNOWN_WORD: "bilinmeyen kelime \"{word}\"",
+      INVALID_SEQUENCE: "\"{word}\" geçerli bir sayı değil",
+      AMBIGUOUS: "ifade birden fazla şekilde okunabiliyor",
+      MINOR_OUT_OF_RANGE: "kuruş (sent) kısmı 100 veya daha fazla",
+    },
+    documentCount: { one: "belge", few: "belge", many: "belge" },
+    total: "toplam",
+    line: "satır",
+  },
+};
+
+export const MESSAGES = {
+  en: {
+    "AMT-01.mismatch": "Amount in words reads {wordsAmount}, but the amount in figures is {amount}.",
+    "AMT-01.currency": "Amount in words is in {wordsCurrency}, but the document currency is {currency}.",
+    "AMT-01.unreadable": "Amount in words could not be read: {reason}.",
+    "SUM-01.line": "Line {line}: {quantity} × {unitPrice} = {expected}, but the line total is {found}.",
+    "SUM-02.subtotal": "Line totals add up to {expected}, but the subtotal is {found}.",
+    "SUM-02.total": "Expected total {expected} ({formula}), but the invoice total is {found}.",
+    "SUM-03.total": "{document}: lines add up to {expected} ({metric}), but the stated total is {found}.",
+    "CUR-01.mismatch": "Documents use different currencies: {currencies}.",
+    "QTY-01.quantity": "Quantity differs: invoice {invoice}, packing list {packingList}.",
+    "QTY-01.line": "Item {model}: invoice quantity {invoice}, packing list quantity {packingList}.",
+    "QTY-01.missing-line": "Item {model} is {presentIn} but not {missingIn}.",
+    "QTY-01.packages": "Number of packages differs: {values}.",
+    "WGT-01.gross-below-net": "{where}: gross weight {gross} kg is less than net weight {net} kg.",
+    "WGT-02.gross": "Gross weight differs: {values}.",
+    "WGT-02.net": "Net weight differs: {values}.",
+    "REF-01.invoice-number": "Packing list refers to invoice {found}, but the invoice number is {expected}.",
+    "REF-01.invoice-date": "Packing list gives invoice date {found}, but the invoice is dated {expected}.",
+    "REF-01.contract-number": "Invoice refers to contract {found}, but the contract number is {expected}.",
+    "REF-01.contract-date": "Invoice gives contract date {found}, but the contract is dated {expected}.",
+    "REF-01.cmr-missing-document": "The CMR's attached documents do not list the {document} {number}.",
+    "DATE-01.contract-after-invoice": "Contract date {contract} is after the invoice date {invoice}.",
+    "DATE-01.invoice-after-shipment": "Invoice date {invoice} is after the goods were taken over on {shipment}.",
+    "PTY-01.name": "{role} differs: \"{a}\" ({aDocument}) and \"{b}\" ({bDocument}).",
+    "INC-01.mismatch": "Incoterms differ: {codes}.",
+    "INC-01.unknown": "\"{code}\" is not an Incoterms 2020 rule.",
+    "INC-02.sea-term-road": "{code} is a sea and inland waterway rule, but the goods travel by road under a CMR.",
+    "INC-03.no-insurance": "Under {code} the seller insures the goods, but the documents show neither an insurance policy nor an insurance charge.",
+    "CMR-01.missing": "CMR is missing Art. 6(1)({item}): {particular}.",
+    "DOC-01.missing": "Missing document: {document}.",
+    "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one.",
+  },
+  ka: {
+    "AMT-01.mismatch": "სიტყვიერად წერია {wordsAmount}, ციფრებით კი {amount}.",
+    "AMT-01.currency": "სიტყვიერად თანხა {wordsCurrency}-ში წერია, დოკუმენტის ვალუტა კი {currency}-ია.",
+    "AMT-01.unreadable": "სიტყვიერი თანხა ვერ იკითხება: {reason}.",
+    "SUM-01.line": "სტრიქონი {line}: {quantity} × {unitPrice} = {expected}, სტრიქონის ჯამად კი წერია {found}.",
+    "SUM-02.subtotal": "სტრიქონების ჯამი {expected}-ია, საქონლის ღირებულებად კი წერია {found}.",
+    "SUM-02.total": "ჯამი {expected} უნდა იყოს ({formula}), ინვოისში კი წერია {found}.",
+    "SUM-03.total": "{document}: სტრიქონების ჯამი {expected}-ია ({metric}), ჯამში კი წერია {found}.",
+    "CUR-01.mismatch": "დოკუმენტებში სხვადასხვა ვალუტაა: {currencies}.",
+    "QTY-01.quantity": "რაოდენობა განსხვავდება: ინვოისში {invoice}, შეფუთვის ფურცელში {packingList}.",
+    "QTY-01.line": "პოზიცია {model}: ინვოისში {invoice}, შეფუთვის ფურცელში {packingList}.",
+    "QTY-01.missing-line": "პოზიცია {model} {presentIn} არის, {missingIn} კი არა.",
+    "QTY-01.packages": "ადგილების რაოდენობა განსხვავდება: {values}.",
+    "WGT-01.gross-below-net": "{where}: ბრუტო წონა {gross} კგ ნეტო წონაზე ({net} კგ) ნაკლებია.",
+    "WGT-02.gross": "ბრუტო წონა განსხვავდება: {values}.",
+    "WGT-02.net": "ნეტო წონა განსხვავდება: {values}.",
+    "REF-01.invoice-number": "შეფუთვის ფურცელში მითითებულია ინვოისი {found}, ინვოისის ნომერი კი {expected}-ია.",
+    "REF-01.invoice-date": "შეფუთვის ფურცელში ინვოისის თარიღად {found} წერია, ინვოისის თარიღი კი {expected}-ია.",
+    "REF-01.contract-number": "ინვოისში მითითებულია ხელშეკრულება {found}, ხელშეკრულების ნომერი კი {expected}-ია.",
+    "REF-01.contract-date": "ინვოისში ხელშეკრულების თარიღად {found} წერია, ხელშეკრულების თარიღი კი {expected}-ია.",
+    "REF-01.cmr-missing-document": "CMR-ის თანდართულ დოკუმენტებში {document} {number} არ არის მითითებული.",
+    "DATE-01.contract-after-invoice": "ხელშეკრულების თარიღი ({contract}) ინვოისის თარიღზე ({invoice}) გვიანია.",
+    "DATE-01.invoice-after-shipment": "ინვოისის თარიღი ({invoice}) ტვირთის მიღების თარიღზე ({shipment}) გვიანია.",
+    "PTY-01.name": "{role} განსხვავდება: „{a}“ ({aDocument}) და „{b}“ ({bDocument}).",
+    "INC-01.mismatch": "Incoterms პირობა განსხვავდება: {codes}.",
+    "INC-01.unknown": "„{code}“ Incoterms 2020-ის პირობა არ არის.",
+    "INC-02.sea-term-road": "{code} საზღვაო და შიდა წყლის ტრანსპორტის პირობაა, ტვირთი კი CMR-ით, საავტომობილო ტრანსპორტით გადაიზიდება.",
+    "INC-03.no-insurance": "{code} პირობით ტვირთს გამყიდველი აზღვევს, დოკუმენტებში კი არც დაზღვევის პოლისია და არც დაზღვევის თანხა.",
+    "CMR-01.missing": "CMR-ს აკლია მუხ. 6(1)({item}): {particular}.",
+    "DOC-01.missing": "აკლია დოკუმენტი: {document}.",
+    "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება.",
+  },
+  ru: {
+    "AMT-01.mismatch": "Прописью указано {wordsAmount}, а цифрами — {amount}.",
+    "AMT-01.currency": "Сумма прописью в валюте {wordsCurrency}, а валюта документа — {currency}.",
+    "AMT-01.unreadable": "Не удалось прочитать сумму прописью: {reason}.",
+    "SUM-01.line": "Строка {line}: {quantity} × {unitPrice} = {expected}, а в сумме строки указано {found}.",
+    "SUM-02.subtotal": "Сумма строк — {expected}, а стоимость товара указана {found}.",
+    "SUM-02.total": "Ожидаемый итог {expected} ({formula}), а в инвойсе указано {found}.",
+    "SUM-03.total": "{document}: сумма строк {expected} ({metric}), а в итоге указано {found}.",
+    "CUR-01.mismatch": "В документах разные валюты: {currencies}.",
+    "QTY-01.quantity": "Количество различается: в инвойсе {invoice}, в упаковочном листе {packingList}.",
+    "QTY-01.line": "Позиция {model}: в инвойсе {invoice}, в упаковочном листе {packingList}.",
+    "QTY-01.missing-line": "Позиция {model} есть {presentIn}, но её нет {missingIn}.",
+    "QTY-01.packages": "Число мест различается: {values}.",
+    "WGT-01.gross-below-net": "{where}: вес брутто {gross} кг меньше веса нетто {net} кг.",
+    "WGT-02.gross": "Вес брутто различается: {values}.",
+    "WGT-02.net": "Вес нетто различается: {values}.",
+    "REF-01.invoice-number": "Упаковочный лист ссылается на инвойс {found}, а номер инвойса — {expected}.",
+    "REF-01.invoice-date": "В упаковочном листе дата инвойса {found}, а инвойс датирован {expected}.",
+    "REF-01.contract-number": "Инвойс ссылается на договор {found}, а номер договора — {expected}.",
+    "REF-01.contract-date": "В инвойсе дата договора {found}, а договор датирован {expected}.",
+    "REF-01.cmr-missing-document": "Среди прилагаемых документов CMR не указан {document} {number}.",
+    "DATE-01.contract-after-invoice": "Дата договора ({contract}) позже даты инвойса ({invoice}).",
+    "DATE-01.invoice-after-shipment": "Дата инвойса ({invoice}) позже даты принятия груза ({shipment}).",
+    "PTY-01.name": "{role} различается: «{a}» ({aDocument}) и «{b}» ({bDocument}).",
+    "INC-01.mismatch": "Условия Инкотермс различаются: {codes}.",
+    "INC-01.unknown": "«{code}» не является правилом Инкотермс 2020.",
+    "INC-02.sea-term-road": "{code} — правило для морского и внутреннего водного транспорта, а груз идёт автомобилем по CMR.",
+    "INC-03.no-insurance": "По условию {code} груз страхует продавец, но в документах нет ни страхового полиса, ни суммы страхования.",
+    "CMR-01.missing": "В CMR нет реквизита ст. 6(1)({item}): {particular}.",
+    "DOC-01.missing": "Нет документа: {document}.",
+    "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый.",
+  },
+  tr: {
+    "AMT-01.mismatch": "Yazıyla {wordsAmount} yazıyor, rakamla tutar ise {amount}.",
+    "AMT-01.currency": "Yazıyla tutarın dövizi {wordsCurrency}, belgenin dövizi ise {currency}.",
+    "AMT-01.unreadable": "Yazıyla tutar okunamadı: {reason}.",
+    "SUM-01.line": "Satır {line}: {quantity} × {unitPrice} = {expected}, satır tutarında ise {found} yazıyor.",
+    "SUM-02.subtotal": "Satırların toplamı {expected}, mal bedelinde ise {found} yazıyor.",
+    "SUM-02.total": "Beklenen toplam {expected} ({formula}), faturada ise {found} yazıyor.",
+    "SUM-03.total": "{document}: satırların toplamı {expected} ({metric}), toplamda ise {found} yazıyor.",
+    "CUR-01.mismatch": "Belgelerde farklı dövizler var: {currencies}.",
+    "QTY-01.quantity": "Miktar farklı: faturada {invoice}, çeki listesinde {packingList}.",
+    "QTY-01.line": "Kalem {model}: faturada {invoice}, çeki listesinde {packingList}.",
+    "QTY-01.missing-line": "Kalem {model} {presentIn} var, {missingIn} yok.",
+    "QTY-01.packages": "Kap sayısı farklı: {values}.",
+    "WGT-01.gross-below-net": "{where}: brüt ağırlık {gross} kg, net ağırlıktan ({net} kg) az.",
+    "WGT-02.gross": "Brüt ağırlık farklı: {values}.",
+    "WGT-02.net": "Net ağırlık farklı: {values}.",
+    "REF-01.invoice-number": "Çeki listesi {found} numaralı faturaya atıf yapıyor, fatura numarası ise {expected}.",
+    "REF-01.invoice-date": "Çeki listesinde fatura tarihi {found}, fatura ise {expected} tarihli.",
+    "REF-01.contract-number": "Fatura {found} numaralı sözleşmeye atıf yapıyor, sözleşme numarası ise {expected}.",
+    "REF-01.contract-date": "Faturada sözleşme tarihi {found}, sözleşme ise {expected} tarihli.",
+    "REF-01.cmr-missing-document": "CMR'nin ekli belgeleri arasında {document} {number} yok.",
+    "DATE-01.contract-after-invoice": "Sözleşme tarihi ({contract}) fatura tarihinden ({invoice}) sonra.",
+    "DATE-01.invoice-after-shipment": "Fatura tarihi ({invoice}) yükleme tarihinden ({shipment}) sonra.",
+    "PTY-01.name": "{role} farklı: \"{a}\" ({aDocument}) ve \"{b}\" ({bDocument}).",
+    "INC-01.mismatch": "Incoterms farklı: {codes}.",
+    "INC-01.unknown": "\"{code}\" bir Incoterms 2020 kuralı değil.",
+    "INC-02.sea-term-road": "{code} deniz ve iç su yolu taşımacılığı kuralıdır, eşya ise CMR ile karayoluyla taşınıyor.",
+    "INC-03.no-insurance": "{code} teslim şeklinde sigortayı satıcı yaptırır, ancak belgeler arasında ne sigorta poliçesi ne de sigorta bedeli var.",
+    "CMR-01.missing": "CMR'de Madde 6(1)({item}) eksik: {particular}.",
+    "DOC-01.missing": "Eksik belge: {document}.",
+    "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır.",
+  },
+} as const satisfies Record<ReportLanguage, Record<string, string>>;
+
+export type MessageKey = keyof (typeof MESSAGES)["en"];
+
+// Every language must define exactly the English keys.
+const _sameKeys: Record<ReportLanguage, Record<MessageKey, string>> = MESSAGES;
+void _sameKeys;
+
+/** English texts, kept for callers that only need the source language. */
+export const MESSAGES_EN = MESSAGES.en;
+
+const DOC_PARAMS = new Set(["document", "present", "missing", "aDocument", "bDocument"]);
+
+/** Lookup that ignores inherited keys ("constructor", "toString"…). */
+function own<T>(record: Record<string, T>, key: string): T | undefined {
+  return Object.hasOwn(record, key) ? record[key] : undefined;
+}
+
+/** Decodes a list param: JSON [[documentType, value], …]. */
+function pairs(encoded: string): [string, string][] {
+  try {
+    const parsed: unknown = JSON.parse(encoded);
+    return Array.isArray(parsed) ? parsed.map((p) => [String(p?.[0] ?? ""), String(p?.[1] ?? "")]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Sentence case. Georgian has no letter case in running text (toUpperCase
+ * would turn Mkhedruli into Mtavruli), so it is left as is.
+ */
+function capitalize(text: string, language: ReportLanguage): string {
+  if (language === "ka" || text.length === 0) return text;
+  return text.charAt(0).toLocaleUpperCase(language) + text.slice(1);
+}
+
+const CANONICAL_NUMBER = /^(-?)([0-9]+)(?:\.([0-9]+))?$/;
+
+/**
+ * A canonical decimal the way the language writes a number: thousands in
+ * groups of three, the language's decimal sign, the printed decimals kept.
+ * "15694.00" is "15,694.00" in English, "15 694,00" in Georgian and Russian
+ * (a no-break space) and "15.694,00" in Turkish. Text that is not a
+ * canonical decimal comes back unchanged.
+ */
+export function formatNumber(value: string, language: ReportLanguage): string {
+  const match = CANONICAL_NUMBER.exec(value);
+  if (!match) return value;
+  const { group, decimal } = VOCAB[language].number;
+  const [, sign = "", whole = "", fraction] = match;
+  const grouped = whole.replace(/\B(?=(?:[0-9]{3})+$)/g, group);
+  return `${sign}${grouped}${fraction === undefined ? "" : `${decimal}${fraction}`}`;
+}
+
+/** A number param as it is shown, with its unit; text that is not a number is escaped like any document text. */
+function numberText(kind: NumberKind, value: string, unit: string | undefined, vocab: Vocab, language: ReportLanguage, escape: (text: string) => string): string {
+  if (kind === "formula") return escape(value).replace(/[0-9]+(?:\.[0-9]+)?/g, (number) => formatNumber(number, language));
+  if (!CANONICAL_NUMBER.test(value)) return escape(value);
+  const shown = formatNumber(value, language);
+  if (kind === "kg") return `${shown} ${vocab.kg}`;
+  return kind === "money" && unit ? `${shown} ${escape(unit)}` : shown;
+}
+
+function localize(name: string, value: string, vocab: Vocab, language: ReportLanguage, escape: (text: string) => string, kind?: NumberKind): string {
+  const docLabel = (code: string) => own<string>(vocab.doc, code) ?? code;
+  if (DOC_PARAMS.has(name)) return escape(docLabel(value));
+  if (name === "metric") return escape(own<string>(vocab.metric, value) ?? value);
+  if (name === "role") return escape(own<string>(vocab.role, value) ?? value);
+  if (name === "values") {
+    const listed = (doc: string) => (vocab.listIn ? own<string>(vocab.docIn, doc) : undefined) ?? docLabel(doc);
+    if (!kind) return escape(pairs(value).map(([doc, v]) => `${listed(doc)} ${v}`).join(", "));
+    return pairs(value).map(([doc, v]) => `${escape(listed(doc))} ${numberText(kind, v, undefined, vocab, language, escape)}`).join(", ");
+  }
+  if (name === "currencies" || name === "codes") return escape(pairs(value).map(([doc, v]) => `${v} (${docLabel(doc)})`).join(", "));
+  if (name === "where") {
+    const [doc = "", part, n] = value.split(":");
+    const capital = capitalize(docLabel(doc), language);
+    if (part === "total") return escape(`${capital}, ${vocab.total}`);
+    if (part === "line") return escape(`${capital}, ${vocab.line} ${n}`);
+    return escape(capital);
+  }
+  return escape(value);
+}
+
+/** A date the way the language writes it: "5 October 2026" in English, 05.10.2026 in Georgian, Russian and Turkish. */
+export function formatDate(iso: string, language: ReportLanguage): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match || !isIsoDate(iso)) return iso;
+  const [, year, month, day] = match;
+  const { months } = VOCAB[language];
+  return months ? `${Number(day)} ${months[Number(month) - 1]} ${year}` : `${day}.${month}.${year}`;
+}
+
+/**
+ * What a CMR-01 finding says is missing: the parts of the particular that are
+ * ("address of the carrier"), or the whole particular when all of it is, or
+ * when the fields are not ones this table knows.
+ */
+function particularText(item: string, fields: string | undefined, vocab: Vocab): string {
+  const whole = own(vocab.particular, item) ?? item;
+  const parts = own(CMR_PARTS, item);
+  if (!parts || fields === undefined) return whole;
+  // "goods[1].description" -> "goods.description": the line does not change the wording.
+  const missing = [...new Set(fields.split(", ").map((field) => field.replace(/\[[^\]]*\]/g, "")))];
+  const known = (field: string): field is CmrPart => (parts as readonly string[]).includes(field);
+  if (!missing.every(known) || parts.every((part) => missing.includes(part))) return whole;
+  return missing.map((field) => vocab.cmrField[field]).join(", ");
+}
+
+/** Which noun form follows the number `count`. */
+export function pluralCategory(count: number, language: ReportLanguage): keyof PluralForms {
+  if (language === "ru") {
+    const tens = count % 100;
+    const ones = count % 10;
+    if (ones === 1 && tens !== 11) return "one";
+    if (ones >= 2 && ones <= 4 && (tens < 12 || tens > 14)) return "few";
+    return "many";
+  }
+  return count === 1 ? "one" : "many";
+}
+
+/** "1 document", "3 документа", "5 документов". */
+export function countDocuments(count: number, language: ReportLanguage): string {
+  return `${count} ${VOCAB[language].documentCount[pluralCategory(count, language)]}`;
+}
+
+/**
+ * Renders a finding message in the given language. `escape` is applied to
+ * every value taken from the params (document text), not to the template.
+ * `units` is the finding's own: the currency of each money param the rule
+ * knows it for.
+ */
+export function formatMessage(
+  key: MessageKey,
+  params: Record<string, string>,
+  language: ReportLanguage = "en",
+  escape: (text: string) => string = (text) => text,
+  units: Readonly<Record<string, string>> = {},
+): string {
+  const vocab = VOCAB[language];
+  const values: Record<string, string> = {};
+  const dates = own(DATE_PARAMS, key) ?? [];
+  const numbers = own(NUMBER_PARAMS, key) ?? {};
+  for (const [name, value] of Object.entries(params)) {
+    const kind = own(numbers, name);
+    if (dates.includes(name)) values[name] = escape(formatDate(value, language));
+    else if (kind && name !== "values") values[name] = numberText(kind, value, own(units, name), vocab, language, escape);
+    else values[name] = localize(name, value, vocab, language, escape, kind);
+    if (DOC_PARAMS.has(name)) values[`${name}In`] = escape(own<string>(vocab.docIn, value) ?? value);
+  }
+  if (params.item) values.particular = particularText(params.item, params.fields, vocab);
+  if (params.reason !== undefined) {
+    const reason = own<string>(vocab.reason, params.reason) ?? values.reason!;
+    values.reason = reason.replace(/\{word\}/g, () => values.word ?? "");
+  }
+  if (params.count !== undefined && /^\d+$/.test(params.count)) {
+    values.docs = vocab.documentCount[pluralCategory(Number(params.count), language)];
+  }
+  const text = MESSAGES[language][key].replace(/\{(\w+)\}/g, (match, name: string) => values[name] ?? match);
+  // A localized label may open the message ("packing list: …").
+  return capitalize(text, language);
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "rule": "CMR-01",
+    "severity": "error",
+    "key": "CMR-01.missing",
+    "params": {
+      "item": "c",
+      "fields": "carrier.address"
+    }
+  },
+  {
+    "rule": "CMR-01",
+    "severity": "warning",
+    "key": "CMR-01.missing",
+    "params": {
+      "item": "j",
+      "fields": "customsInstructions"
+    }
+  }
+]

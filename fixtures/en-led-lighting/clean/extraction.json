@@ -1,0 +1,829 @@
+{
+  "schemaVersion": "2",
+  "documents": [
+    {
+      "type": "commercial_invoice",
+      "id": "invoice",
+      "sourceFile": "invoice.pdf",
+      "language": "en",
+      "number": {
+        "value": "BL-INV-26-0412",
+        "quote": "BL-INV-26-0412",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-14",
+        "quote": "14 Oct 2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "Baltic Lumen OÜ",
+          "quote": "Baltic Lumen OÜ",
+          "page": 1
+        },
+        "address": {
+          "value": "Tööstuse 14, 10416 Tallinn",
+          "quote": "Tööstuse 14, 10416 Tallinn",
+          "page": 1
+        },
+        "country": {
+          "value": "Estonia",
+          "quote": "Estonia",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "Kartli Retail LLC",
+          "quote": "Kartli Retail LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "quote": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "page": 1
+        },
+        "country": {
+          "value": "Georgia",
+          "quote": "Georgia",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "address": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        }
+      },
+      "contractRef": {
+        "number": {
+          "value": "BL-SC-26-031",
+          "quote": "BL-SC-26-031",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-10-02",
+          "quote": "02 Oct 2026",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "DAP",
+          "quote": "DAP",
+          "page": 1
+        },
+        "place": {
+          "value": "Tbilisi, Georgia",
+          "quote": "Tbilisi, Georgia",
+          "page": 1
+        },
+        "version": {
+          "value": "Incoterms 2020",
+          "quote": "Incoterms 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "USD",
+        "quote": "USD",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "LED ceiling panel 600×600 mm, 40 W",
+            "quote": "LED ceiling panel 600×600 mm, 40 W",
+            "page": 1
+          },
+          "model": {
+            "value": "LED-PNL-60",
+            "quote": "LED-PNL-60",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "400",
+            "quote": "400",
+            "page": 1
+          },
+          "unit": {
+            "value": "pcs",
+            "quote": "pcs",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "18.50",
+            "quote": "18.50",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "7400.00",
+            "quote": "7,400.00",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "LED tube T8 1200 mm, 18 W",
+            "quote": "LED tube T8 1200 mm, 18 W",
+            "page": 1
+          },
+          "model": {
+            "value": "LED-TUBE-120",
+            "quote": "LED-TUBE-120",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "1500",
+            "quote": "1,500",
+            "page": 1
+          },
+          "unit": {
+            "value": "pcs",
+            "quote": "pcs",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "2.90",
+            "quote": "2.90",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "4350.00",
+            "quote": "4,350.00",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "LED driver 40 W, constant current",
+            "quote": "LED driver 40 W, constant current",
+            "page": 1
+          },
+          "model": {
+            "value": "LED-DRV-40",
+            "quote": "LED-DRV-40",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "600",
+            "quote": "600",
+            "page": 1
+          },
+          "unit": {
+            "value": "pcs",
+            "quote": "pcs",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "6.25",
+            "quote": "6.25",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "3750.00",
+            "quote": "3,750.00",
+            "page": 1
+          }
+        }
+      ],
+      "subtotal": {
+        "value": "15500.00",
+        "quote": "USD 15,500.00",
+        "page": 1
+      },
+      "discount": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "discountPercent": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "freight": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "insurance": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "otherCharges": [],
+      "tax": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "total": {
+        "value": "15500.00",
+        "quote": "USD 15,500.00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "SAY US DOLLARS FIFTEEN THOUSAND FIVE HUNDRED AND CENTS 00 ONLY",
+        "quote": "SAY US DOLLARS FIFTEEN THOUSAND FIVE HUNDRED AND CENTS 00 ONLY",
+        "page": 1
+      },
+      "packages": {
+        "value": "82",
+        "quote": "82 cartons",
+        "page": 1
+      },
+      "netWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "grossWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "countryOfOrigin": {
+        "value": "Estonia",
+        "quote": "Estonia",
+        "page": 1
+      }
+    },
+    {
+      "type": "packing_list",
+      "id": "packing-list",
+      "sourceFile": "packing-list.pdf",
+      "language": "en",
+      "number": {
+        "value": "BL-PL-26-0412",
+        "quote": "BL-PL-26-0412",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-15",
+        "quote": "15 Oct 2026",
+        "page": 1
+      },
+      "shipper": {
+        "name": {
+          "value": "Baltic Lumen OÜ",
+          "quote": "Baltic Lumen OÜ",
+          "page": 1
+        },
+        "address": {
+          "value": "Tööstuse 14, 10416 Tallinn",
+          "quote": "Tööstuse 14, 10416 Tallinn",
+          "page": 1
+        },
+        "country": {
+          "value": "Estonia",
+          "quote": "Estonia",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": "Kartli Retail LLC",
+          "quote": "Kartli Retail LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "quote": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "page": 1
+        },
+        "country": {
+          "value": "Georgia",
+          "quote": "Georgia",
+          "page": 1
+        }
+      },
+      "invoiceRef": {
+        "number": {
+          "value": "BL-INV-26-0412",
+          "quote": "BL-INV-26-0412",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-10-14",
+          "quote": "14 Oct 2026",
+          "page": 1
+        }
+      },
+      "packingMethod": {
+        "value": "cartons",
+        "quote": "cartons",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "LED ceiling panel 600×600 mm, 40 W",
+            "quote": "LED ceiling panel 600×600 mm, 40 W",
+            "page": 1
+          },
+          "model": {
+            "value": "LED-PNL-60",
+            "quote": "LED-PNL-60",
+            "page": 1
+          },
+          "quantity": {
+            "value": "400",
+            "quote": "400",
+            "page": 1
+          },
+          "unit": {
+            "value": "pcs",
+            "quote": "pcs",
+            "page": 1
+          },
+          "packages": {
+            "value": "40",
+            "quote": "40",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "320",
+            "quote": "320",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "368",
+            "quote": "368",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "2.4",
+            "quote": "2.4",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "LED tube T8 1200 mm, 18 W",
+            "quote": "LED tube T8 1200 mm, 18 W",
+            "page": 1
+          },
+          "model": {
+            "value": "LED-TUBE-120",
+            "quote": "LED-TUBE-120",
+            "page": 1
+          },
+          "quantity": {
+            "value": "1500",
+            "quote": "1,500",
+            "page": 1
+          },
+          "unit": {
+            "value": "pcs",
+            "quote": "pcs",
+            "page": 1
+          },
+          "packages": {
+            "value": "30",
+            "quote": "30",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "255",
+            "quote": "255",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "285",
+            "quote": "285",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "1.2",
+            "quote": "1.2",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "LED driver 40 W, constant current",
+            "quote": "LED driver 40 W, constant current",
+            "page": 1
+          },
+          "model": {
+            "value": "LED-DRV-40",
+            "quote": "LED-DRV-40",
+            "page": 1
+          },
+          "quantity": {
+            "value": "600",
+            "quote": "600",
+            "page": 1
+          },
+          "unit": {
+            "value": "pcs",
+            "quote": "pcs",
+            "page": 1
+          },
+          "packages": {
+            "value": "12",
+            "quote": "12",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "120",
+            "quote": "120",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "132",
+            "quote": "132",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "0.3",
+            "quote": "0.3",
+            "page": 1
+          }
+        }
+      ],
+      "totalQuantity": {
+        "value": "2500",
+        "quote": "2,500",
+        "page": 1
+      },
+      "totalPackages": {
+        "value": "82",
+        "quote": "82",
+        "page": 1
+      },
+      "totalNetWeightKg": {
+        "value": "695",
+        "quote": "695",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "785",
+        "quote": "785",
+        "page": 1
+      },
+      "totalVolumeM3": {
+        "value": "3.9",
+        "quote": "3.9",
+        "page": 1
+      }
+    },
+    {
+      "type": "cmr",
+      "id": "cmr",
+      "sourceFile": "cmr.pdf",
+      "language": "en",
+      "number": {
+        "value": "VCL-0915226",
+        "quote": "VCL-0915226",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-16",
+        "quote": "16 Oct 2026",
+        "page": 1
+      },
+      "placeOfIssue": {
+        "value": "Tallinn",
+        "quote": "Tallinn",
+        "page": 1
+      },
+      "sender": {
+        "name": {
+          "value": "Baltic Lumen OÜ",
+          "quote": "Baltic Lumen OÜ",
+          "page": 1
+        },
+        "address": {
+          "value": "Tööstuse 14, 10416 Tallinn",
+          "quote": "Tööstuse 14, 10416 Tallinn",
+          "page": 1
+        },
+        "country": {
+          "value": "Estonia",
+          "quote": "Estonia",
+          "page": 1
+        }
+      },
+      "carrier": {
+        "name": {
+          "value": "Via Caucasus Logistics LLC",
+          "quote": "Via Caucasus Logistics LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "5 Airport Road, 4600 Kutaisi",
+          "quote": "5 Airport Road, 4600 Kutaisi",
+          "page": 1
+        },
+        "country": {
+          "value": "Georgia",
+          "quote": "Georgia",
+          "page": 1
+        }
+      },
+      "placeOfTakingOver": {
+        "value": "Tööstuse 14, Tallinn, Estonia",
+        "quote": "Tööstuse 14, Tallinn, Estonia",
+        "page": 1
+      },
+      "dateOfTakingOver": {
+        "value": "2026-10-16",
+        "quote": "16 Oct 2026",
+        "page": 1
+      },
+      "placeOfDelivery": {
+        "value": "12 Aghmashenebeli Ave, Tbilisi, Georgia",
+        "quote": "12 Aghmashenebeli Ave, Tbilisi, Georgia",
+        "page": 1
+      },
+      "consignee": {
+        "name": {
+          "value": "Kartli Retail LLC",
+          "quote": "Kartli Retail LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "quote": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "page": 1
+        },
+        "country": {
+          "value": "Georgia",
+          "quote": "Georgia",
+          "page": 1
+        }
+      },
+      "goods": [
+        {
+          "marksAndNumbers": {
+            "value": "BL/LED-PNL-60/1-40",
+            "quote": "BL/LED-PNL-60/1-40",
+            "page": 1
+          },
+          "packages": {
+            "value": "40",
+            "quote": "40",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "cartons",
+            "quote": "cartons",
+            "page": 1
+          },
+          "description": {
+            "value": "LED ceiling panel 600×600 mm, 40 W",
+            "quote": "LED ceiling panel 600×600 mm, 40 W",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "368",
+            "quote": "368",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "2.4",
+            "quote": "2.4",
+            "page": 1
+          }
+        },
+        {
+          "marksAndNumbers": {
+            "value": "BL/LED-TUBE-120/41-70",
+            "quote": "BL/LED-TUBE-120/41-70",
+            "page": 1
+          },
+          "packages": {
+            "value": "30",
+            "quote": "30",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "cartons",
+            "quote": "cartons",
+            "page": 1
+          },
+          "description": {
+            "value": "LED tube T8 1200 mm, 18 W",
+            "quote": "LED tube T8 1200 mm, 18 W",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "285",
+            "quote": "285",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "1.2",
+            "quote": "1.2",
+            "page": 1
+          }
+        },
+        {
+          "marksAndNumbers": {
+            "value": "BL/LED-DRV-40/71-82",
+            "quote": "BL/LED-DRV-40/71-82",
+            "page": 1
+          },
+          "packages": {
+            "value": "12",
+            "quote": "12",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "cartons",
+            "quote": "cartons",
+            "page": 1
+          },
+          "description": {
+            "value": "LED driver 40 W, constant current",
+            "quote": "LED driver 40 W, constant current",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "132",
+            "quote": "132",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "0.3",
+            "quote": "0.3",
+            "page": 1
+          }
+        }
+      ],
+      "dangerousGoods": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "totalPackages": {
+        "value": "82",
+        "quote": "82",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "785",
+        "quote": "785",
+        "page": 1
+      },
+      "carriageCharges": {
+        "value": "Freight prepaid by sender (DAP)",
+        "quote": "Freight prepaid by sender (DAP)",
+        "page": 1
+      },
+      "customsInstructions": {
+        "value": "Export clearance in Tallinn; import clearance in Tbilisi",
+        "quote": "Export clearance in Tallinn; import clearance in Tbilisi",
+        "page": 1
+      },
+      "convention": {
+        "value": "This carriage is subject, notwithstanding any clause to the contrary, to the Convention on the Contract for the International Carriage of Goods by Road (CMR).",
+        "quote": "This carriage is subject, notwithstanding any clause to the contrary, to the Convention on the Contract for the International Carriage of Goods by Road (CMR).",
+        "page": 1
+      },
+      "attachedDocuments": [
+        {
+          "value": "Commercial invoice BL-INV-26-0412",
+          "quote": "Commercial invoice BL-INV-26-0412",
+          "page": 1
+        },
+        {
+          "value": "Packing list BL-PL-26-0412",
+          "quote": "Packing list BL-PL-26-0412",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "type": "contract",
+      "id": "contract",
+      "sourceFile": "contract.pdf",
+      "language": "en",
+      "number": {
+        "value": "BL-SC-26-031",
+        "quote": "BL-SC-26-031",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-02",
+        "quote": "02 Oct 2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "Baltic Lumen OÜ",
+          "quote": "Baltic Lumen OÜ",
+          "page": 1
+        },
+        "address": {
+          "value": "Tööstuse 14, 10416 Tallinn",
+          "quote": "Tööstuse 14, 10416 Tallinn",
+          "page": 1
+        },
+        "country": {
+          "value": "Estonia",
+          "quote": "Estonia",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "Kartli Retail LLC",
+          "quote": "Kartli Retail LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "quote": "12 Aghmashenebeli Ave, 0102 Tbilisi",
+          "page": 1
+        },
+        "country": {
+          "value": "Georgia",
+          "quote": "Georgia",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "DAP",
+          "quote": "DAP",
+          "page": 1
+        },
+        "place": {
+          "value": "Tbilisi, Georgia",
+          "quote": "Tbilisi, Georgia",
+          "page": 1
+        },
+        "version": {
+          "value": "Incoterms 2020",
+          "quote": "Incoterms 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "USD",
+        "quote": "USD",
+        "page": 1
+      },
+      "totalAmount": {
+        "value": "15500.00",
+        "quote": "USD 15,500.00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "SAY US DOLLARS FIFTEEN THOUSAND FIVE HUNDRED AND CENTS 00 ONLY",
+        "quote": "SAY US DOLLARS FIFTEEN THOUSAND FIVE HUNDRED AND CENTS 00 ONLY",
+        "page": 1
+      },
+      "goodsDescription": {
+        "value": "LED lighting products: ceiling panels, tubes and drivers",
+        "quote": "LED lighting products: ceiling panels, tubes and drivers",
+        "page": 1
+      }
+    }
+  ]
+}

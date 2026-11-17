@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "AMT-01",
+    "severity": "error",
+    "key": "AMT-01.currency",
+    "params": {
+      "wordsCurrency": "EUR",
+      "currency": "USD"
+    }
+  }
+]

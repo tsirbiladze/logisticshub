@@ -1,0 +1,956 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "2"
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/commercialInvoice"
+          },
+          {
+            "$ref": "#/$defs/packingList"
+          },
+          {
+            "$ref": "#/$defs/cmr"
+          },
+          {
+            "$ref": "#/$defs/contract"
+          },
+          {
+            "$ref": "#/$defs/otherDocument"
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "documents"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "commercialInvoice": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "commercial_invoice"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique id of this document within the set: 'invoice', 'packing-list', 'cmr', 'contract', or a short name for another document; 'invoice-2' for a second document of a type."
+        },
+        "sourceFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of the file the document came from, without folders. For a document spread over several image files, the first file."
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "tr",
+                "ka",
+                "other"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Main language of the document text. An amount in words is read in it, and a month name in a date is checked in it or in English."
+        },
+        "number": {
+          "description": "The document's own number, e.g. invoice number or CMR number.",
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "description": "The document's issue date.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "seller": {
+          "$ref": "#/$defs/party"
+        },
+        "buyer": {
+          "$ref": "#/$defs/party"
+        },
+        "consignee": {
+          "description": "Delivery party, only when one is printed apart from the buyer; otherwise all values null.",
+          "$ref": "#/$defs/party"
+        },
+        "contractRef": {
+          "description": "Contract or order the invoice refers to.",
+          "$ref": "#/$defs/reference"
+        },
+        "incoterm": {
+          "$ref": "#/$defs/incoterm"
+        },
+        "currency": {
+          "$ref": "#/$defs/citedCurrency"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/invoiceLine"
+          }
+        },
+        "subtotal": {
+          "description": "Goods value before discounts and charges. Null when the invoice prints one total only.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "discount": {
+          "description": "Discount taken off on this invoice, as an amount of money: 'Discount 5%: 775.00' becomes '775.00'. Never a percentage. Null when no amount is printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "discountPercent": {
+          "description": "Discount rate in percent, when one is printed: '5%' becomes '5'. Null if none. When only the rate is printed (no amount), fill this and leave discount null.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "freight": {
+          "description": "Freight charged ON this invoice. Null if freight is only mentioned as paid separately.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "insurance": {
+          "description": "Insurance charged ON this invoice.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "otherCharges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/citedDecimal"
+          },
+          "description": "Every other amount this invoice adds between the subtotal and the total (packing, handling, bank charges, a second tax), one entry per printed amount. An amount it takes off (an advance already paid) is negative. Quote the amount with the currency printed next to it ('USD 120.00'). [] if none."
+        },
+        "tax": {
+          "description": "Tax added on this invoice (VAT, GST, sales tax), as an amount: 'VAT 18%: 2,790.00' becomes '2790.00'. Quote the amount without the rate, with the currency printed next to it ('EUR 2,394.00'). Null when the prices already include the tax or only a rate is printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "total": {
+          "description": "Final amount payable on this invoice.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalInWords": {
+          "$ref": "#/$defs/amountInWords"
+        },
+        "packages": {
+          "description": "Number of packages stated on the invoice. Keep a packing word printed next to it in the quote: '82 cartons'.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "netWeightKg": {
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "grossWeightKg": {
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "countryOfOrigin": {
+          "$ref": "#/$defs/citedText"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "sourceFile",
+        "language",
+        "number",
+        "date",
+        "seller",
+        "buyer",
+        "consignee",
+        "contractRef",
+        "incoterm",
+        "currency",
+        "lines",
+        "subtotal",
+        "discount",
+        "discountPercent",
+        "freight",
+        "insurance",
+        "otherCharges",
+        "tax",
+        "total",
+        "totalInWords",
+        "packages",
+        "netWeightKg",
+        "grossWeightKg",
+        "countryOfOrigin"
+      ],
+      "additionalProperties": false
+    },
+    "textValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The value as written in the document, on one line, or null if absent."
+    },
+    "quote": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Exact text copied from the document, character for character (same spelling, digits, separators and script): the text of this field only, without its label, wrapped lines joined with one space. Null when the value is null."
+    },
+    "page": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Page of the source file where the quote is printed, counted from 1. Null when the value is null."
+    },
+    "citedText": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/textValue"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        }
+      },
+      "required": [
+        "value",
+        "quote",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "dateValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Date as YYYY-MM-DD. '18.09.2026' becomes '2026-09-18'; day first unless the document's own dates show the month first. Null if absent."
+    },
+    "citedDate": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/dateValue"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        }
+      },
+      "required": [
+        "value",
+        "quote",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "party": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Company or person name, with its legal form.",
+          "$ref": "#/$defs/citedText"
+        },
+        "address": {
+          "description": "Street, building, postal code and city, without the country. Null when only a name and a country are printed.",
+          "$ref": "#/$defs/citedText"
+        },
+        "country": {
+          "description": "Country as written in the document, also when it is the last word of the address.",
+          "$ref": "#/$defs/citedText"
+        }
+      },
+      "required": [
+        "name",
+        "address",
+        "country"
+      ],
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "$ref": "#/$defs/citedDate"
+        }
+      },
+      "required": [
+        "number",
+        "date"
+      ],
+      "additionalProperties": false
+    },
+    "incoterm": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Incoterms rule code as written, e.g. 'FCA', 'CIF', 'EXW'.",
+          "$ref": "#/$defs/citedText"
+        },
+        "place": {
+          "description": "Named place after the rule, e.g. 'Kayseri, Türkiye'.",
+          "$ref": "#/$defs/citedText"
+        },
+        "version": {
+          "description": "Edition if stated, e.g. 'Incoterms 2020'.",
+          "$ref": "#/$defs/citedText"
+        }
+      },
+      "required": [
+        "code",
+        "place",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "citedCurrency": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/currencyValue"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        }
+      },
+      "required": [
+        "value",
+        "quote",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "currencyValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "ISO 4217 code: 'EUR', 'USD', 'GEL', 'TRY', 'RUB'… '€' becomes 'EUR', 'ლარი' becomes 'GEL'. Null if absent."
+    },
+    "invoiceLine": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "$ref": "#/$defs/citedText"
+        },
+        "model": {
+          "description": "Article, model or SKU code. Null when the document prints none.",
+          "$ref": "#/$defs/citedText"
+        },
+        "hsCode": {
+          "description": "HS / tariff code exactly as printed, if present.",
+          "$ref": "#/$defs/citedText"
+        },
+        "quantity": {
+          "description": "Number of goods units. Quote the number alone ('400'); the unit goes in unit.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "unit": {
+          "description": "Unit as written, e.g. 'pcs', 'ცალი', 'adet', 'шт'.",
+          "$ref": "#/$defs/citedText"
+        },
+        "unitPrice": {
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "lineTotal": {
+          "$ref": "#/$defs/citedDecimal"
+        }
+      },
+      "required": [
+        "description",
+        "model",
+        "hsCode",
+        "quantity",
+        "unit",
+        "unitPrice",
+        "lineTotal"
+      ],
+      "additionalProperties": false
+    },
+    "decimalValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Canonical decimal: optional '-', digits, optional '.' and digits. No thousands separators, no currency, no units. '13,300.00' becomes '13300.00'; '1 880,5' becomes '1880.5'. The decimal sign is the one the same document's other numbers show: next to '9.684,00', '16.560' becomes '16560'. Keep the printed decimals. Never a sum or a conversion of your own. Null if absent."
+    },
+    "citedDecimal": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/decimalValue"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        }
+      },
+      "required": [
+        "value",
+        "quote",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "amountInWords": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/wordsValue"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "page": {
+          "$ref": "#/$defs/page"
+        }
+      },
+      "required": [
+        "value",
+        "quote",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "wordsValue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The full amount-in-words phrase, copied exactly, including currency words. Null if absent."
+    },
+    "packingList": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "packing_list"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique id of this document within the set: 'invoice', 'packing-list', 'cmr', 'contract', or a short name for another document; 'invoice-2' for a second document of a type."
+        },
+        "sourceFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of the file the document came from, without folders. For a document spread over several image files, the first file."
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "tr",
+                "ka",
+                "other"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Main language of the document text. An amount in words is read in it, and a month name in a date is checked in it or in English."
+        },
+        "number": {
+          "description": "The document's own number, e.g. invoice number or CMR number.",
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "description": "The document's issue date.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "shipper": {
+          "$ref": "#/$defs/party"
+        },
+        "consignee": {
+          "$ref": "#/$defs/party"
+        },
+        "invoiceRef": {
+          "description": "Invoice this packing list belongs to.",
+          "$ref": "#/$defs/reference"
+        },
+        "packingMethod": {
+          "description": "Packing method printed once for the whole list, e.g. 'Packing: cartons' becomes 'cartons'. Null if none.",
+          "$ref": "#/$defs/citedText"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/packingListLine"
+          }
+        },
+        "totalQuantity": {
+          "description": "Total quantity as printed. Null when the list prints no total; never a sum of the lines.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalPackages": {
+          "description": "Total number of packages as printed, with a packing word printed next to it in the quote ('82 cartons'). Null when no total is printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalNetWeightKg": {
+          "description": "Total net weight as printed. Null when no total is printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalGrossWeightKg": {
+          "description": "Total gross weight as printed. Null when no total is printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalVolumeM3": {
+          "description": "Total volume as printed. Null when no total is printed.",
+          "$ref": "#/$defs/citedDecimal"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "sourceFile",
+        "language",
+        "number",
+        "date",
+        "shipper",
+        "consignee",
+        "invoiceRef",
+        "packingMethod",
+        "lines",
+        "totalQuantity",
+        "totalPackages",
+        "totalNetWeightKg",
+        "totalGrossWeightKg",
+        "totalVolumeM3"
+      ],
+      "additionalProperties": false
+    },
+    "packingListLine": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "$ref": "#/$defs/citedText"
+        },
+        "model": {
+          "$ref": "#/$defs/citedText"
+        },
+        "quantity": {
+          "description": "Number of goods units. Quote the number alone; the unit goes in unit.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "unit": {
+          "$ref": "#/$defs/citedText"
+        },
+        "packages": {
+          "description": "Number of packages for this line. Quote the number alone when the line prints its packing method; that goes in packingMethod.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "packingMethod": {
+          "description": "Packing method printed for this line in its own cell, e.g. 'carton', 'pallet'. Null if none.",
+          "$ref": "#/$defs/citedText"
+        },
+        "netWeightKg": {
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "grossWeightKg": {
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "volumeM3": {
+          "$ref": "#/$defs/citedDecimal"
+        }
+      },
+      "required": [
+        "description",
+        "model",
+        "quantity",
+        "unit",
+        "packages",
+        "packingMethod",
+        "netWeightKg",
+        "grossWeightKg",
+        "volumeM3"
+      ],
+      "additionalProperties": false
+    },
+    "cmr": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "cmr"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique id of this document within the set: 'invoice', 'packing-list', 'cmr', 'contract', or a short name for another document; 'invoice-2' for a second document of a type."
+        },
+        "sourceFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of the file the document came from, without folders. For a document spread over several image files, the first file."
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "tr",
+                "ka",
+                "other"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Main language of the document text. An amount in words is read in it, and a month name in a date is checked in it or in English."
+        },
+        "number": {
+          "description": "The consignment note number, printed in the header.",
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "description": "(a) Date the CMR was made out (box 21). The date in the header has no field: take it only when box 21 is empty.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "placeOfIssue": {
+          "description": "(a) Place where the CMR was made out (box 21).",
+          "$ref": "#/$defs/citedText"
+        },
+        "sender": {
+          "description": "(b) Sender (box 1).",
+          "$ref": "#/$defs/party"
+        },
+        "carrier": {
+          "description": "(c) Carrier (box 16).",
+          "$ref": "#/$defs/party"
+        },
+        "placeOfTakingOver": {
+          "description": "(d) Place of taking over the goods (box 4).",
+          "$ref": "#/$defs/citedText"
+        },
+        "dateOfTakingOver": {
+          "description": "(d) Date of taking over the goods (box 4).",
+          "$ref": "#/$defs/citedDate"
+        },
+        "placeOfDelivery": {
+          "description": "(d) Place designated for delivery (box 3).",
+          "$ref": "#/$defs/citedText"
+        },
+        "consignee": {
+          "description": "(e) Consignee (box 2).",
+          "$ref": "#/$defs/party"
+        },
+        "goods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cmrGoodsLine"
+          },
+          "description": "(f)(g)(h) Goods lines (boxes 6-12)."
+        },
+        "dangerousGoods": {
+          "description": "(f) Dangerous goods description if any.",
+          "$ref": "#/$defs/citedText"
+        },
+        "totalPackages": {
+          "description": "(g) Total number of packages, when printed apart from the goods lines; otherwise null.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalGrossWeightKg": {
+          "description": "(h) Total gross weight, when printed apart from the goods lines; otherwise null.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "carriageCharges": {
+          "description": "(i) Charges relating to carriage, as written.",
+          "$ref": "#/$defs/citedText"
+        },
+        "customsInstructions": {
+          "description": "(j) Instructions for customs and other formalities.",
+          "$ref": "#/$defs/citedText"
+        },
+        "convention": {
+          "description": "(k) Statement that the carriage is subject to the CMR Convention; quote the whole sentence.",
+          "$ref": "#/$defs/citedText"
+        },
+        "attachedDocuments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/citedText"
+          },
+          "description": "Documents listed as attached (box 5), one text entry per document, as printed with its number, e.g. 'Invoice AOS-INV-2026-0918-01'."
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "sourceFile",
+        "language",
+        "number",
+        "date",
+        "placeOfIssue",
+        "sender",
+        "carrier",
+        "placeOfTakingOver",
+        "dateOfTakingOver",
+        "placeOfDelivery",
+        "consignee",
+        "goods",
+        "dangerousGoods",
+        "totalPackages",
+        "totalGrossWeightKg",
+        "carriageCharges",
+        "customsInstructions",
+        "convention",
+        "attachedDocuments"
+      ],
+      "additionalProperties": false
+    },
+    "cmrGoodsLine": {
+      "type": "object",
+      "properties": {
+        "marksAndNumbers": {
+          "$ref": "#/$defs/citedText"
+        },
+        "packages": {
+          "description": "Number of packages (box 7). Quote the number alone; the packing word goes in packingMethod.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "packingMethod": {
+          "description": "Method of packing (box 8), e.g. 'cartons', 'pallets', 'ყუთი'.",
+          "$ref": "#/$defs/citedText"
+        },
+        "description": {
+          "$ref": "#/$defs/citedText"
+        },
+        "grossWeightKg": {
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "volumeM3": {
+          "$ref": "#/$defs/citedDecimal"
+        }
+      },
+      "required": [
+        "marksAndNumbers",
+        "packages",
+        "packingMethod",
+        "description",
+        "grossWeightKg",
+        "volumeM3"
+      ],
+      "additionalProperties": false
+    },
+    "contract": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "contract"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique id of this document within the set: 'invoice', 'packing-list', 'cmr', 'contract', or a short name for another document; 'invoice-2' for a second document of a type."
+        },
+        "sourceFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of the file the document came from, without folders. For a document spread over several image files, the first file."
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "tr",
+                "ka",
+                "other"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Main language of the document text. An amount in words is read in it, and a month name in a date is checked in it or in English."
+        },
+        "number": {
+          "description": "The document's own number, e.g. invoice number or CMR number.",
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "description": "The document's issue date.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "seller": {
+          "$ref": "#/$defs/party"
+        },
+        "buyer": {
+          "$ref": "#/$defs/party"
+        },
+        "incoterm": {
+          "$ref": "#/$defs/incoterm"
+        },
+        "currency": {
+          "$ref": "#/$defs/citedCurrency"
+        },
+        "totalAmount": {
+          "description": "The contract value.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalInWords": {
+          "$ref": "#/$defs/amountInWords"
+        },
+        "goodsDescription": {
+          "description": "The goods as the contract names them, to the end of that sentence and without its heading, on one line.",
+          "$ref": "#/$defs/citedText"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "sourceFile",
+        "language",
+        "number",
+        "date",
+        "seller",
+        "buyer",
+        "incoterm",
+        "currency",
+        "totalAmount",
+        "totalInWords",
+        "goodsDescription"
+      ],
+      "additionalProperties": false
+    },
+    "otherDocument": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "other"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique id of this document within the set: 'invoice', 'packing-list', 'cmr', 'contract', or a short name for another document; 'invoice-2' for a second document of a type."
+        },
+        "sourceFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of the file the document came from, without folders. For a document spread over several image files, the first file."
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "tr",
+                "ka",
+                "other"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Main language of the document text. An amount in words is read in it, and a month name in a date is checked in it or in English."
+        },
+        "number": {
+          "description": "The document's own number, e.g. invoice number or CMR number.",
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "description": "The document's issue date.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "title": {
+          "description": "What the document is, as titled, e.g. 'Freight statement'.",
+          "$ref": "#/$defs/citedText"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "sourceFile",
+        "language",
+        "number",
+        "date",
+        "title"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "INC-02",
+    "severity": "warning",
+    "key": "INC-02.sea-term-road",
+    "params": {
+      "code": "FOB"
+    }
+  }
+]

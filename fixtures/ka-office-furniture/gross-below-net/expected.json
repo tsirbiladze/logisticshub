@@ -1,0 +1,20 @@
+[
+  {
+    "rule": "WGT-01",
+    "severity": "error",
+    "key": "WGT-01.gross-below-net",
+    "params": {
+      "where": "packing_list:line:2",
+      "net": "600",
+      "gross": "580"
+    }
+  },
+  {
+    "rule": "WGT-02",
+    "severity": "error",
+    "key": "WGT-02.gross",
+    "params": {
+      "values": "[[\"packing_list\",\"1780\"],[\"cmr\",\"1880\"]]"
+    }
+  }
+]

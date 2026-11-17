@@ -1,0 +1,23 @@
+[
+  {
+    "rule": "SUM-01",
+    "severity": "error",
+    "key": "SUM-01.line",
+    "params": {
+      "line": "2",
+      "quantity": "1500",
+      "unitPrice": "2.90",
+      "expected": "4350.00",
+      "found": "4530.00"
+    }
+  },
+  {
+    "rule": "SUM-02",
+    "severity": "error",
+    "key": "SUM-02.subtotal",
+    "params": {
+      "expected": "15680.00",
+      "found": "15500.00"
+    }
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "AMT-01",
+    "severity": "error",
+    "key": "AMT-01.mismatch",
+    "params": {
+      "words": "YALNIZ DOKUZBİNSEKİZYÜZSEKSENDÖRT AVRO SIFIR SENT",
+      "wordsAmount": "9884.00",
+      "amount": "9684.00"
+    }
+  }
+]

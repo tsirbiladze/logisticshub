@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "QTY-01",
+    "severity": "error",
+    "key": "QTY-01.line",
+    "params": {
+      "model": "AT-TWL-70",
+      "invoice": "2400",
+      "packingList": "2300"
+    }
+  }
+]

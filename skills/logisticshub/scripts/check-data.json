@@ -1,0 +1,2839 @@
+{
+  "version": "1.0.0",
+  "schemaVersion": "2",
+  "reportVersion": "1",
+  "languages": [
+    "en",
+    "ka",
+    "ru",
+    "tr"
+  ],
+  "ruleIds": [
+    "AMT-01",
+    "SUM-01",
+    "SUM-02",
+    "SUM-03",
+    "CUR-01",
+    "QTY-01",
+    "WGT-01",
+    "WGT-02",
+    "REF-01",
+    "DATE-01",
+    "PTY-01",
+    "INC-01",
+    "INC-02",
+    "INC-03",
+    "CMR-01",
+    "DOC-01"
+  ],
+  "ruleTitles": {
+    "en": {
+      "AMT-01": "Amount in words = amount in figures",
+      "SUM-01": "Quantity × price = line total",
+      "SUM-02": "Invoice totals",
+      "SUM-03": "Packing list and CMR totals",
+      "CUR-01": "One currency",
+      "QTY-01": "Quantities and packages",
+      "WGT-01": "Gross ≥ net",
+      "WGT-02": "Same weights on every document",
+      "REF-01": "Cross-references",
+      "DATE-01": "Date order",
+      "PTY-01": "Same parties",
+      "INC-01": "Incoterms rule",
+      "INC-02": "Incoterms and transport mode",
+      "INC-03": "Insurance under CIF/CIP",
+      "CMR-01": "CMR required particulars",
+      "DOC-01": "Complete document set"
+    },
+    "ka": {
+      "AMT-01": "თანხა სიტყვიერად = თანხა ციფრებით",
+      "SUM-01": "რაოდენობა × ფასი = სტრიქონის ჯამი",
+      "SUM-02": "ინვოისის ჯამები",
+      "SUM-03": "შეფუთვის ფურცლისა და CMR-ის ჯამები",
+      "CUR-01": "ერთი ვალუტა",
+      "QTY-01": "საქონლისა და ადგილების რაოდენობა",
+      "WGT-01": "ბრუტო ≥ ნეტო",
+      "WGT-02": "ერთნაირი წონა ყველა დოკუმენტში",
+      "REF-01": "მითითებები დოკუმენტებს შორის",
+      "DATE-01": "თარიღების თანმიმდევრობა",
+      "PTY-01": "ერთი და იგივე მხარეები",
+      "INC-01": "Incoterms პირობა",
+      "INC-02": "Incoterms და ტრანსპორტის სახე",
+      "INC-03": "დაზღვევა CIF/CIP პირობით",
+      "CMR-01": "CMR-ის სავალდებულო მონაცემები",
+      "DOC-01": "დოკუმენტების სრული ნაკრები"
+    },
+    "ru": {
+      "AMT-01": "Сумма прописью = сумма цифрами",
+      "SUM-01": "Количество × цена = сумма строки",
+      "SUM-02": "Итоги инвойса",
+      "SUM-03": "Итоги упаковочного листа и CMR",
+      "CUR-01": "Единая валюта",
+      "QTY-01": "Количество и места",
+      "WGT-01": "Брутто ≥ нетто",
+      "WGT-02": "Одинаковый вес во всех документах",
+      "REF-01": "Ссылки между документами",
+      "DATE-01": "Порядок дат",
+      "PTY-01": "Одни и те же стороны",
+      "INC-01": "Условие Инкотермс",
+      "INC-02": "Инкотермс и вид транспорта",
+      "INC-03": "Страхование при CIF/CIP",
+      "CMR-01": "Обязательные реквизиты CMR",
+      "DOC-01": "Полный комплект документов"
+    },
+    "tr": {
+      "AMT-01": "Yazıyla tutar = rakamla tutar",
+      "SUM-01": "Miktar × fiyat = satır tutarı",
+      "SUM-02": "Fatura toplamları",
+      "SUM-03": "Çeki listesi ve CMR toplamları",
+      "CUR-01": "Tek döviz",
+      "QTY-01": "Miktar ve kap sayısı",
+      "WGT-01": "Brüt ≥ net",
+      "WGT-02": "Tüm belgelerde aynı ağırlık",
+      "REF-01": "Belgeler arası referanslar",
+      "DATE-01": "Tarih sırası",
+      "PTY-01": "Aynı taraflar",
+      "INC-01": "Incoterms kuralı",
+      "INC-02": "Incoterms ve taşıma şekli",
+      "INC-03": "CIF/CIP'te sigorta",
+      "CMR-01": "CMR zorunlu bilgileri",
+      "DOC-01": "Eksiksiz belge seti"
+    }
+  },
+  "ruleChecks": {
+    "en": {
+      "AMT-01": "Read the amount in words on the document and compare it with the figures; one of the two has to be corrected.",
+      "SUM-01": "Recalculate this line of the invoice: the quantity, the unit price or the line total is wrong.",
+      "SUM-02": "Add the invoice up again: a line total, a charge, the subtotal or the total is wrong.",
+      "SUM-03": "Add the lines of the document up again: a line or the stated total is wrong.",
+      "CUR-01": "Find out which currency the parties agreed on and have the other document corrected.",
+      "QTY-01": "Compare with what was actually loaded: the quantity of each item and the number of packages must be the same on every document.",
+      "WGT-01": "Look at the weights on the document: gross weight includes the packing, so it cannot be less than net. The two numbers may have been swapped.",
+      "WGT-02": "Find out which weight is right (from the weighing, if the goods were weighed) and have the other documents corrected.",
+      "REF-01": "Look at the number and the date of the document that is referred to, and have the reference corrected.",
+      "DATE-01": "Check the dates on the documents: a contract is signed before its invoice is issued, and an invoice is usually issued by the day the goods are taken over.",
+      "PTY-01": "Find out whether both names belong to the same company; if not, one of the documents names the wrong party.",
+      "INC-01": "Find out which rule the parties agreed on and have it written as an Incoterms 2020 code on both documents.",
+      "INC-02": "Ask the parties whether they meant the rule for any mode of transport: FCA for FOB or FAS, CPT for CFR, CIP for CIF.",
+      "INC-03": "Ask the seller for the insurance policy or certificate, or find out where the insurance is charged.",
+      "CMR-01": "Have the missing particular entered in the CMR before the goods leave.",
+      "DOC-01": "Add the missing document and run the check again. Where there are several documents of one type, see whether the right one was compared."
+    },
+    "ka": {
+      "AMT-01": "წაიკითხე დოკუმენტში სიტყვიერად დაწერილი თანხა და ციფრებს შეადარე: ერთ-ერთი გასასწორებელია.",
+      "SUM-01": "ინვოისის ეს სტრიქონი თავიდან გადათვალე: რაოდენობა, ფასი ან სტრიქონის ჯამი არასწორია.",
+      "SUM-02": "ინვოისის თანხები თავიდან შეკრიბე: არასწორია რომელიმე სტრიქონის ჯამი, დამატებითი ხარჯი, საქონლის ღირებულება ან საბოლოო ჯამი.",
+      "SUM-03": "დოკუმენტის სტრიქონები თავიდან შეკრიბე: არასწორია რომელიმე სტრიქონი ან ჯამში ჩაწერილი რიცხვი.",
+      "CUR-01": "გაარკვიე, რომელ ვალუტაზე შეთანხმდნენ მხარეები, და მეორე დოკუმენტი გაასწორებინე.",
+      "QTY-01": "შეადარე ფაქტობრივად დატვირთულ საქონელს: თითოეული პოზიციის რაოდენობაც და ადგილების რაოდენობაც ყველა დოკუმენტში ერთნაირი უნდა იყოს.",
+      "WGT-01": "ნახე წონები დოკუმენტში: ბრუტო წონა შეფუთვასაც მოიცავს, ამიტომ ნეტოზე ნაკლები ვერ იქნება. შესაძლოა, ეს ორი რიცხვი ერთმანეთში აირია.",
+      "WGT-02": "გაარკვიე, რომელი წონაა სწორი (თუ ტვირთი აიწონა, აწონვის შედეგით), და დანარჩენი დოკუმენტები გაასწორებინე.",
+      "REF-01": "ნახე მითითებული დოკუმენტის ნომერი და თარიღი და მითითება გაასწორებინე.",
+      "DATE-01": "შეამოწმე თარიღები დოკუმენტებში: ხელშეკრულება ინვოისის გამოწერამდე იდება, ინვოისი კი, როგორც წესი, არაუგვიანეს ტვირთის მიღების დღისა გამოიწერება.",
+      "PTY-01": "გაარკვიე, ორივე სახელი ერთსა და იმავე კომპანიას ეკუთვნის თუ არა; თუ სხვა კომპანიაა, ერთ-ერთ დოკუმენტში მხარე არასწორად წერია.",
+      "INC-01": "გაარკვიე, რომელ პირობაზე შეთანხმდნენ მხარეები, და ორივე დოკუმენტში Incoterms 2020-ის კოდით ჩააწერინე.",
+      "INC-02": "ჰკითხე მხარეებს, ხომ არ გულისხმობდნენ ნებისმიერი ტრანსპორტისთვის განკუთვნილ პირობას: FOB-ის ან FAS-ის ნაცვლად FCA-ს, CFR-ის ნაცვლად CPT-ს, CIF-ის ნაცვლად CIP-ს.",
+      "INC-03": "გამყიდველს დაზღვევის პოლისი ან სერტიფიკატი მოსთხოვე, ან გაარკვიე, სად არის გათვალისწინებული დაზღვევის თანხა.",
+      "CMR-01": "ტვირთის გაგზავნამდე ნაკლული მონაცემი CMR-ში ჩააწერინე.",
+      "DOC-01": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი. თუ ერთი სახის რამდენიმე დოკუმენტია, ნახე, სწორი შედარდა თუ არა."
+    },
+    "ru": {
+      "AMT-01": "Прочитайте сумму прописью в документе и сравните её с цифрами: одно из двух нужно исправить.",
+      "SUM-01": "Пересчитайте эту строку инвойса: неверно количество, цена или сумма строки.",
+      "SUM-02": "Сложите суммы инвойса заново: неверна сумма одной из строк, один из расходов, стоимость товара или итог.",
+      "SUM-03": "Сложите строки документа заново: неверна одна из строк или указанный итог.",
+      "CUR-01": "Выясните, о какой валюте договорились стороны, и попросите исправить другой документ.",
+      "QTY-01": "Сверьте с фактически погруженным товаром: количество по каждой позиции и число мест должны совпадать во всех документах.",
+      "WGT-01": "Посмотрите вес в документе: брутто включает упаковку и не может быть меньше нетто. Возможно, эти два числа перепутаны.",
+      "WGT-02": "Выясните, какой вес верный (по взвешиванию, если груз взвешивали), и попросите исправить остальные документы.",
+      "REF-01": "Посмотрите номер и дату документа, на который дана ссылка, и попросите исправить ссылку.",
+      "DATE-01": "Проверьте даты в документах: договор заключают до выставления инвойса, а инвойс обычно выставляют не позже дня принятия груза.",
+      "PTY-01": "Выясните, одна ли это компания; если нет, в одном из документов сторона указана неверно.",
+      "INC-01": "Выясните, о каком условии договорились стороны, и попросите указать его кодом Инкотермс 2020 в обоих документах.",
+      "INC-02": "Уточните у сторон, не имелось ли в виду условие для любого вида транспорта: FCA вместо FOB или FAS, CPT вместо CFR, CIP вместо CIF.",
+      "INC-03": "Запросите у продавца страховой полис или сертификат либо выясните, где учтена сумма страхования.",
+      "CMR-01": "Попросите внести недостающие сведения в CMR до отправки груза.",
+      "DOC-01": "Добавьте недостающий документ и запустите проверку снова. Если документов одного вида несколько, посмотрите, тот ли был взят для сверки."
+    },
+    "tr": {
+      "AMT-01": "Belgedeki yazıyla tutarı okuyup rakamlarla karşılaştırın: ikisinden biri düzeltilmeli.",
+      "SUM-01": "Faturanın bu satırını yeniden hesaplayın: miktar, birim fiyat veya satır tutarı yanlış.",
+      "SUM-02": "Faturadaki tutarları yeniden toplayın: bir satır tutarı, bir masraf, mal bedeli veya genel toplam yanlış.",
+      "SUM-03": "Belgedeki satırları yeniden toplayın: satırlardan biri veya yazılan toplam yanlış.",
+      "CUR-01": "Tarafların hangi dövizde anlaştığını öğrenin ve diğer belgeyi düzelttirin.",
+      "QTY-01": "Fiilen yüklenen malla karşılaştırın: her kalemin miktarı ve kap sayısı tüm belgelerde aynı olmalı.",
+      "WGT-01": "Belgedeki ağırlıklara bakın: brüt ağırlık ambalajı da içerir, netten az olamaz. İki sayı yer değiştirmiş olabilir.",
+      "WGT-02": "Hangi ağırlığın doğru olduğunu öğrenin (eşya tartıldıysa tartım sonucuna göre) ve diğer belgeleri düzelttirin.",
+      "REF-01": "Atıf yapılan belgenin numarasına ve tarihine bakın, atfı düzelttirin.",
+      "DATE-01": "Belgelerdeki tarihleri kontrol edin: sözleşme fatura düzenlenmeden önce yapılır, fatura da genellikle en geç yükleme günü düzenlenir.",
+      "PTY-01": "İki adın aynı şirkete ait olup olmadığını öğrenin; değilse belgelerden birinde taraf yanlış yazılmış.",
+      "INC-01": "Tarafların hangi kuralda anlaştığını öğrenin ve iki belgeye de Incoterms 2020 koduyla yazdırın.",
+      "INC-02": "Taraflara, her taşıma şekline uygun kuralı kastedip kastetmediklerini sorun: FOB veya FAS yerine FCA, CFR yerine CPT, CIF yerine CIP.",
+      "INC-03": "Satıcıdan sigorta poliçesini veya sertifikasını isteyin ya da sigorta bedelinin nerede yer aldığını öğrenin.",
+      "CMR-01": "Eksik bilgiyi eşya yola çıkmadan önce CMR'ye yazdırın.",
+      "DOC-01": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın. Aynı türden birden fazla belge varsa karşılaştırmada doğru belgenin kullanılıp kullanılmadığına bakın."
+    }
+  },
+  "keyChecks": {
+    "en": {
+      "AMT-01.currency": "Look at the currency the amount in words names and at the currency of the document: one of the two has to be corrected.",
+      "AMT-01.unreadable": "Read the amount in words on the document yourself and compare it with the figures: the checker could not read it, so it was not compared with them.",
+      "REF-01.cmr-missing-document": "Have the document entered among the documents attached to the CMR (box 5), or see whether it is listed there under another number.",
+      "INC-01.unknown": "Look at the delivery terms on the document: the rule may be misspelled or come from an older edition of Incoterms (DAF, DES, DEQ, DDU, DAT). Have it written as an Incoterms 2020 code.",
+      "DOC-01.missing": "Add the missing document and run the check again.",
+      "DOC-01.multiple": "See whether the first of them is the one that belongs to this shipment: the other documents were compared with the first one only."
+    },
+    "ka": {
+      "AMT-01.currency": "ნახე, რომელი ვალუტა წერია სიტყვიერ თანხაში და რომელია დოკუმენტის ვალუტა: ერთ-ერთი გასასწორებელია.",
+      "AMT-01.unreadable": "დოკუმენტში სიტყვიერად დაწერილი თანხა თვითონ წაიკითხე და ციფრებს შეადარე: შემმოწმებელმა ის ვერ წაიკითხა, ამიტომ ციფრებთან არ შეუდარებია.",
+      "REF-01.cmr-missing-document": "ეს დოკუმენტი CMR-ის თანდართული დოკუმენტების სიაში (გრაფა 5) ჩააწერინე, ან ნახე, ხომ არ არის იქ სხვა ნომრით მითითებული.",
+      "INC-01.unknown": "ნახე მიწოდების პირობა დოკუმენტში: შესაძლოა, შეცდომით წერია ან Incoterms-ის ძველი გამოცემიდანაა (DAF, DES, DEQ, DDU, DAT). Incoterms 2020-ის კოდით ჩააწერინე.",
+      "DOC-01.missing": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი.",
+      "DOC-01.multiple": "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა."
+    },
+    "ru": {
+      "AMT-01.currency": "Посмотрите, какая валюта названа в сумме прописью и какова валюта документа: одно из двух нужно исправить.",
+      "AMT-01.unreadable": "Прочитайте сумму прописью в документе сами и сравните её с цифрами: программа не смогла её прочитать, поэтому с цифрами она не сравнивалась.",
+      "REF-01.cmr-missing-document": "Попросите внести этот документ в графу 5 CMR (прилагаемые документы) или посмотрите, не указан ли он там под другим номером.",
+      "INC-01.unknown": "Посмотрите условие поставки в документе: возможно, в нём опечатка или оно взято из старой редакции Инкотермс (DAF, DES, DEQ, DDU, DAT). Попросите указать его кодом Инкотермс 2020.",
+      "DOC-01.missing": "Добавьте недостающий документ и запустите проверку снова.",
+      "DOC-01.multiple": "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым."
+    },
+    "tr": {
+      "AMT-01.currency": "Yazıyla tutarda geçen dövize ve belgenin dövizine bakın: ikisinden biri düzeltilmeli.",
+      "AMT-01.unreadable": "Belgedeki yazıyla tutarı kendiniz okuyup rakamlarla karşılaştırın: program bu tutarı okuyamadı, bu yüzden rakamlarla karşılaştırılmadı.",
+      "REF-01.cmr-missing-document": "Bu belgeyi CMR'nin ekli belgeler kutusuna (kutu 5) yazdırın ya da orada başka bir numarayla geçip geçmediğine bakın.",
+      "INC-01.unknown": "Belgedeki teslim şekline bakın: yanlış yazılmış ya da Incoterms'in eski bir sürümünden alınmış olabilir (DAF, DES, DEQ, DDU, DAT). Incoterms 2020 koduyla yazdırın.",
+      "DOC-01.missing": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın.",
+      "DOC-01.multiple": "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı."
+    }
+  },
+  "fieldLabels": {
+    "en": {
+      "number": "number",
+      "date": "date",
+      "cmr:date": "date the CMR was made out",
+      "dateOfTakingOver": "date of taking over",
+      "currency": "currency",
+      "totalInWords": "amount in words",
+      "total": "total",
+      "totalAmount": "contract value",
+      "subtotal": "subtotal",
+      "discount": "discount",
+      "freight": "freight",
+      "insurance": "insurance",
+      "otherCharges": "other charge",
+      "tax": "tax",
+      "lines.model": "item code",
+      "lines.quantity": "quantity",
+      "lines.unitPrice": "unit price",
+      "lines.lineTotal": "total",
+      "lines.netWeightKg": "net weight",
+      "lines.grossWeightKg": "gross weight",
+      "packages": "number of packages",
+      "netWeightKg": "net weight",
+      "grossWeightKg": "gross weight",
+      "totalQuantity": "total quantity",
+      "totalPackages": "total number of packages",
+      "totalNetWeightKg": "total net weight",
+      "totalGrossWeightKg": "total gross weight",
+      "totalVolumeM3": "total volume",
+      "invoiceRef.number": "invoice number",
+      "invoiceRef.date": "invoice date",
+      "contractRef.number": "contract number",
+      "contractRef.date": "contract date",
+      "attachedDocuments": "attached document",
+      "seller.name": "seller",
+      "buyer.name": "buyer",
+      "consignee.name": "consignee",
+      "shipper.name": "shipper",
+      "sender.name": "sender",
+      "incoterm.code": "Incoterms rule"
+    },
+    "ka": {
+      "number": "ნომერი",
+      "date": "თარიღი",
+      "cmr:date": "შედგენის თარიღი",
+      "dateOfTakingOver": "ტვირთის მიღების თარიღი",
+      "currency": "ვალუტა",
+      "totalInWords": "თანხა სიტყვიერად",
+      "total": "საბოლოო ჯამი",
+      "totalAmount": "ხელშეკრულების ღირებულება",
+      "subtotal": "საქონლის ღირებულება",
+      "discount": "ფასდაკლება",
+      "freight": "ტრანსპორტირების ხარჯი",
+      "insurance": "დაზღვევა",
+      "otherCharges": "დამატებითი ხარჯი",
+      "tax": "გადასახადი",
+      "lines.model": "მოდელი",
+      "lines.quantity": "რაოდენობა",
+      "lines.unitPrice": "ერთეულის ფასი",
+      "lines.lineTotal": "ჯამი",
+      "lines.netWeightKg": "ნეტო წონა",
+      "lines.grossWeightKg": "ბრუტო წონა",
+      "packages": "ადგილების რაოდენობა",
+      "netWeightKg": "ნეტო წონა",
+      "grossWeightKg": "ბრუტო წონა",
+      "totalQuantity": "საერთო რაოდენობა",
+      "totalPackages": "ადგილების საერთო რაოდენობა",
+      "totalNetWeightKg": "საერთო ნეტო წონა",
+      "totalGrossWeightKg": "საერთო ბრუტო წონა",
+      "totalVolumeM3": "საერთო მოცულობა",
+      "invoiceRef.number": "ინვოისის ნომერი",
+      "invoiceRef.date": "ინვოისის თარიღი",
+      "contractRef.number": "ხელშეკრულების ნომერი",
+      "contractRef.date": "ხელშეკრულების თარიღი",
+      "attachedDocuments": "თანდართული დოკუმენტი",
+      "seller.name": "გამყიდველი",
+      "buyer.name": "მყიდველი",
+      "consignee.name": "მიმღები",
+      "shipper.name": "გამგზავნი",
+      "sender.name": "გამგზავნი",
+      "incoterm.code": "Incoterms პირობა"
+    },
+    "ru": {
+      "number": "номер",
+      "date": "дата",
+      "cmr:date": "дата составления",
+      "dateOfTakingOver": "дата принятия груза",
+      "currency": "валюта",
+      "totalInWords": "сумма прописью",
+      "total": "итог",
+      "totalAmount": "сумма договора",
+      "subtotal": "стоимость товара",
+      "discount": "скидка",
+      "freight": "фрахт",
+      "insurance": "страхование",
+      "otherCharges": "дополнительный расход",
+      "tax": "налог",
+      "lines.model": "артикул",
+      "lines.quantity": "количество",
+      "lines.unitPrice": "цена",
+      "lines.lineTotal": "сумма",
+      "lines.netWeightKg": "вес нетто",
+      "lines.grossWeightKg": "вес брутто",
+      "packages": "число мест",
+      "netWeightKg": "вес нетто",
+      "grossWeightKg": "вес брутто",
+      "totalQuantity": "общее количество",
+      "totalPackages": "общее число мест",
+      "totalNetWeightKg": "общий вес нетто",
+      "totalGrossWeightKg": "общий вес брутто",
+      "totalVolumeM3": "общий объём",
+      "invoiceRef.number": "номер инвойса",
+      "invoiceRef.date": "дата инвойса",
+      "contractRef.number": "номер договора",
+      "contractRef.date": "дата договора",
+      "attachedDocuments": "прилагаемый документ",
+      "seller.name": "продавец",
+      "buyer.name": "покупатель",
+      "consignee.name": "грузополучатель",
+      "shipper.name": "грузоотправитель",
+      "sender.name": "отправитель",
+      "incoterm.code": "условие Инкотермс"
+    },
+    "tr": {
+      "number": "numara",
+      "date": "tarih",
+      "cmr:date": "düzenlenme tarihi",
+      "dateOfTakingOver": "yükleme tarihi",
+      "currency": "döviz",
+      "totalInWords": "yazıyla tutar",
+      "total": "genel toplam",
+      "totalAmount": "sözleşme bedeli",
+      "subtotal": "mal bedeli",
+      "discount": "iskonto",
+      "freight": "navlun",
+      "insurance": "sigorta",
+      "otherCharges": "diğer masraf",
+      "tax": "vergi",
+      "lines.model": "ürün kodu",
+      "lines.quantity": "miktar",
+      "lines.unitPrice": "birim fiyat",
+      "lines.lineTotal": "tutar",
+      "lines.netWeightKg": "net ağırlık",
+      "lines.grossWeightKg": "brüt ağırlık",
+      "packages": "kap sayısı",
+      "netWeightKg": "net ağırlık",
+      "grossWeightKg": "brüt ağırlık",
+      "totalQuantity": "toplam miktar",
+      "totalPackages": "toplam kap sayısı",
+      "totalNetWeightKg": "toplam net ağırlık",
+      "totalGrossWeightKg": "toplam brüt ağırlık",
+      "totalVolumeM3": "toplam hacim",
+      "invoiceRef.number": "fatura numarası",
+      "invoiceRef.date": "fatura tarihi",
+      "contractRef.number": "sözleşme numarası",
+      "contractRef.date": "sözleşme tarihi",
+      "attachedDocuments": "ekli belge",
+      "seller.name": "satıcı",
+      "buyer.name": "alıcı",
+      "consignee.name": "alıcı (teslim alan)",
+      "shipper.name": "gönderici",
+      "sender.name": "gönderici",
+      "incoterm.code": "Incoterms kuralı"
+    }
+  },
+  "messages": {
+    "en": {
+      "AMT-01.mismatch": "Amount in words reads {wordsAmount}, but the amount in figures is {amount}.",
+      "AMT-01.currency": "Amount in words is in {wordsCurrency}, but the document currency is {currency}.",
+      "AMT-01.unreadable": "Amount in words could not be read: {reason}.",
+      "SUM-01.line": "Line {line}: {quantity} × {unitPrice} = {expected}, but the line total is {found}.",
+      "SUM-02.subtotal": "Line totals add up to {expected}, but the subtotal is {found}.",
+      "SUM-02.total": "Expected total {expected} ({formula}), but the invoice total is {found}.",
+      "SUM-03.total": "{document}: lines add up to {expected} ({metric}), but the stated total is {found}.",
+      "CUR-01.mismatch": "Documents use different currencies: {currencies}.",
+      "QTY-01.quantity": "Quantity differs: invoice {invoice}, packing list {packingList}.",
+      "QTY-01.line": "Item {model}: invoice quantity {invoice}, packing list quantity {packingList}.",
+      "QTY-01.missing-line": "Item {model} is {presentIn} but not {missingIn}.",
+      "QTY-01.packages": "Number of packages differs: {values}.",
+      "WGT-01.gross-below-net": "{where}: gross weight {gross} kg is less than net weight {net} kg.",
+      "WGT-02.gross": "Gross weight differs: {values}.",
+      "WGT-02.net": "Net weight differs: {values}.",
+      "REF-01.invoice-number": "Packing list refers to invoice {found}, but the invoice number is {expected}.",
+      "REF-01.invoice-date": "Packing list gives invoice date {found}, but the invoice is dated {expected}.",
+      "REF-01.contract-number": "Invoice refers to contract {found}, but the contract number is {expected}.",
+      "REF-01.contract-date": "Invoice gives contract date {found}, but the contract is dated {expected}.",
+      "REF-01.cmr-missing-document": "The CMR's attached documents do not list the {document} {number}.",
+      "DATE-01.contract-after-invoice": "Contract date {contract} is after the invoice date {invoice}.",
+      "DATE-01.invoice-after-shipment": "Invoice date {invoice} is after the goods were taken over on {shipment}.",
+      "PTY-01.name": "{role} differs: \"{a}\" ({aDocument}) and \"{b}\" ({bDocument}).",
+      "INC-01.mismatch": "Incoterms differ: {codes}.",
+      "INC-01.unknown": "\"{code}\" is not an Incoterms 2020 rule.",
+      "INC-02.sea-term-road": "{code} is a sea and inland waterway rule, but the goods travel by road under a CMR.",
+      "INC-03.no-insurance": "Under {code} the seller insures the goods, but the documents show neither an insurance policy nor an insurance charge.",
+      "CMR-01.missing": "CMR is missing Art. 6(1)({item}): {particular}.",
+      "DOC-01.missing": "Missing document: {document}.",
+      "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one."
+    },
+    "ka": {
+      "AMT-01.mismatch": "სიტყვიერად წერია {wordsAmount}, ციფრებით კი {amount}.",
+      "AMT-01.currency": "სიტყვიერად თანხა {wordsCurrency}-ში წერია, დოკუმენტის ვალუტა კი {currency}-ია.",
+      "AMT-01.unreadable": "სიტყვიერი თანხა ვერ იკითხება: {reason}.",
+      "SUM-01.line": "სტრიქონი {line}: {quantity} × {unitPrice} = {expected}, სტრიქონის ჯამად კი წერია {found}.",
+      "SUM-02.subtotal": "სტრიქონების ჯამი {expected}-ია, საქონლის ღირებულებად კი წერია {found}.",
+      "SUM-02.total": "ჯამი {expected} უნდა იყოს ({formula}), ინვოისში კი წერია {found}.",
+      "SUM-03.total": "{document}: სტრიქონების ჯამი {expected}-ია ({metric}), ჯამში კი წერია {found}.",
+      "CUR-01.mismatch": "დოკუმენტებში სხვადასხვა ვალუტაა: {currencies}.",
+      "QTY-01.quantity": "რაოდენობა განსხვავდება: ინვოისში {invoice}, შეფუთვის ფურცელში {packingList}.",
+      "QTY-01.line": "პოზიცია {model}: ინვოისში {invoice}, შეფუთვის ფურცელში {packingList}.",
+      "QTY-01.missing-line": "პოზიცია {model} {presentIn} არის, {missingIn} კი არა.",
+      "QTY-01.packages": "ადგილების რაოდენობა განსხვავდება: {values}.",
+      "WGT-01.gross-below-net": "{where}: ბრუტო წონა {gross} კგ ნეტო წონაზე ({net} კგ) ნაკლებია.",
+      "WGT-02.gross": "ბრუტო წონა განსხვავდება: {values}.",
+      "WGT-02.net": "ნეტო წონა განსხვავდება: {values}.",
+      "REF-01.invoice-number": "შეფუთვის ფურცელში მითითებულია ინვოისი {found}, ინვოისის ნომერი კი {expected}-ია.",
+      "REF-01.invoice-date": "შეფუთვის ფურცელში ინვოისის თარიღად {found} წერია, ინვოისის თარიღი კი {expected}-ია.",
+      "REF-01.contract-number": "ინვოისში მითითებულია ხელშეკრულება {found}, ხელშეკრულების ნომერი კი {expected}-ია.",
+      "REF-01.contract-date": "ინვოისში ხელშეკრულების თარიღად {found} წერია, ხელშეკრულების თარიღი კი {expected}-ია.",
+      "REF-01.cmr-missing-document": "CMR-ის თანდართულ დოკუმენტებში {document} {number} არ არის მითითებული.",
+      "DATE-01.contract-after-invoice": "ხელშეკრულების თარიღი ({contract}) ინვოისის თარიღზე ({invoice}) გვიანია.",
+      "DATE-01.invoice-after-shipment": "ინვოისის თარიღი ({invoice}) ტვირთის მიღების თარიღზე ({shipment}) გვიანია.",
+      "PTY-01.name": "{role} განსხვავდება: „{a}“ ({aDocument}) და „{b}“ ({bDocument}).",
+      "INC-01.mismatch": "Incoterms პირობა განსხვავდება: {codes}.",
+      "INC-01.unknown": "„{code}“ Incoterms 2020-ის პირობა არ არის.",
+      "INC-02.sea-term-road": "{code} საზღვაო და შიდა წყლის ტრანსპორტის პირობაა, ტვირთი კი CMR-ით, საავტომობილო ტრანსპორტით გადაიზიდება.",
+      "INC-03.no-insurance": "{code} პირობით ტვირთს გამყიდველი აზღვევს, დოკუმენტებში კი არც დაზღვევის პოლისია და არც დაზღვევის თანხა.",
+      "CMR-01.missing": "CMR-ს აკლია მუხ. 6(1)({item}): {particular}.",
+      "DOC-01.missing": "აკლია დოკუმენტი: {document}.",
+      "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება."
+    },
+    "ru": {
+      "AMT-01.mismatch": "Прописью указано {wordsAmount}, а цифрами — {amount}.",
+      "AMT-01.currency": "Сумма прописью в валюте {wordsCurrency}, а валюта документа — {currency}.",
+      "AMT-01.unreadable": "Не удалось прочитать сумму прописью: {reason}.",
+      "SUM-01.line": "Строка {line}: {quantity} × {unitPrice} = {expected}, а в сумме строки указано {found}.",
+      "SUM-02.subtotal": "Сумма строк — {expected}, а стоимость товара указана {found}.",
+      "SUM-02.total": "Ожидаемый итог {expected} ({formula}), а в инвойсе указано {found}.",
+      "SUM-03.total": "{document}: сумма строк {expected} ({metric}), а в итоге указано {found}.",
+      "CUR-01.mismatch": "В документах разные валюты: {currencies}.",
+      "QTY-01.quantity": "Количество различается: в инвойсе {invoice}, в упаковочном листе {packingList}.",
+      "QTY-01.line": "Позиция {model}: в инвойсе {invoice}, в упаковочном листе {packingList}.",
+      "QTY-01.missing-line": "Позиция {model} есть {presentIn}, но её нет {missingIn}.",
+      "QTY-01.packages": "Число мест различается: {values}.",
+      "WGT-01.gross-below-net": "{where}: вес брутто {gross} кг меньше веса нетто {net} кг.",
+      "WGT-02.gross": "Вес брутто различается: {values}.",
+      "WGT-02.net": "Вес нетто различается: {values}.",
+      "REF-01.invoice-number": "Упаковочный лист ссылается на инвойс {found}, а номер инвойса — {expected}.",
+      "REF-01.invoice-date": "В упаковочном листе дата инвойса {found}, а инвойс датирован {expected}.",
+      "REF-01.contract-number": "Инвойс ссылается на договор {found}, а номер договора — {expected}.",
+      "REF-01.contract-date": "В инвойсе дата договора {found}, а договор датирован {expected}.",
+      "REF-01.cmr-missing-document": "Среди прилагаемых документов CMR не указан {document} {number}.",
+      "DATE-01.contract-after-invoice": "Дата договора ({contract}) позже даты инвойса ({invoice}).",
+      "DATE-01.invoice-after-shipment": "Дата инвойса ({invoice}) позже даты принятия груза ({shipment}).",
+      "PTY-01.name": "{role} различается: «{a}» ({aDocument}) и «{b}» ({bDocument}).",
+      "INC-01.mismatch": "Условия Инкотермс различаются: {codes}.",
+      "INC-01.unknown": "«{code}» не является правилом Инкотермс 2020.",
+      "INC-02.sea-term-road": "{code} — правило для морского и внутреннего водного транспорта, а груз идёт автомобилем по CMR.",
+      "INC-03.no-insurance": "По условию {code} груз страхует продавец, но в документах нет ни страхового полиса, ни суммы страхования.",
+      "CMR-01.missing": "В CMR нет реквизита ст. 6(1)({item}): {particular}.",
+      "DOC-01.missing": "Нет документа: {document}.",
+      "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый."
+    },
+    "tr": {
+      "AMT-01.mismatch": "Yazıyla {wordsAmount} yazıyor, rakamla tutar ise {amount}.",
+      "AMT-01.currency": "Yazıyla tutarın dövizi {wordsCurrency}, belgenin dövizi ise {currency}.",
+      "AMT-01.unreadable": "Yazıyla tutar okunamadı: {reason}.",
+      "SUM-01.line": "Satır {line}: {quantity} × {unitPrice} = {expected}, satır tutarında ise {found} yazıyor.",
+      "SUM-02.subtotal": "Satırların toplamı {expected}, mal bedelinde ise {found} yazıyor.",
+      "SUM-02.total": "Beklenen toplam {expected} ({formula}), faturada ise {found} yazıyor.",
+      "SUM-03.total": "{document}: satırların toplamı {expected} ({metric}), toplamda ise {found} yazıyor.",
+      "CUR-01.mismatch": "Belgelerde farklı dövizler var: {currencies}.",
+      "QTY-01.quantity": "Miktar farklı: faturada {invoice}, çeki listesinde {packingList}.",
+      "QTY-01.line": "Kalem {model}: faturada {invoice}, çeki listesinde {packingList}.",
+      "QTY-01.missing-line": "Kalem {model} {presentIn} var, {missingIn} yok.",
+      "QTY-01.packages": "Kap sayısı farklı: {values}.",
+      "WGT-01.gross-below-net": "{where}: brüt ağırlık {gross} kg, net ağırlıktan ({net} kg) az.",
+      "WGT-02.gross": "Brüt ağırlık farklı: {values}.",
+      "WGT-02.net": "Net ağırlık farklı: {values}.",
+      "REF-01.invoice-number": "Çeki listesi {found} numaralı faturaya atıf yapıyor, fatura numarası ise {expected}.",
+      "REF-01.invoice-date": "Çeki listesinde fatura tarihi {found}, fatura ise {expected} tarihli.",
+      "REF-01.contract-number": "Fatura {found} numaralı sözleşmeye atıf yapıyor, sözleşme numarası ise {expected}.",
+      "REF-01.contract-date": "Faturada sözleşme tarihi {found}, sözleşme ise {expected} tarihli.",
+      "REF-01.cmr-missing-document": "CMR'nin ekli belgeleri arasında {document} {number} yok.",
+      "DATE-01.contract-after-invoice": "Sözleşme tarihi ({contract}) fatura tarihinden ({invoice}) sonra.",
+      "DATE-01.invoice-after-shipment": "Fatura tarihi ({invoice}) yükleme tarihinden ({shipment}) sonra.",
+      "PTY-01.name": "{role} farklı: \"{a}\" ({aDocument}) ve \"{b}\" ({bDocument}).",
+      "INC-01.mismatch": "Incoterms farklı: {codes}.",
+      "INC-01.unknown": "\"{code}\" bir Incoterms 2020 kuralı değil.",
+      "INC-02.sea-term-road": "{code} deniz ve iç su yolu taşımacılığı kuralıdır, eşya ise CMR ile karayoluyla taşınıyor.",
+      "INC-03.no-insurance": "{code} teslim şeklinde sigortayı satıcı yaptırır, ancak belgeler arasında ne sigorta poliçesi ne de sigorta bedeli var.",
+      "CMR-01.missing": "CMR'de Madde 6(1)({item}) eksik: {particular}.",
+      "DOC-01.missing": "Eksik belge: {document}.",
+      "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır."
+    }
+  },
+  "dateParams": {
+    "REF-01.invoice-date": [
+      "found",
+      "expected"
+    ],
+    "REF-01.contract-date": [
+      "found",
+      "expected"
+    ],
+    "DATE-01.contract-after-invoice": [
+      "contract",
+      "invoice"
+    ],
+    "DATE-01.invoice-after-shipment": [
+      "invoice",
+      "shipment"
+    ]
+  },
+  "numberParams": {
+    "AMT-01.mismatch": {
+      "wordsAmount": "money",
+      "amount": "money"
+    },
+    "SUM-01.line": {
+      "quantity": "number",
+      "unitPrice": "number",
+      "expected": "money",
+      "found": "money"
+    },
+    "SUM-02.subtotal": {
+      "expected": "money",
+      "found": "money"
+    },
+    "SUM-02.total": {
+      "expected": "money",
+      "formula": "formula",
+      "found": "money"
+    },
+    "SUM-03.total": {
+      "expected": "number",
+      "found": "number"
+    },
+    "QTY-01.quantity": {
+      "invoice": "number",
+      "packingList": "number"
+    },
+    "QTY-01.line": {
+      "invoice": "number",
+      "packingList": "number"
+    },
+    "QTY-01.packages": {
+      "values": "number"
+    },
+    "WGT-01.gross-below-net": {
+      "gross": "number",
+      "net": "number"
+    },
+    "WGT-02.gross": {
+      "values": "kg"
+    },
+    "WGT-02.net": {
+      "values": "kg"
+    }
+  },
+  "cmrParts": {
+    "a": [
+      "date",
+      "placeOfIssue"
+    ],
+    "b": [
+      "sender.name",
+      "sender.address"
+    ],
+    "c": [
+      "carrier.name",
+      "carrier.address"
+    ],
+    "d": [
+      "placeOfTakingOver",
+      "dateOfTakingOver",
+      "placeOfDelivery"
+    ],
+    "e": [
+      "consignee.name",
+      "consignee.address"
+    ],
+    "f": [
+      "goods.description",
+      "goods.packingMethod"
+    ],
+    "g": [
+      "totalPackages",
+      "goods.marksAndNumbers"
+    ]
+  },
+  "vocab": {
+    "en": {
+      "number": {
+        "group": ",",
+        "decimal": "."
+      },
+      "kg": "kg",
+      "doc": {
+        "commercial_invoice": "invoice",
+        "packing_list": "packing list",
+        "cmr": "CMR",
+        "contract": "contract",
+        "other": "document"
+      },
+      "docIn": {
+        "commercial_invoice": "in the invoice",
+        "packing_list": "in the packing list",
+        "cmr": "in the CMR",
+        "contract": "in the contract",
+        "other": "in the document"
+      },
+      "metric": {
+        "quantity": "quantity",
+        "packages": "packages",
+        "netWeightKg": "net weight, kg",
+        "grossWeightKg": "gross weight, kg",
+        "volumeM3": "volume, m³"
+      },
+      "role": {
+        "seller": "Seller",
+        "buyer": "Buyer",
+        "consignee": "Consignee"
+      },
+      "particular": {
+        "a": "date and place the CMR was made out",
+        "b": "name and address of the sender",
+        "c": "name and address of the carrier",
+        "d": "place and date of taking over, place of delivery",
+        "e": "name and address of the consignee",
+        "f": "description of the goods and method of packing",
+        "g": "number of packages, marks and numbers",
+        "h": "gross weight",
+        "i": "carriage charges",
+        "j": "instructions for customs",
+        "k": "statement that the CMR Convention applies"
+      },
+      "cmrField": {
+        "date": "date the CMR was made out",
+        "placeOfIssue": "place the CMR was made out",
+        "sender.name": "name of the sender",
+        "sender.address": "address of the sender",
+        "carrier.name": "name of the carrier",
+        "carrier.address": "address of the carrier",
+        "placeOfTakingOver": "place of taking over",
+        "dateOfTakingOver": "date of taking over",
+        "placeOfDelivery": "place of delivery",
+        "consignee.name": "name of the consignee",
+        "consignee.address": "address of the consignee",
+        "goods.description": "description of the goods",
+        "goods.packingMethod": "method of packing",
+        "totalPackages": "number of packages",
+        "goods.marksAndNumbers": "marks and numbers"
+      },
+      "months": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "listIn": false,
+      "reason": {
+        "EMPTY": "no amount found",
+        "UNKNOWN_WORD": "unknown word \"{word}\"",
+        "INVALID_SEQUENCE": "\"{word}\" is not a valid number",
+        "AMBIGUOUS": "the words can be read in more than one way",
+        "MINOR_OUT_OF_RANGE": "the cents are 100 or more"
+      },
+      "documentCount": {
+        "one": "document",
+        "few": "documents",
+        "many": "documents"
+      },
+      "total": "total",
+      "line": "line"
+    },
+    "ka": {
+      "number": {
+        "group": " ",
+        "decimal": ","
+      },
+      "kg": "კგ",
+      "doc": {
+        "commercial_invoice": "ინვოისი",
+        "packing_list": "შეფუთვის ფურცელი",
+        "cmr": "CMR",
+        "contract": "ხელშეკრულება",
+        "other": "დოკუმენტი"
+      },
+      "docIn": {
+        "commercial_invoice": "ინვოისში",
+        "packing_list": "შეფუთვის ფურცელში",
+        "cmr": "CMR-ში",
+        "contract": "ხელშეკრულებაში",
+        "other": "დოკუმენტში"
+      },
+      "metric": {
+        "quantity": "რაოდენობა",
+        "packages": "ადგილების რაოდენობა",
+        "netWeightKg": "ნეტო, კგ",
+        "grossWeightKg": "ბრუტო, კგ",
+        "volumeM3": "მოცულობა, მ³"
+      },
+      "role": {
+        "seller": "გამყიდველი",
+        "buyer": "მყიდველი",
+        "consignee": "მიმღები"
+      },
+      "particular": {
+        "a": "შედგენის თარიღი და ადგილი",
+        "b": "გამგზავნის სახელი და მისამართი",
+        "c": "გადამზიდველის სახელი და მისამართი",
+        "d": "ტვირთის მიღების ადგილი და თარიღი, მიწოდების ადგილი",
+        "e": "მიმღების სახელი და მისამართი",
+        "f": "საქონლის აღწერა და შეფუთვის სახე",
+        "g": "ადგილების რაოდენობა, მარკირება და ნომრები",
+        "h": "ბრუტო წონა",
+        "i": "გადაზიდვის ხარჯები",
+        "j": "მითითებები საბაჟოსთვის",
+        "k": "ჩანაწერი, რომ გადაზიდვას CMR კონვენცია არეგულირებს"
+      },
+      "cmrField": {
+        "date": "შედგენის თარიღი",
+        "placeOfIssue": "შედგენის ადგილი",
+        "sender.name": "გამგზავნის სახელი",
+        "sender.address": "გამგზავნის მისამართი",
+        "carrier.name": "გადამზიდველის სახელი",
+        "carrier.address": "გადამზიდველის მისამართი",
+        "placeOfTakingOver": "ტვირთის მიღების ადგილი",
+        "dateOfTakingOver": "ტვირთის მიღების თარიღი",
+        "placeOfDelivery": "მიწოდების ადგილი",
+        "consignee.name": "მიმღების სახელი",
+        "consignee.address": "მიმღების მისამართი",
+        "goods.description": "საქონლის აღწერა",
+        "goods.packingMethod": "შეფუთვის სახე",
+        "totalPackages": "ადგილების რაოდენობა",
+        "goods.marksAndNumbers": "მარკირება და ნომრები"
+      },
+      "months": null,
+      "listIn": true,
+      "reason": {
+        "EMPTY": "თანხა არ ჩანს",
+        "UNKNOWN_WORD": "უცნობი სიტყვა „{word}“",
+        "INVALID_SEQUENCE": "„{word}“ სწორი რიცხვი არ არის",
+        "AMBIGUOUS": "ტექსტი ცალსახად არ იკითხება",
+        "MINOR_OUT_OF_RANGE": "ცენტები (თეთრები) 100 ან მეტია"
+      },
+      "documentCount": {
+        "one": "დოკუმენტი",
+        "few": "დოკუმენტი",
+        "many": "დოკუმენტი"
+      },
+      "total": "ჯამი",
+      "line": "სტრიქონი"
+    },
+    "ru": {
+      "number": {
+        "group": " ",
+        "decimal": ","
+      },
+      "kg": "кг",
+      "doc": {
+        "commercial_invoice": "инвойс",
+        "packing_list": "упаковочный лист",
+        "cmr": "CMR",
+        "contract": "договор",
+        "other": "документ"
+      },
+      "docIn": {
+        "commercial_invoice": "в инвойсе",
+        "packing_list": "в упаковочном листе",
+        "cmr": "в CMR",
+        "contract": "в договоре",
+        "other": "в документе"
+      },
+      "metric": {
+        "quantity": "количество",
+        "packages": "места",
+        "netWeightKg": "нетто, кг",
+        "grossWeightKg": "брутто, кг",
+        "volumeM3": "объём, м³"
+      },
+      "role": {
+        "seller": "Продавец",
+        "buyer": "Покупатель",
+        "consignee": "Грузополучатель"
+      },
+      "particular": {
+        "a": "дата и место составления",
+        "b": "наименование и адрес отправителя",
+        "c": "наименование и адрес перевозчика",
+        "d": "место и дата принятия груза, место доставки",
+        "e": "наименование и адрес получателя",
+        "f": "описание груза и вид упаковки",
+        "g": "число мест, их маркировка и номера",
+        "h": "вес брутто",
+        "i": "расходы, связанные с перевозкой",
+        "j": "указания для таможенных формальностей",
+        "k": "указание, что перевозка регулируется Конвенцией CMR"
+      },
+      "cmrField": {
+        "date": "дата составления",
+        "placeOfIssue": "место составления",
+        "sender.name": "наименование отправителя",
+        "sender.address": "адрес отправителя",
+        "carrier.name": "наименование перевозчика",
+        "carrier.address": "адрес перевозчика",
+        "placeOfTakingOver": "место принятия груза",
+        "dateOfTakingOver": "дата принятия груза",
+        "placeOfDelivery": "место доставки",
+        "consignee.name": "наименование получателя",
+        "consignee.address": "адрес получателя",
+        "goods.description": "описание груза",
+        "goods.packingMethod": "вид упаковки",
+        "totalPackages": "число мест",
+        "goods.marksAndNumbers": "маркировка и номера мест"
+      },
+      "months": null,
+      "listIn": true,
+      "reason": {
+        "EMPTY": "сумма не найдена",
+        "UNKNOWN_WORD": "неизвестное слово «{word}»",
+        "INVALID_SEQUENCE": "«{word}» — недопустимое число",
+        "AMBIGUOUS": "текст можно прочитать по-разному",
+        "MINOR_OUT_OF_RANGE": "центов (копеек) 100 или больше"
+      },
+      "documentCount": {
+        "one": "документ",
+        "few": "документа",
+        "many": "документов"
+      },
+      "total": "итого",
+      "line": "строка"
+    },
+    "tr": {
+      "number": {
+        "group": ".",
+        "decimal": ","
+      },
+      "kg": "kg",
+      "doc": {
+        "commercial_invoice": "fatura",
+        "packing_list": "çeki listesi",
+        "cmr": "CMR",
+        "contract": "sözleşme",
+        "other": "belge"
+      },
+      "docIn": {
+        "commercial_invoice": "faturada",
+        "packing_list": "çeki listesinde",
+        "cmr": "CMR'de",
+        "contract": "sözleşmede",
+        "other": "belgede"
+      },
+      "metric": {
+        "quantity": "miktar",
+        "packages": "kap",
+        "netWeightKg": "net, kg",
+        "grossWeightKg": "brüt, kg",
+        "volumeM3": "hacim, m³"
+      },
+      "role": {
+        "seller": "Satıcı",
+        "buyer": "Alıcı",
+        "consignee": "Alıcı (teslim alan)"
+      },
+      "particular": {
+        "a": "düzenlenme tarihi ve yeri",
+        "b": "göndericinin adı ve adresi",
+        "c": "taşıyıcının adı ve adresi",
+        "d": "yükleme yeri ve tarihi, teslim yeri",
+        "e": "alıcının adı ve adresi",
+        "f": "eşyanın tanımı ve ambalaj şekli",
+        "g": "kap sayısı, marka ve numaraları",
+        "h": "brüt ağırlık",
+        "i": "taşıma masrafları",
+        "j": "gümrük işlemleri için talimatlar",
+        "k": "taşımanın CMR Sözleşmesine tabi olduğu kaydı"
+      },
+      "cmrField": {
+        "date": "düzenlenme tarihi",
+        "placeOfIssue": "düzenlenme yeri",
+        "sender.name": "göndericinin adı",
+        "sender.address": "göndericinin adresi",
+        "carrier.name": "taşıyıcının adı",
+        "carrier.address": "taşıyıcının adresi",
+        "placeOfTakingOver": "yükleme yeri",
+        "dateOfTakingOver": "yükleme tarihi",
+        "placeOfDelivery": "teslim yeri",
+        "consignee.name": "alıcının adı",
+        "consignee.address": "alıcının adresi",
+        "goods.description": "eşyanın tanımı",
+        "goods.packingMethod": "ambalaj şekli",
+        "totalPackages": "kap sayısı",
+        "goods.marksAndNumbers": "marka ve numaralar"
+      },
+      "months": null,
+      "listIn": true,
+      "reason": {
+        "EMPTY": "tutar bulunamadı",
+        "UNKNOWN_WORD": "bilinmeyen kelime \"{word}\"",
+        "INVALID_SEQUENCE": "\"{word}\" geçerli bir sayı değil",
+        "AMBIGUOUS": "ifade birden fazla şekilde okunabiliyor",
+        "MINOR_OUT_OF_RANGE": "kuruş (sent) kısmı 100 veya daha fazla"
+      },
+      "documentCount": {
+        "one": "belge",
+        "few": "belge",
+        "many": "belge"
+      },
+      "total": "toplam",
+      "line": "satır"
+    }
+  },
+  "ui": {
+    "en": {
+      "title": "Document check report",
+      "errors": "Errors",
+      "warnings": "Warnings",
+      "errorsHeading": "Errors",
+      "warningsHeading": "Warnings",
+      "documents": "documents",
+      "rules": "rules",
+      "checked": "Checked",
+      "noProblems": "No problems found.",
+      "page": "p.",
+      "computed": "sum of lines",
+      "extractionIssues": "Extraction issues",
+      "extractionOk": "Extraction: no issues",
+      "extractionIssuesHint": "Fix these fields in extraction.json and run the check again.",
+      "extractionIssuesEffect": "A value with an issue may have been left out of the checks, so the result below can be incomplete.",
+      "unreadable": "The extraction could not be read, so no rules ran.",
+      "error": "Error",
+      "warning": "Warning",
+      "generatedBy": "Generated by Logisticshub",
+      "quote": [
+        "“",
+        "”"
+      ]
+    },
+    "ka": {
+      "title": "დოკუმენტების შემოწმების ანგარიში",
+      "errors": "შეცდომა",
+      "warnings": "გაფრთხილება",
+      "errorsHeading": "შეცდომები",
+      "warningsHeading": "გაფრთხილებები",
+      "documents": "დოკუმენტი",
+      "rules": "წესი",
+      "checked": "შემოწმდა",
+      "noProblems": "შეუსაბამობა არ აღმოჩნდა.",
+      "page": "გვ.",
+      "computed": "სტრიქონების ჯამი",
+      "extractionIssues": "ამოკითხვის ხარვეზები",
+      "extractionOk": "ამოკითხვა: ხარვეზი არ არის",
+      "extractionIssuesHint": "ეს ველები extraction.json-ში გაასწორე და შემოწმება თავიდან გაუშვი.",
+      "extractionIssuesEffect": "შესაძლოა, ხარვეზიანი მნიშვნელობა შემოწმებაში არ მოხვდა და ქვემოთ მოცემული შედეგი არასრულია.",
+      "unreadable": "extraction.json-ის წაკითხვა ვერ მოხერხდა, ამიტომ შემოწმება არ ჩატარებულა.",
+      "error": "შეცდომა",
+      "warning": "გაფრთხილება",
+      "generatedBy": "შექმნილია Logisticshub-ით",
+      "quote": [
+        "„",
+        "“"
+      ]
+    },
+    "ru": {
+      "title": "Отчёт о проверке документов",
+      "errors": "Ошибки",
+      "warnings": "Предупреждения",
+      "errorsHeading": "Ошибки",
+      "warningsHeading": "Предупреждения",
+      "documents": "док.",
+      "rules": "правил",
+      "checked": "Проверено",
+      "noProblems": "Проблем не найдено.",
+      "page": "стр.",
+      "computed": "сумма строк",
+      "extractionIssues": "Проблемы извлечения",
+      "extractionOk": "Извлечение: без проблем",
+      "extractionIssuesHint": "Исправьте эти поля в extraction.json и запустите проверку снова.",
+      "extractionIssuesEffect": "Значение с замечанием могло не попасть в проверку, поэтому результат ниже может быть неполным.",
+      "unreadable": "Не удалось прочитать извлечённые данные, правила не запускались.",
+      "error": "Ошибка",
+      "warning": "Предупреждение",
+      "generatedBy": "Создано в Logisticshub",
+      "quote": [
+        "«",
+        "»"
+      ]
+    },
+    "tr": {
+      "title": "Belge kontrol raporu",
+      "errors": "Hatalar",
+      "warnings": "Uyarılar",
+      "errorsHeading": "Hatalar",
+      "warningsHeading": "Uyarılar",
+      "documents": "belge",
+      "rules": "kural",
+      "checked": "Kontrol edildi",
+      "noProblems": "Sorun bulunmadı.",
+      "page": "s.",
+      "computed": "satırların toplamı",
+      "extractionIssues": "Veri çıkarma sorunları",
+      "extractionOk": "Veri çıkarma: sorun yok",
+      "extractionIssuesHint": "Bu alanları extraction.json içinde düzeltip kontrolü yeniden çalıştırın.",
+      "extractionIssuesEffect": "Sorunlu bir değer kontrole alınmamış olabilir; bu yüzden aşağıdaki sonuç eksik olabilir.",
+      "unreadable": "Çıkarılan veriler okunamadı, kurallar çalıştırılmadı.",
+      "error": "Hata",
+      "warning": "Uyarı",
+      "generatedBy": "Logisticshub ile oluşturuldu",
+      "quote": [
+        "“",
+        "”"
+      ]
+    }
+  },
+  "lexicons": {
+    "en": {
+      "language": "en",
+      "locale": "en",
+      "numbers": {
+        "zero": {
+          "value": 0,
+          "role": "unit"
+        },
+        "nil": {
+          "value": 0,
+          "role": "unit"
+        },
+        "one": {
+          "value": 1,
+          "role": "unit"
+        },
+        "two": {
+          "value": 2,
+          "role": "unit"
+        },
+        "three": {
+          "value": 3,
+          "role": "unit"
+        },
+        "four": {
+          "value": 4,
+          "role": "unit"
+        },
+        "five": {
+          "value": 5,
+          "role": "unit"
+        },
+        "six": {
+          "value": 6,
+          "role": "unit"
+        },
+        "no": {
+          "value": 0,
+          "role": "unit"
+        },
+        "seven": {
+          "value": 7,
+          "role": "unit"
+        },
+        "eight": {
+          "value": 8,
+          "role": "unit"
+        },
+        "nine": {
+          "value": 9,
+          "role": "unit"
+        },
+        "ten": {
+          "value": 10,
+          "role": "unit"
+        },
+        "eleven": {
+          "value": 11,
+          "role": "unit"
+        },
+        "twelve": {
+          "value": 12,
+          "role": "unit"
+        },
+        "thirteen": {
+          "value": 13,
+          "role": "unit"
+        },
+        "fourteen": {
+          "value": 14,
+          "role": "unit"
+        },
+        "fifteen": {
+          "value": 15,
+          "role": "unit"
+        },
+        "sixteen": {
+          "value": 16,
+          "role": "unit"
+        },
+        "seventeen": {
+          "value": 17,
+          "role": "unit"
+        },
+        "eighteen": {
+          "value": 18,
+          "role": "unit"
+        },
+        "nineteen": {
+          "value": 19,
+          "role": "unit"
+        },
+        "twenty": {
+          "value": 20,
+          "role": "unit"
+        },
+        "thirty": {
+          "value": 30,
+          "role": "unit"
+        },
+        "forty": {
+          "value": 40,
+          "role": "unit"
+        },
+        "fourty": {
+          "value": 40,
+          "role": "unit"
+        },
+        "fifty": {
+          "value": 50,
+          "role": "unit"
+        },
+        "sixty": {
+          "value": 60,
+          "role": "unit"
+        },
+        "seventy": {
+          "value": 70,
+          "role": "unit"
+        },
+        "eighty": {
+          "value": 80,
+          "role": "unit"
+        },
+        "ninety": {
+          "value": 90,
+          "role": "unit"
+        },
+        "hundred": {
+          "value": 100,
+          "role": "hundred"
+        },
+        "thousand": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "million": {
+          "value": 1000000,
+          "role": "scale"
+        },
+        "billion": {
+          "value": 1000000000,
+          "role": "scale"
+        }
+      },
+      "connectors": [
+        "and",
+        "&"
+      ],
+      "ignorable": [
+        "say",
+        "only",
+        "total",
+        "amount",
+        "sum",
+        "of",
+        "in",
+        "words",
+        "the",
+        "us",
+        "u",
+        "s",
+        "american",
+        "united",
+        "states",
+        "arab",
+        "turkish",
+        "georgian",
+        "russian",
+        "new",
+        "exactly"
+      ],
+      "articles": [
+        "a",
+        "an"
+      ],
+      "vigesimal": false,
+      "compoundTeens": false,
+      "major": {
+        "euro": "EUR",
+        "eur": "EUR",
+        "dollar": "USD",
+        "usd": "USD",
+        "lari": "GEL",
+        "gel": "GEL",
+        "lira": "TRY",
+        "lire": "TRY",
+        "try": "TRY",
+        "tl": "TRY",
+        "rouble": "RUB",
+        "ruble": "RUB",
+        "rub": "RUB",
+        "pound": "GBP",
+        "gbp": "GBP",
+        "sterling": "GBP",
+        "yuan": "CNY",
+        "cny": "CNY",
+        "renminbi": "CNY",
+        "tenge": "KZT",
+        "kzt": "KZT",
+        "manat": "AZN/TMT",
+        "azn": "AZN",
+        "tmt": "TMT",
+        "dram": "AMD",
+        "amd": "AMD",
+        "hryvnia": "UAH",
+        "hryvnya": "UAH",
+        "grivna": "UAH",
+        "uah": "UAH",
+        "franc": null,
+        "chf": "CHF",
+        "dirham": "AED/MAD",
+        "aed": "AED"
+      },
+      "qualifiers": {
+        "swiss": {
+          "franc": "CHF"
+        },
+        "azerbaijan": {
+          "manat": "AZN"
+        },
+        "azeri": {
+          "manat": "AZN"
+        },
+        "turkmen": {
+          "manat": "TMT"
+        },
+        "uae": {
+          "dirham": "AED"
+        },
+        "emirat": {
+          "dirham": "AED"
+        },
+        "moroccan": {
+          "dirham": "MAD"
+        },
+        "kazakh": {},
+        "armenian": {},
+        "ukrainian": {}
+      },
+      "minor": {
+        "cent": null,
+        "eurocent": "EUR",
+        "tetri": "GEL",
+        "kurus": "TRY",
+        "kuruş": "TRY",
+        "kopeck": "RUB",
+        "kopek": "RUB",
+        "kopeyka": "RUB",
+        "penny": "GBP",
+        "pence": "GBP",
+        "fen": "CNY",
+        "tiyn": "KZT",
+        "qapik": "AZN",
+        "gapik": "AZN",
+        "luma": "AMD",
+        "kopiy": "UAH",
+        "rappen": "CHF",
+        "centime": null,
+        "fils": null
+      },
+      "glued": false,
+      "suffixes": []
+    },
+    "ru": {
+      "language": "ru",
+      "locale": "ru",
+      "numbers": {
+        "ноль": {
+          "value": 0,
+          "role": "unit"
+        },
+        "нуль": {
+          "value": 0,
+          "role": "unit"
+        },
+        "ноля": {
+          "value": 0,
+          "role": "unit"
+        },
+        "нуля": {
+          "value": 0,
+          "role": "unit"
+        },
+        "один": {
+          "value": 1,
+          "role": "unit"
+        },
+        "одна": {
+          "value": 1,
+          "role": "unit"
+        },
+        "одно": {
+          "value": 1,
+          "role": "unit"
+        },
+        "одного": {
+          "value": 1,
+          "role": "unit"
+        },
+        "одной": {
+          "value": 1,
+          "role": "unit"
+        },
+        "одну": {
+          "value": 1,
+          "role": "unit"
+        },
+        "два": {
+          "value": 2,
+          "role": "unit"
+        },
+        "две": {
+          "value": 2,
+          "role": "unit"
+        },
+        "двух": {
+          "value": 2,
+          "role": "unit"
+        },
+        "три": {
+          "value": 3,
+          "role": "unit"
+        },
+        "трех": {
+          "value": 3,
+          "role": "unit"
+        },
+        "четыре": {
+          "value": 4,
+          "role": "unit"
+        },
+        "четырех": {
+          "value": 4,
+          "role": "unit"
+        },
+        "пять": {
+          "value": 5,
+          "role": "unit"
+        },
+        "пяти": {
+          "value": 5,
+          "role": "unit"
+        },
+        "шесть": {
+          "value": 6,
+          "role": "unit"
+        },
+        "шести": {
+          "value": 6,
+          "role": "unit"
+        },
+        "семь": {
+          "value": 7,
+          "role": "unit"
+        },
+        "семи": {
+          "value": 7,
+          "role": "unit"
+        },
+        "восемь": {
+          "value": 8,
+          "role": "unit"
+        },
+        "восьми": {
+          "value": 8,
+          "role": "unit"
+        },
+        "девять": {
+          "value": 9,
+          "role": "unit"
+        },
+        "девяти": {
+          "value": 9,
+          "role": "unit"
+        },
+        "десять": {
+          "value": 10,
+          "role": "unit"
+        },
+        "десяти": {
+          "value": 10,
+          "role": "unit"
+        },
+        "одиннадцать": {
+          "value": 11,
+          "role": "unit"
+        },
+        "одиннадцати": {
+          "value": 11,
+          "role": "unit"
+        },
+        "двенадцать": {
+          "value": 12,
+          "role": "unit"
+        },
+        "двенадцати": {
+          "value": 12,
+          "role": "unit"
+        },
+        "тринадцать": {
+          "value": 13,
+          "role": "unit"
+        },
+        "тринадцати": {
+          "value": 13,
+          "role": "unit"
+        },
+        "четырнадцать": {
+          "value": 14,
+          "role": "unit"
+        },
+        "четырнадцати": {
+          "value": 14,
+          "role": "unit"
+        },
+        "пятнадцать": {
+          "value": 15,
+          "role": "unit"
+        },
+        "пятнадцати": {
+          "value": 15,
+          "role": "unit"
+        },
+        "шестнадцать": {
+          "value": 16,
+          "role": "unit"
+        },
+        "шестнадцати": {
+          "value": 16,
+          "role": "unit"
+        },
+        "семнадцать": {
+          "value": 17,
+          "role": "unit"
+        },
+        "семнадцати": {
+          "value": 17,
+          "role": "unit"
+        },
+        "восемнадцать": {
+          "value": 18,
+          "role": "unit"
+        },
+        "восемнадцати": {
+          "value": 18,
+          "role": "unit"
+        },
+        "девятнадцать": {
+          "value": 19,
+          "role": "unit"
+        },
+        "девятнадцати": {
+          "value": 19,
+          "role": "unit"
+        },
+        "двадцать": {
+          "value": 20,
+          "role": "unit"
+        },
+        "двадцати": {
+          "value": 20,
+          "role": "unit"
+        },
+        "тридцать": {
+          "value": 30,
+          "role": "unit"
+        },
+        "тридцати": {
+          "value": 30,
+          "role": "unit"
+        },
+        "сорок": {
+          "value": 40,
+          "role": "unit"
+        },
+        "сорока": {
+          "value": 40,
+          "role": "unit"
+        },
+        "пятьдесят": {
+          "value": 50,
+          "role": "unit"
+        },
+        "пятидесяти": {
+          "value": 50,
+          "role": "unit"
+        },
+        "шестьдесят": {
+          "value": 60,
+          "role": "unit"
+        },
+        "шестидесяти": {
+          "value": 60,
+          "role": "unit"
+        },
+        "семьдесят": {
+          "value": 70,
+          "role": "unit"
+        },
+        "семидесяти": {
+          "value": 70,
+          "role": "unit"
+        },
+        "восемьдесят": {
+          "value": 80,
+          "role": "unit"
+        },
+        "восьмидесяти": {
+          "value": 80,
+          "role": "unit"
+        },
+        "девяносто": {
+          "value": 90,
+          "role": "unit"
+        },
+        "девяноста": {
+          "value": 90,
+          "role": "unit"
+        },
+        "сто": {
+          "value": 100,
+          "role": "unit"
+        },
+        "ста": {
+          "value": 100,
+          "role": "unit"
+        },
+        "двести": {
+          "value": 200,
+          "role": "unit"
+        },
+        "двухсот": {
+          "value": 200,
+          "role": "unit"
+        },
+        "триста": {
+          "value": 300,
+          "role": "unit"
+        },
+        "трехсот": {
+          "value": 300,
+          "role": "unit"
+        },
+        "четыреста": {
+          "value": 400,
+          "role": "unit"
+        },
+        "четырехсот": {
+          "value": 400,
+          "role": "unit"
+        },
+        "пятьсот": {
+          "value": 500,
+          "role": "unit"
+        },
+        "пятисот": {
+          "value": 500,
+          "role": "unit"
+        },
+        "шестьсот": {
+          "value": 600,
+          "role": "unit"
+        },
+        "шестисот": {
+          "value": 600,
+          "role": "unit"
+        },
+        "семьсот": {
+          "value": 700,
+          "role": "unit"
+        },
+        "семисот": {
+          "value": 700,
+          "role": "unit"
+        },
+        "восемьсот": {
+          "value": 800,
+          "role": "unit"
+        },
+        "восьмисот": {
+          "value": 800,
+          "role": "unit"
+        },
+        "девятьсот": {
+          "value": 900,
+          "role": "unit"
+        },
+        "девятисот": {
+          "value": 900,
+          "role": "unit"
+        },
+        "тысяча": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "тысячи": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "тысяч": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "тысячу": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "миллион": {
+          "value": 1000000,
+          "role": "scale"
+        },
+        "миллиона": {
+          "value": 1000000,
+          "role": "scale"
+        },
+        "миллионов": {
+          "value": 1000000,
+          "role": "scale"
+        },
+        "миллиард": {
+          "value": 1000000000,
+          "role": "scale"
+        },
+        "миллиарда": {
+          "value": 1000000000,
+          "role": "scale"
+        },
+        "миллиардов": {
+          "value": 1000000000,
+          "role": "scale"
+        }
+      },
+      "connectors": [
+        "и"
+      ],
+      "ignorable": [
+        "сумма",
+        "сумму",
+        "итого",
+        "всего",
+        "только",
+        "ровно",
+        "прописью",
+        "в",
+        "размере",
+        "сша",
+        "американских",
+        "турецких",
+        "турецкая",
+        "турецкие",
+        "грузинских",
+        "российских",
+        "рф"
+      ],
+      "articles": [],
+      "vigesimal": false,
+      "compoundTeens": false,
+      "major": {
+        "евро": "EUR",
+        "доллар": "USD",
+        "долл": "USD",
+        "рубл": "RUB",
+        "руб": "RUB",
+        "лари": "GEL",
+        "лир": "TRY",
+        "фунт": "GBP",
+        "юан": "CNY",
+        "тенге": "KZT",
+        "манат": "AZN/TMT",
+        "драм": "AMD",
+        "гривн": "UAH",
+        "гривен": "UAH",
+        "грн": "UAH",
+        "франк": null,
+        "дирхам": "AED/MAD",
+        "дирхем": "AED/MAD"
+      },
+      "qualifiers": {
+        "швейцарск": {
+          "франк": "CHF"
+        },
+        "азербайджанск": {
+          "манат": "AZN"
+        },
+        "туркменск": {
+          "манат": "TMT"
+        },
+        "оаэ": {
+          "дирхам": "AED",
+          "дирхем": "AED"
+        },
+        "марокканск": {
+          "дирхам": "MAD",
+          "дирхем": "MAD"
+        },
+        "казахстанск": {},
+        "армянск": {},
+        "украинск": {}
+      },
+      "minor": {
+        "цент": null,
+        "евроцент": "EUR",
+        "копе": "RUB",
+        "коп": "RUB",
+        "тетри": "GEL",
+        "куруш": "TRY",
+        "пенс": "GBP",
+        "фэн": "CNY",
+        "тиын": "KZT",
+        "тиин": "KZT",
+        "гяпик": "AZN",
+        "лум": "AMD",
+        "раппен": "CHF",
+        "сантим": null,
+        "филс": null
+      },
+      "glued": false,
+      "suffixes": []
+    },
+    "tr": {
+      "language": "tr",
+      "locale": "tr",
+      "numbers": {
+        "sıfır": {
+          "value": 0,
+          "role": "unit"
+        },
+        "sifir": {
+          "value": 0,
+          "role": "unit"
+        },
+        "bir": {
+          "value": 1,
+          "role": "unit"
+        },
+        "iki": {
+          "value": 2,
+          "role": "unit"
+        },
+        "üç": {
+          "value": 3,
+          "role": "unit"
+        },
+        "uc": {
+          "value": 3,
+          "role": "unit"
+        },
+        "dört": {
+          "value": 4,
+          "role": "unit"
+        },
+        "dort": {
+          "value": 4,
+          "role": "unit"
+        },
+        "beş": {
+          "value": 5,
+          "role": "unit"
+        },
+        "bes": {
+          "value": 5,
+          "role": "unit"
+        },
+        "altı": {
+          "value": 6,
+          "role": "unit"
+        },
+        "alti": {
+          "value": 6,
+          "role": "unit"
+        },
+        "yedi": {
+          "value": 7,
+          "role": "unit"
+        },
+        "sekiz": {
+          "value": 8,
+          "role": "unit"
+        },
+        "dokuz": {
+          "value": 9,
+          "role": "unit"
+        },
+        "on": {
+          "value": 10,
+          "role": "unit"
+        },
+        "yirmi": {
+          "value": 20,
+          "role": "unit"
+        },
+        "otuz": {
+          "value": 30,
+          "role": "unit"
+        },
+        "kırk": {
+          "value": 40,
+          "role": "unit"
+        },
+        "kirk": {
+          "value": 40,
+          "role": "unit"
+        },
+        "elli": {
+          "value": 50,
+          "role": "unit"
+        },
+        "altmış": {
+          "value": 60,
+          "role": "unit"
+        },
+        "altmis": {
+          "value": 60,
+          "role": "unit"
+        },
+        "yetmiş": {
+          "value": 70,
+          "role": "unit"
+        },
+        "yetmis": {
+          "value": 70,
+          "role": "unit"
+        },
+        "seksen": {
+          "value": 80,
+          "role": "unit"
+        },
+        "doksan": {
+          "value": 90,
+          "role": "unit"
+        },
+        "yüz": {
+          "value": 100,
+          "role": "hundred"
+        },
+        "yuz": {
+          "value": 100,
+          "role": "hundred"
+        },
+        "bin": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "milyon": {
+          "value": 1000000,
+          "role": "scale"
+        },
+        "milyar": {
+          "value": 1000000000,
+          "role": "scale"
+        }
+      },
+      "connectors": [
+        "ve"
+      ],
+      "ignorable": [
+        "yalnız",
+        "yalniz",
+        "yazıyla",
+        "yaziyla",
+        "toplam",
+        "tutar",
+        "tutarında",
+        "tutarinda",
+        "abd",
+        "amerikan",
+        "türk",
+        "turk",
+        "gürcü",
+        "gurcu",
+        "rus"
+      ],
+      "articles": [],
+      "vigesimal": false,
+      "compoundTeens": true,
+      "major": {
+        "avro": "EUR",
+        "euro": "EUR",
+        "dolar": "USD",
+        "lira": "TRY",
+        "tl": "TRY",
+        "ruble": "RUB",
+        "lari": "GEL",
+        "sterlin": "GBP",
+        "yuan": "CNY",
+        "tenge": "KZT",
+        "manat": "AZN/TMT",
+        "dram": "AMD",
+        "grivna": "UAH",
+        "frank": null,
+        "frang": null,
+        "dirhem": "AED/MAD"
+      },
+      "qualifiers": {
+        "isviçre": {
+          "frank": "CHF",
+          "frang": "CHF"
+        },
+        "isvicre": {
+          "frank": "CHF",
+          "frang": "CHF"
+        },
+        "azerbaycan": {
+          "manat": "AZN"
+        },
+        "türkmenistan": {
+          "manat": "TMT"
+        },
+        "turkmenistan": {
+          "manat": "TMT"
+        },
+        "bae": {
+          "dirhem": "AED"
+        },
+        "fas": {
+          "dirhem": "MAD"
+        },
+        "kazak": {},
+        "ermeni": {},
+        "ukrayna": {}
+      },
+      "minor": {
+        "kuruş": "TRY",
+        "kurus": "TRY",
+        "sent": null,
+        "cent": null,
+        "eurocent": "EUR",
+        "tetri": "GEL",
+        "kopek": "RUB",
+        "peni": "GBP"
+      },
+      "glued": true,
+      "suffixes": [
+        "sı",
+        "si",
+        "ı",
+        "i"
+      ]
+    },
+    "ka": {
+      "language": "ka",
+      "locale": "ka",
+      "numbers": {
+        "ნულ": {
+          "value": 0,
+          "role": "unit"
+        },
+        "ერთ": {
+          "value": 1,
+          "role": "unit"
+        },
+        "ორ": {
+          "value": 2,
+          "role": "unit"
+        },
+        "სამ": {
+          "value": 3,
+          "role": "unit"
+        },
+        "ოთხ": {
+          "value": 4,
+          "role": "unit"
+        },
+        "ხუთ": {
+          "value": 5,
+          "role": "unit"
+        },
+        "ექვს": {
+          "value": 6,
+          "role": "unit"
+        },
+        "შვიდ": {
+          "value": 7,
+          "role": "unit"
+        },
+        "რვა": {
+          "value": 8,
+          "role": "unit"
+        },
+        "რვ": {
+          "value": 8,
+          "role": "unit"
+        },
+        "ცხრა": {
+          "value": 9,
+          "role": "unit"
+        },
+        "ცხრ": {
+          "value": 9,
+          "role": "unit"
+        },
+        "ათ": {
+          "value": 10,
+          "role": "unit"
+        },
+        "თერთმეტ": {
+          "value": 11,
+          "role": "unit"
+        },
+        "თორმეტ": {
+          "value": 12,
+          "role": "unit"
+        },
+        "ცამეტ": {
+          "value": 13,
+          "role": "unit"
+        },
+        "თოთხმეტ": {
+          "value": 14,
+          "role": "unit"
+        },
+        "თხუთმეტ": {
+          "value": 15,
+          "role": "unit"
+        },
+        "თექვსმეტ": {
+          "value": 16,
+          "role": "unit"
+        },
+        "ჩვიდმეტ": {
+          "value": 17,
+          "role": "unit"
+        },
+        "თვრამეტ": {
+          "value": 18,
+          "role": "unit"
+        },
+        "ცხრამეტ": {
+          "value": 19,
+          "role": "unit"
+        },
+        "ოც": {
+          "value": 20,
+          "role": "unit"
+        },
+        "ორმოც": {
+          "value": 40,
+          "role": "unit"
+        },
+        "სამოც": {
+          "value": 60,
+          "role": "unit"
+        },
+        "ოთხმოც": {
+          "value": 80,
+          "role": "unit"
+        },
+        "ას": {
+          "value": 100,
+          "role": "hundred"
+        },
+        "ორას": {
+          "value": 200,
+          "role": "unit"
+        },
+        "სამას": {
+          "value": 300,
+          "role": "unit"
+        },
+        "ოთხას": {
+          "value": 400,
+          "role": "unit"
+        },
+        "ხუთას": {
+          "value": 500,
+          "role": "unit"
+        },
+        "ექვსას": {
+          "value": 600,
+          "role": "unit"
+        },
+        "შვიდას": {
+          "value": 700,
+          "role": "unit"
+        },
+        "რვაას": {
+          "value": 800,
+          "role": "unit"
+        },
+        "ცხრაას": {
+          "value": 900,
+          "role": "unit"
+        },
+        "ათას": {
+          "value": 1000,
+          "role": "scale"
+        },
+        "მილიონ": {
+          "value": 1000000,
+          "role": "scale"
+        },
+        "მილიარდ": {
+          "value": 1000000000,
+          "role": "scale"
+        }
+      },
+      "connectors": [
+        "და"
+      ],
+      "ignorable": [
+        "მხოლოდ",
+        "სულ",
+        "თანხა",
+        "თანხით",
+        "ოდენობით",
+        "ოდენობა",
+        "სიტყვიერად",
+        "აშშ",
+        "ამერიკულ",
+        "თურქულ",
+        "რუსულ",
+        "ქართულ",
+        "ინგლისურ"
+      ],
+      "articles": [],
+      "vigesimal": true,
+      "compoundTeens": false,
+      "major": {
+        "ევრო": "EUR",
+        "დოლარ": "USD",
+        "ლარ": "GEL",
+        "ლირ": "TRY",
+        "რუბლ": "RUB",
+        "ფუნტ": "GBP",
+        "იუან": "CNY",
+        "ტენგე": "KZT",
+        "მანათ": "AZN/TMT",
+        "დრამ": "AMD",
+        "გრივნა": "UAH",
+        "გრივნ": "UAH",
+        "ფრანკ": null,
+        "დირჰამ": "AED/MAD",
+        "დირჰემ": "AED/MAD"
+      },
+      "qualifiers": {
+        "შვეიცარიულ": {
+          "ფრანკ": "CHF"
+        },
+        "აზერბაიჯანულ": {
+          "მანათ": "AZN"
+        },
+        "თურქმენულ": {
+          "მანათ": "TMT"
+        },
+        "ყაზახურ": {},
+        "სომხურ": {},
+        "უკრაინულ": {}
+      },
+      "minor": {
+        "ცენტ": null,
+        "ევროცენტ": "EUR",
+        "თეთრ": "GEL",
+        "ქურუშ": "TRY",
+        "კაპიკ": "RUB",
+        "პენს": "GBP"
+      },
+      "glued": true,
+      "suffixes": [
+        "ი",
+        "ის",
+        "ს",
+        "ით"
+      ]
+    }
+  },
+  "legalForms": [
+    "ltd",
+    "limited",
+    "llc",
+    "llp",
+    "inc",
+    "corp",
+    "corporation",
+    "co",
+    "plc",
+    "gmbh",
+    "ag",
+    "sa",
+    "sas",
+    "srl",
+    "spa",
+    "bv",
+    "nv",
+    "jsc",
+    "ojsc",
+    "cjsc",
+    "as",
+    "aş",
+    "şti",
+    "sti",
+    "tic",
+    "san",
+    "ve",
+    "oü",
+    "ооо",
+    "оао",
+    "зао",
+    "пао",
+    "ао",
+    "ип",
+    "тоо",
+    "შპს",
+    "სს",
+    "იმ",
+    "ი/მ"
+  ],
+  "refSeparators": "[\\s\\-_./\\\\:]*",
+  "incoterms2020": [
+    "EXW",
+    "FCA",
+    "CPT",
+    "CIP",
+    "DAP",
+    "DPU",
+    "DDP",
+    "FAS",
+    "FOB",
+    "CFR",
+    "CIF"
+  ],
+  "seaOnly": [
+    "FAS",
+    "FOB",
+    "CFR",
+    "CIF"
+  ],
+  "sellerInsures": [
+    "CIF",
+    "CIP"
+  ],
+  "insuranceTitle": {
+    "source": "insur|assur|страх|sigort|დაზღვ",
+    "flags": "iu"
+  },
+  "requiredDocuments": [
+    "commercial_invoice",
+    "packing_list",
+    "cmr"
+  ],
+  "unitAliases": {
+    "piece": [
+      "pc",
+      "pcs",
+      "pce",
+      "pces",
+      "piece",
+      "pieces",
+      "ea",
+      "each",
+      "шт",
+      "штук",
+      "штука",
+      "штуки",
+      "ცალი",
+      "ც",
+      "adet",
+      "ad"
+    ],
+    "set": [
+      "set",
+      "sets",
+      "компл",
+      "комплект",
+      "комплекта",
+      "комплектов",
+      "კომპლექტი",
+      "კომპლ",
+      "takım",
+      "tk"
+    ],
+    "pair": [
+      "pair",
+      "pairs",
+      "pr",
+      "prs",
+      "пара",
+      "пары",
+      "пар",
+      "წყვილი",
+      "çift"
+    ],
+    "kg": [
+      "kg",
+      "kgs",
+      "kilogram",
+      "kilograms",
+      "кг",
+      "კგ"
+    ],
+    "m": [
+      "m",
+      "meter",
+      "meters",
+      "metre",
+      "metres",
+      "м",
+      "მ"
+    ],
+    "m2": [
+      "m2",
+      "sqm",
+      "sq m",
+      "кв м",
+      "м2",
+      "მ2"
+    ],
+    "l": [
+      "l",
+      "lt",
+      "ltr",
+      "liter",
+      "liters",
+      "litre",
+      "litres",
+      "л",
+      "ლ"
+    ]
+  },
+  "monthWords": {
+    "en": {
+      "january": 1,
+      "february": 2,
+      "march": 3,
+      "april": 4,
+      "may": 5,
+      "june": 6,
+      "july": 7,
+      "august": 8,
+      "september": 9,
+      "october": 10,
+      "november": 11,
+      "december": 12,
+      "jan": 1,
+      "feb": 2,
+      "mar": 3,
+      "apr": 4,
+      "jun": 6,
+      "jul": 7,
+      "aug": 8,
+      "sep": 9,
+      "sept": 9,
+      "oct": 10,
+      "nov": 11,
+      "dec": 12
+    },
+    "tr": {
+      "ocak": 1,
+      "subat": 2,
+      "mart": 3,
+      "nisan": 4,
+      "mayis": 5,
+      "haziran": 6,
+      "temmuz": 7,
+      "agustos": 8,
+      "eylul": 9,
+      "ekim": 10,
+      "kasim": 11,
+      "aralik": 12
+    },
+    "ru": {
+      "январь": 1,
+      "января": 1,
+      "январе": 1,
+      "январю": 1,
+      "январем": 1,
+      "февраль": 2,
+      "февраля": 2,
+      "феврале": 2,
+      "февралю": 2,
+      "февралем": 2,
+      "апрель": 4,
+      "апреля": 4,
+      "апреле": 4,
+      "апрелю": 4,
+      "апрелем": 4,
+      "июнь": 6,
+      "июня": 6,
+      "июне": 6,
+      "июню": 6,
+      "июнем": 6,
+      "июль": 7,
+      "июля": 7,
+      "июле": 7,
+      "июлю": 7,
+      "июлем": 7,
+      "сентябрь": 9,
+      "сентября": 9,
+      "сентябре": 9,
+      "сентябрю": 9,
+      "сентябрем": 9,
+      "октябрь": 10,
+      "октября": 10,
+      "октябре": 10,
+      "октябрю": 10,
+      "октябрем": 10,
+      "ноябрь": 11,
+      "ноября": 11,
+      "ноябре": 11,
+      "ноябрю": 11,
+      "ноябрем": 11,
+      "декабрь": 12,
+      "декабря": 12,
+      "декабре": 12,
+      "декабрю": 12,
+      "декабрем": 12,
+      "март": 3,
+      "марта": 3,
+      "марте": 3,
+      "марту": 3,
+      "мартом": 3,
+      "август": 8,
+      "августа": 8,
+      "августе": 8,
+      "августу": 8,
+      "августом": 8,
+      "маи": 5,
+      "мая": 5,
+      "мае": 5,
+      "маю": 5,
+      "маем": 5,
+      "янв": 1,
+      "фев": 2,
+      "февр": 2,
+      "апр": 4,
+      "авг": 8,
+      "сен": 9,
+      "сент": 9,
+      "окт": 10,
+      "ноя": 11,
+      "нояб": 11,
+      "дек": 12
+    },
+    "ka": {
+      "იანვარი": 1,
+      "იანვარს": 1,
+      "იანვარის": 1,
+      "იანვარში": 1,
+      "იანვარით": 1,
+      "იანვარიდან": 1,
+      "იანვარამდე": 1,
+      "თებერვალი": 2,
+      "თებერვალს": 2,
+      "თებერვალის": 2,
+      "თებერვალში": 2,
+      "თებერვალით": 2,
+      "თებერვალიდან": 2,
+      "თებერვალამდე": 2,
+      "მარტი": 3,
+      "მარტს": 3,
+      "მარტის": 3,
+      "მარტში": 3,
+      "მარტით": 3,
+      "მარტიდან": 3,
+      "მარტამდე": 3,
+      "აპრილი": 4,
+      "აპრილს": 4,
+      "აპრილის": 4,
+      "აპრილში": 4,
+      "აპრილით": 4,
+      "აპრილიდან": 4,
+      "აპრილამდე": 4,
+      "მაისი": 5,
+      "მაისს": 5,
+      "მაისის": 5,
+      "მაისში": 5,
+      "მაისით": 5,
+      "მაისიდან": 5,
+      "მაისამდე": 5,
+      "ივნისი": 6,
+      "ივნისს": 6,
+      "ივნისის": 6,
+      "ივნისში": 6,
+      "ივნისით": 6,
+      "ივნისიდან": 6,
+      "ივნისამდე": 6,
+      "ივლისი": 7,
+      "ივლისს": 7,
+      "ივლისის": 7,
+      "ივლისში": 7,
+      "ივლისით": 7,
+      "ივლისიდან": 7,
+      "ივლისამდე": 7,
+      "სექტემბერი": 9,
+      "სექტემბერს": 9,
+      "სექტემბერის": 9,
+      "სექტემბერში": 9,
+      "სექტემბერით": 9,
+      "სექტემბერიდან": 9,
+      "სექტემბერამდე": 9,
+      "ოქტომბერი": 10,
+      "ოქტომბერს": 10,
+      "ოქტომბერის": 10,
+      "ოქტომბერში": 10,
+      "ოქტომბერით": 10,
+      "ოქტომბერიდან": 10,
+      "ოქტომბერამდე": 10,
+      "ნოემბერი": 11,
+      "ნოემბერს": 11,
+      "ნოემბერის": 11,
+      "ნოემბერში": 11,
+      "ნოემბერით": 11,
+      "ნოემბერიდან": 11,
+      "ნოემბერამდე": 11,
+      "დეკემბერი": 12,
+      "დეკემბერს": 12,
+      "დეკემბერის": 12,
+      "დეკემბერში": 12,
+      "დეკემბერით": 12,
+      "დეკემბერიდან": 12,
+      "დეკემბერამდე": 12,
+      "იანვრის": 1,
+      "იანვრით": 1,
+      "იანვრიდან": 1,
+      "იანვრამდე": 1,
+      "თებერვლის": 2,
+      "თებერვლით": 2,
+      "თებერვლიდან": 2,
+      "თებერვლამდე": 2,
+      "სექტემბრის": 9,
+      "სექტემბრით": 9,
+      "სექტემბრიდან": 9,
+      "სექტემბრამდე": 9,
+      "ოქტომბრის": 10,
+      "ოქტომბრით": 10,
+      "ოქტომბრიდან": 10,
+      "ოქტომბრამდე": 10,
+      "ნოემბრის": 11,
+      "ნოემბრით": 11,
+      "ნოემბრიდან": 11,
+      "ნოემბრამდე": 11,
+      "დეკემბრის": 12,
+      "დეკემბრით": 12,
+      "დეკემბრიდან": 12,
+      "დეკემბრამდე": 12,
+      "აგვისტო": 8,
+      "აგვისტოს": 8,
+      "აგვისტოში": 8,
+      "აგვისტოდან": 8,
+      "აგვისტომდე": 8,
+      "იანვ": 1,
+      "თებ": 2,
+      "აპრ": 4,
+      "ივნ": 6,
+      "ივლ": 7,
+      "აგვ": 8,
+      "სექ": 9,
+      "სექტ": 9,
+      "ოქტ": 10,
+      "ნოემ": 11,
+      "დეკ": 12
+    }
+  },
+  "currencyCodes": [
+    "AED",
+    "AFN",
+    "AMD",
+    "ANG",
+    "AOA",
+    "ARS",
+    "AUD",
+    "AWG",
+    "AZN",
+    "BAM",
+    "BBD",
+    "BDT",
+    "BGN",
+    "BHD",
+    "BIF",
+    "BMD",
+    "BND",
+    "BOB",
+    "BRL",
+    "BSD",
+    "BTN",
+    "BWP",
+    "BYN",
+    "BZD",
+    "CAD",
+    "CDF",
+    "CHF",
+    "CLP",
+    "CNY",
+    "COP",
+    "CRC",
+    "CUP",
+    "CVE",
+    "CZK",
+    "DJF",
+    "DKK",
+    "DOP",
+    "DZD",
+    "EGP",
+    "ERN",
+    "ETB",
+    "EUR",
+    "FJD",
+    "FKP",
+    "GBP",
+    "GEL",
+    "GHS",
+    "GIP",
+    "GMD",
+    "GNF",
+    "GTQ",
+    "GYD",
+    "HKD",
+    "HNL",
+    "HTG",
+    "HUF",
+    "IDR",
+    "ILS",
+    "INR",
+    "IQD",
+    "IRR",
+    "ISK",
+    "JMD",
+    "JOD",
+    "JPY",
+    "KES",
+    "KGS",
+    "KHR",
+    "KMF",
+    "KPW",
+    "KRW",
+    "KWD",
+    "KYD",
+    "KZT",
+    "LAK",
+    "LBP",
+    "LKR",
+    "LRD",
+    "LSL",
+    "LYD",
+    "MAD",
+    "MDL",
+    "MGA",
+    "MKD",
+    "MMK",
+    "MNT",
+    "MOP",
+    "MRU",
+    "MUR",
+    "MVR",
+    "MWK",
+    "MXN",
+    "MYR",
+    "MZN",
+    "NAD",
+    "NGN",
+    "NIO",
+    "NOK",
+    "NPR",
+    "NZD",
+    "OMR",
+    "PAB",
+    "PEN",
+    "PGK",
+    "PHP",
+    "PKR",
+    "PLN",
+    "PYG",
+    "QAR",
+    "RON",
+    "RSD",
+    "RUB",
+    "RWF",
+    "SAR",
+    "SBD",
+    "SCR",
+    "SDG",
+    "SEK",
+    "SGD",
+    "SHP",
+    "SLE",
+    "SOS",
+    "SRD",
+    "SSP",
+    "STN",
+    "SVC",
+    "SYP",
+    "SZL",
+    "THB",
+    "TJS",
+    "TMT",
+    "TND",
+    "TRY",
+    "TTD",
+    "TWD",
+    "TZS",
+    "UAH",
+    "UGX",
+    "USD",
+    "UYU",
+    "UZS",
+    "VES",
+    "VND",
+    "VUV",
+    "WST",
+    "XAF",
+    "XCD",
+    "XCG",
+    "XOF",
+    "XPF",
+    "YER",
+    "ZAR",
+    "ZMW",
+    "ZWG"
+  ],
+  "currencySigns": {
+    "€": [
+      "EUR"
+    ],
+    "₾": [
+      "GEL"
+    ],
+    "₺": [
+      "TRY"
+    ],
+    "₽": [
+      "RUB"
+    ],
+    "₴": [
+      "UAH"
+    ],
+    "₸": [
+      "KZT"
+    ],
+    "₼": [
+      "AZN"
+    ],
+    "֏": [
+      "AMD"
+    ],
+    "₹": [
+      "INR"
+    ],
+    "₪": [
+      "ILS"
+    ],
+    "£": [
+      "GBP",
+      "EGP",
+      "LBP",
+      "SYP",
+      "SDG",
+      "SSP",
+      "GIP",
+      "FKP",
+      "SHP"
+    ],
+    "¥": [
+      "JPY",
+      "CNY"
+    ],
+    "$": [
+      "USD",
+      "CAD",
+      "AUD",
+      "NZD",
+      "SGD",
+      "HKD",
+      "TWD",
+      "MXN",
+      "ARS",
+      "CLP",
+      "COP",
+      "UYU",
+      "BRL",
+      "BSD",
+      "BBD",
+      "BZD",
+      "BMD",
+      "BND",
+      "KYD",
+      "XCD",
+      "FJD",
+      "GYD",
+      "JMD",
+      "LRD",
+      "NAD",
+      "SBD",
+      "SRD",
+      "TTD",
+      "DOP",
+      "CUP",
+      "ZWG"
+    ]
+  },
+  "cmrSeverity": {
+    "a": "warning",
+    "b": "error",
+    "c": "error",
+    "d": "error",
+    "e": "error",
+    "f": "error",
+    "g": "error",
+    "h": "error",
+    "i": "warning",
+    "j": "warning",
+    "k": "warning"
+  },
+  "reportCss": "\n:root { --ink: #111214; --muted: #5d616b; --line: #cfd1d6; --paper: #ececea; --card: #f7f7f5; --red: #e1251b; --amber: #8a5a00; }\n@media (prefers-color-scheme: dark) { :root { --ink: #ededeb; --muted: #a2a5ad; --line: #3a3c42; --paper: #141518; --card: #1c1d21; --red: #ff4d42; --amber: #e0a63a; } }\n* { box-sizing: border-box; }\nbody { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, \"Segoe UI\", \"Noto Sans\", \"Noto Sans Georgian\", sans-serif;\n  --grid: color-mix(in srgb, var(--line) 45%, transparent);\n  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 48px 48px; background-position: -1px -1px; }\nmain { max-width: 860px; margin: 0 auto; padding: 40px 20px 56px; }\n.brand { font-weight: 800; letter-spacing: .04em; font-size: 13px; text-transform: uppercase; }\n.brand b { color: var(--red); }\nh1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.05; margin: 10px 0 18px; letter-spacing: -.02em; }\n.summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }\n.stat { background: var(--card); border: 1px solid var(--line); padding: 10px 14px; min-width: 120px; }\n.stat strong { display: block; font-size: 28px; line-height: 1.1; }\n.stat.err strong { color: var(--red); }\n.stat.warn strong { color: var(--amber); }\n.stat span { color: var(--muted); font-size: 13px; }\n.ok { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--ink); padding: 14px 16px; font-weight: 600; }\n.note { color: var(--muted); font-size: 13px; margin: -14px 0 24px; }\nh2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 30px 0 10px; }\nh2:lang(ka) { text-transform: none; letter-spacing: 0; font-size: 14px; }\n.finding { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--red); padding: 14px 16px; margin-bottom: 10px; }\n.finding.warning { border-left-color: var(--amber); }\n.rule { font-size: 12px; color: var(--muted); letter-spacing: .03em; }\n.rule b { color: var(--ink); }\n.message { font-size: 16px; font-weight: 600; margin: 4px 0 10px; }\nul { list-style: none; padding: 0; margin: 0; }\nli { border-top: 1px dashed var(--line); padding: 7px 0 0; margin-top: 7px; font-size: 14px; }\n.src { color: var(--muted); font-size: 12.5px; display: block; }\n.field { font-weight: 600; }\nq { quotes: none; font-family: ui-monospace, \"SFMono-Regular\", Menlo, Consolas, monospace; font-size: 13.5px; background: color-mix(in srgb, var(--red) 9%, transparent); padding: 1px 4px; }\n.check { margin: 10px 0 0; font-size: 14px; color: var(--muted); }\n.issues li { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }\n.issues-hint { margin: 0 0 4px; font-size: 14px; }\nfooter { margin-top: 36px; color: var(--muted); font-size: 12.5px; }\n@media print { body { background: #fff; } .finding, .stat, .ok { break-inside: avoid; } }\n"
+}

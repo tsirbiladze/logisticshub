@@ -1,0 +1,15 @@
+{
+  "name": "logisticshub",
+  "owner": { "name": "Tornike Sirbiladze", "url": "https://tsirbiladze.com" },
+  "metadata": {
+    "description": "Cross-check trade documents (invoice, packing list, CMR, contract) with your AI agent."
+  },
+  "plugins": [
+    {
+      "name": "logisticshub",
+      "source": "./",
+      "description": "Cross-check a commercial invoice, packing list, CMR and contract: 16 deterministic rules, exact quotes and pages, reports in EN/KA/RU/TR and marked PDFs.",
+      "category": "productivity"
+    }
+  ]
+}

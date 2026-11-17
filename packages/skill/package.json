@@ -1,0 +1,18 @@
+{
+  "name": "@logisticshub/skill",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Builds the installable Agent Skill into skills/logisticshub.",
+  "scripts": {
+    "build": "node build.ts"
+  },
+  "dependencies": {
+    "@logisticshub/annotate": "workspace:*",
+    "@logisticshub/core": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "n2words": "6.3.0"
+  }
+}

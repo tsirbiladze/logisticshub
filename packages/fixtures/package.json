@@ -1,0 +1,13 @@
+{
+  "name": "@logisticshub/fixtures",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Synthetic shipment packs: PDFs, ideal extractions and expected findings.",
+  "scripts": {
+    "generate": "node src/generate.ts"
+  },
+  "dependencies": {
+    "@logisticshub/core": "workspace:*"
+  }
+}

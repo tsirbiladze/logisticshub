@@ -1,0 +1,10 @@
+[
+  {
+    "rule": "INC-03",
+    "severity": "warning",
+    "key": "INC-03.no-insurance",
+    "params": {
+      "code": "CIP"
+    }
+  }
+]

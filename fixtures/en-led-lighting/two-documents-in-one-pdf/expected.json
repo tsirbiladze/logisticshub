@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "REF-01",
+    "severity": "error",
+    "key": "REF-01.invoice-number",
+    "params": {
+      "expected": "BL-INV-26-0412",
+      "found": "BL-INV-26-0421"
+    }
+  }
+]

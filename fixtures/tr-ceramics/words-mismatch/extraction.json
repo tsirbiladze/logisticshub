@@ -1,0 +1,713 @@
+{
+  "schemaVersion": "2",
+  "documents": [
+    {
+      "type": "commercial_invoice",
+      "id": "invoice",
+      "sourceFile": "invoice.pdf",
+      "language": "tr",
+      "number": {
+        "value": "ESR2026000781",
+        "quote": "ESR2026000781",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-20",
+        "quote": "20.10.2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "quote": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "page": 1
+        },
+        "address": {
+          "value": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "quote": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "page": 1
+        },
+        "country": {
+          "value": "Türkiye",
+          "quote": "Türkiye",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "Batumi Yapı Market LLC",
+          "quote": "Batumi Yapı Market LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "Gorgiladze Cad. No:60, 6010 Batum",
+          "quote": "Gorgiladze Cad. No:60, 6010 Batum",
+          "page": 1
+        },
+        "country": {
+          "value": "Gürcistan",
+          "quote": "Gürcistan",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "address": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        }
+      },
+      "contractRef": {
+        "number": {
+          "value": "ESR-SZL-2026-019",
+          "quote": "ESR-SZL-2026-019",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-10-08",
+          "quote": "08.10.2026",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "EXW",
+          "quote": "EXW",
+          "page": 1
+        },
+        "place": {
+          "value": "Çiğli / İzmir",
+          "quote": "Çiğli / İzmir",
+          "page": 1
+        },
+        "version": {
+          "value": "Incoterms 2020",
+          "quote": "Incoterms 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "EUR",
+        "quote": "EUR",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "Granit seramik 60×60 cm, mat gri",
+            "quote": "Granit seramik 60×60 cm, mat gri",
+            "page": 1
+          },
+          "model": {
+            "value": "ESR-GRN-6060",
+            "quote": "ESR-GRN-6060",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "720",
+            "quote": "720",
+            "page": 1
+          },
+          "unit": {
+            "value": "m²",
+            "quote": "m²",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "9.75",
+            "quote": "9,75",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "7020.00",
+            "quote": "7.020,00",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "Duvar seramiği 30×60 cm, parlak beyaz",
+            "quote": "Duvar seramiği 30×60 cm, parlak beyaz",
+            "page": 1
+          },
+          "model": {
+            "value": "ESR-DUV-3060",
+            "quote": "ESR-DUV-3060",
+            "page": 1
+          },
+          "hsCode": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "quantity": {
+            "value": "360",
+            "quote": "360",
+            "page": 1
+          },
+          "unit": {
+            "value": "m²",
+            "quote": "m²",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "7.40",
+            "quote": "7,40",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "2664.00",
+            "quote": "2.664,00",
+            "page": 1
+          }
+        }
+      ],
+      "subtotal": {
+        "value": "9684.00",
+        "quote": "EUR 9.684,00",
+        "page": 1
+      },
+      "discount": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "discountPercent": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "freight": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "insurance": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "otherCharges": [],
+      "tax": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "total": {
+        "value": "9684.00",
+        "quote": "EUR 9.684,00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "YALNIZ DOKUZBİNSEKİZYÜZSEKSENDÖRT AVRO SIFIR SENT",
+        "quote": "YALNIZ DOKUZBİNSEKİZYÜZSEKSENDÖRT AVRO SIFIR SENT",
+        "page": 1
+      },
+      "packages": {
+        "value": "18",
+        "quote": "18 palet",
+        "page": 1
+      },
+      "netWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "grossWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "countryOfOrigin": {
+        "value": "Türkiye",
+        "quote": "Türkiye",
+        "page": 1
+      }
+    },
+    {
+      "type": "packing_list",
+      "id": "packing-list",
+      "sourceFile": "packing-list.pdf",
+      "language": "tr",
+      "number": {
+        "value": "ESR2026000781-ÇL",
+        "quote": "ESR2026000781-ÇL",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-21",
+        "quote": "21.10.2026",
+        "page": 1
+      },
+      "shipper": {
+        "name": {
+          "value": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "quote": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "page": 1
+        },
+        "address": {
+          "value": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "quote": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "page": 1
+        },
+        "country": {
+          "value": "Türkiye",
+          "quote": "Türkiye",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": "Batumi Yapı Market LLC",
+          "quote": "Batumi Yapı Market LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "Gorgiladze Cad. No:60, 6010 Batum",
+          "quote": "Gorgiladze Cad. No:60, 6010 Batum",
+          "page": 1
+        },
+        "country": {
+          "value": "Gürcistan",
+          "quote": "Gürcistan",
+          "page": 1
+        }
+      },
+      "invoiceRef": {
+        "number": {
+          "value": "ESR2026000781",
+          "quote": "ESR2026000781",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-10-20",
+          "quote": "20.10.2026",
+          "page": 1
+        }
+      },
+      "packingMethod": {
+        "value": "palet",
+        "quote": "palet",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "Granit seramik 60×60 cm, mat gri",
+            "quote": "Granit seramik 60×60 cm, mat gri",
+            "page": 1
+          },
+          "model": {
+            "value": "ESR-GRN-6060",
+            "quote": "ESR-GRN-6060",
+            "page": 1
+          },
+          "quantity": {
+            "value": "720",
+            "quote": "720",
+            "page": 1
+          },
+          "unit": {
+            "value": "m²",
+            "quote": "m²",
+            "page": 1
+          },
+          "packages": {
+            "value": "12",
+            "quote": "12",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "16560",
+            "quote": "16.560",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "16920",
+            "quote": "16.920",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "13.2",
+            "quote": "13,2",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "Duvar seramiği 30×60 cm, parlak beyaz",
+            "quote": "Duvar seramiği 30×60 cm, parlak beyaz",
+            "page": 1
+          },
+          "model": {
+            "value": "ESR-DUV-3060",
+            "quote": "ESR-DUV-3060",
+            "page": 1
+          },
+          "quantity": {
+            "value": "360",
+            "quote": "360",
+            "page": 1
+          },
+          "unit": {
+            "value": "m²",
+            "quote": "m²",
+            "page": 1
+          },
+          "packages": {
+            "value": "6",
+            "quote": "6",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "5400",
+            "quote": "5.400",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "5580",
+            "quote": "5.580",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "6.6",
+            "quote": "6,6",
+            "page": 1
+          }
+        }
+      ],
+      "totalQuantity": {
+        "value": "1080",
+        "quote": "1.080",
+        "page": 1
+      },
+      "totalPackages": {
+        "value": "18",
+        "quote": "18",
+        "page": 1
+      },
+      "totalNetWeightKg": {
+        "value": "21960",
+        "quote": "21.960",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "22500",
+        "quote": "22.500",
+        "page": 1
+      },
+      "totalVolumeM3": {
+        "value": "19.8",
+        "quote": "19,8",
+        "page": 1
+      }
+    },
+    {
+      "type": "cmr",
+      "id": "cmr",
+      "sourceFile": "cmr.pdf",
+      "language": "tr",
+      "number": {
+        "value": "TR 1029384",
+        "quote": "TR 1029384",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-22",
+        "quote": "22.10.2026",
+        "page": 1
+      },
+      "placeOfIssue": {
+        "value": "İzmir",
+        "quote": "İzmir",
+        "page": 1
+      },
+      "sender": {
+        "name": {
+          "value": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "quote": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "page": 1
+        },
+        "address": {
+          "value": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "quote": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "page": 1
+        },
+        "country": {
+          "value": "Türkiye",
+          "quote": "Türkiye",
+          "page": 1
+        }
+      },
+      "carrier": {
+        "name": {
+          "value": "Karadeniz Lojistik Ltd. Şti.",
+          "quote": "Karadeniz Lojistik Ltd. Şti.",
+          "page": 1
+        },
+        "address": {
+          "value": "Liman Cad. No:12, 61100 Trabzon",
+          "quote": "Liman Cad. No:12, 61100 Trabzon",
+          "page": 1
+        },
+        "country": {
+          "value": "Türkiye",
+          "quote": "Türkiye",
+          "page": 1
+        }
+      },
+      "placeOfTakingOver": {
+        "value": "Atatürk OSB, Çiğli / İzmir, Türkiye",
+        "quote": "Atatürk OSB, Çiğli / İzmir, Türkiye",
+        "page": 1
+      },
+      "dateOfTakingOver": {
+        "value": "2026-10-22",
+        "quote": "22.10.2026",
+        "page": 1
+      },
+      "placeOfDelivery": {
+        "value": "Gorgiladze Cad. No:60, Batum, Gürcistan",
+        "quote": "Gorgiladze Cad. No:60, Batum, Gürcistan",
+        "page": 1
+      },
+      "consignee": {
+        "name": {
+          "value": "Batumi Yapı Market LLC",
+          "quote": "Batumi Yapı Market LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "Gorgiladze Cad. No:60, 6010 Batum",
+          "quote": "Gorgiladze Cad. No:60, 6010 Batum",
+          "page": 1
+        },
+        "country": {
+          "value": "Gürcistan",
+          "quote": "Gürcistan",
+          "page": 1
+        }
+      },
+      "goods": [
+        {
+          "marksAndNumbers": {
+            "value": "ESR/781/P01-P12",
+            "quote": "ESR/781/P01-P12",
+            "page": 1
+          },
+          "packages": {
+            "value": "12",
+            "quote": "12",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "palet",
+            "quote": "palet",
+            "page": 1
+          },
+          "description": {
+            "value": "Granit seramik 60×60 cm, mat gri",
+            "quote": "Granit seramik 60×60 cm, mat gri",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "16920",
+            "quote": "16.920",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "13.2",
+            "quote": "13,2",
+            "page": 1
+          }
+        },
+        {
+          "marksAndNumbers": {
+            "value": "ESR/781/P13-P18",
+            "quote": "ESR/781/P13-P18",
+            "page": 1
+          },
+          "packages": {
+            "value": "6",
+            "quote": "6",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "palet",
+            "quote": "palet",
+            "page": 1
+          },
+          "description": {
+            "value": "Duvar seramiği 30×60 cm, parlak beyaz",
+            "quote": "Duvar seramiği 30×60 cm, parlak beyaz",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "5580",
+            "quote": "5.580",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "6.6",
+            "quote": "6,6",
+            "page": 1
+          }
+        }
+      ],
+      "dangerousGoods": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "totalPackages": {
+        "value": "18",
+        "quote": "18",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "22500",
+        "quote": "22.500",
+        "page": 1
+      },
+      "carriageCharges": {
+        "value": "Navlun alıcıya aittir (EXW)",
+        "quote": "Navlun alıcıya aittir (EXW)",
+        "page": 1
+      },
+      "customsInstructions": {
+        "value": "İhracat beyannamesi: İzmir Gümrüğü. İthalat: Sarpi gümrük kapısı",
+        "quote": "İhracat beyannamesi: İzmir Gümrüğü. İthalat: Sarpi gümrük kapısı",
+        "page": 1
+      },
+      "convention": {
+        "value": "Bu taşıma, aksine herhangi bir hükme bakılmaksızın, Eşyaların Karayoluyla Uluslararası Taşınması için Sözleşme Mukavelesine (CMR) tabidir.",
+        "quote": "Bu taşıma, aksine herhangi bir hükme bakılmaksızın, Eşyaların Karayoluyla Uluslararası Taşınması için Sözleşme Mukavelesine (CMR) tabidir.",
+        "page": 1
+      },
+      "attachedDocuments": [
+        {
+          "value": "Ticari fatura ESR2026000781",
+          "quote": "Ticari fatura ESR2026000781",
+          "page": 1
+        },
+        {
+          "value": "Çeki listesi ESR2026000781-ÇL",
+          "quote": "Çeki listesi ESR2026000781-ÇL",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "type": "contract",
+      "id": "contract",
+      "sourceFile": "contract.pdf",
+      "language": "tr",
+      "number": {
+        "value": "ESR-SZL-2026-019",
+        "quote": "ESR-SZL-2026-019",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-10-08",
+        "quote": "08.10.2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "quote": "Ege Seramik Sanayi ve Ticaret A.Ş.",
+          "page": 1
+        },
+        "address": {
+          "value": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "quote": "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
+          "page": 1
+        },
+        "country": {
+          "value": "Türkiye",
+          "quote": "Türkiye",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "Batumi Yapı Market LLC",
+          "quote": "Batumi Yapı Market LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "Gorgiladze Cad. No:60, 6010 Batum",
+          "quote": "Gorgiladze Cad. No:60, 6010 Batum",
+          "page": 1
+        },
+        "country": {
+          "value": "Gürcistan",
+          "quote": "Gürcistan",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "EXW",
+          "quote": "EXW",
+          "page": 1
+        },
+        "place": {
+          "value": "Çiğli / İzmir",
+          "quote": "Çiğli / İzmir",
+          "page": 1
+        },
+        "version": {
+          "value": "Incoterms 2020",
+          "quote": "Incoterms 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "EUR",
+        "quote": "EUR",
+        "page": 1
+      },
+      "totalAmount": {
+        "value": "9684.00",
+        "quote": "EUR 9.684,00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "YALNIZ DOKUZBİNALTIYÜZSEKSENDÖRT AVRO SIFIR SENT",
+        "quote": "YALNIZ DOKUZBİNALTIYÜZSEKSENDÖRT AVRO SIFIR SENT",
+        "page": 1
+      },
+      "goodsDescription": {
+        "value": "Seramik yer ve duvar karoları",
+        "quote": "Seramik yer ve duvar karoları",
+        "page": 1
+      }
+    }
+  ]
+}

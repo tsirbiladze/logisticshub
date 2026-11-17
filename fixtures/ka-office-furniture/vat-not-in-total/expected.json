@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "SUM-02",
+    "severity": "error",
+    "key": "SUM-02.total",
+    "params": {
+      "expected": "15694.00",
+      "formula": "13300.00 + 2394.00",
+      "found": "13300.00"
+    }
+  }
+]

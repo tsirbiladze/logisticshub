@@ -1,0 +1,14 @@
+[
+  {
+    "rule": "PTY-01",
+    "severity": "warning",
+    "key": "PTY-01.name",
+    "params": {
+      "role": "consignee",
+      "a": "Batumi Yapı Market LLC",
+      "aDocument": "commercial_invoice",
+      "b": "Tiflis Yapı Market LLC",
+      "bDocument": "cmr"
+    }
+  }
+]

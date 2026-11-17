@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "REF-01",
+    "severity": "warning",
+    "key": "REF-01.cmr-missing-document",
+    "params": {
+      "document": "commercial_invoice",
+      "number": "ESR2026000781"
+    }
+  }
+]

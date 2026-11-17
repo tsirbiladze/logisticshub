@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm verify
+      # The committed skill must match a fresh build.
+      - run: pnpm build:skill && git diff --exit-code -- skills/
+      # claude.ai expects the skill folder at the zip's root.
+      - run: cd skills && zip -r ../logisticshub-skill.zip logisticshub
+      - run: gh release create "$GITHUB_REF_NAME" logisticshub-skill.zip --title "logisticshub ${GITHUB_REF_NAME#v}" --notes-file <(awk '/^## /{n++} n==1' CHANGELOG.md)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
