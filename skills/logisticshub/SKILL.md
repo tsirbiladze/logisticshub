@@ -1,15 +1,15 @@
 ---
 name: logisticshub
-description: Cross-check a shipment's export or customs documents (invoice, packing list, CMR, contract), or one invoice's sums and amount in words. English, Georgian, Russian, Turkish. Not for paying or booking.
+description: Cross-check trade documents (invoice, packing list, CMR, contract), or one invoice's sums and amount in words. Look up Georgian HS codes. EN, KA, RU, TR. Not for paying or booking.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   homepage: "https://tsirbiladze.com/skills/logisticshub"
 ---
 
 # Logisticshub: trade document cross-check
 
-You read the documents; `scripts/check.mjs` (in this skill's directory) applies 16 deterministic rules to your extraction and writes the report. The rules see only what you extract, so record what is **printed**, quoted **verbatim**, and nothing you worked out yourself.
+You read the documents; `scripts/check.mjs` (in this skill's directory) applies 17 deterministic rules to your extraction and writes the report. The rules see only what you extract, so record what is **printed**, quoted **verbatim**, and nothing you worked out yourself.
 
 ## 1. Collect the set
 
@@ -68,10 +68,14 @@ Answer in the user's language; when it is not one of the four, translate the rep
 - the paths of `report.html` (opens in any browser) and of each `.marked.pdf` that was written;
 - what limits the result: extraction issues left after the correction rounds, notes for the user, every fact you left null because you could not read it, and every number or date whose reading you had to choose.
 
-Present findings as discrepancies to verify against the originals, not as verdicts. With no findings and no issues, say the documents agree on the 16 rules. When the user gave fewer documents on purpose (one invoice), a `DOC-01` warning that the packing list or the CMR is missing is expected: say what was checked and that the rules which compare documents had nothing to compare.
+Present findings as discrepancies to verify against the originals, not as verdicts. With no findings and no issues, say the documents agree on the 17 rules. When the user gave fewer documents on purpose (one invoice), a `DOC-01` warning that the packing list or the CMR is missing is expected: say what was checked and that the rules which compare documents had nothing to compare.
 
 A discrepancy you noticed while reading that no rule reports (`references/rules.md`, "Not checked") goes under its own heading after the findings, "Seen while reading, not checked by a rule", with its quotes and pages. Keep it out of the checker's findings and counts.
 
 Done when the user has every finding with its evidence, the file paths and every limit above, and nothing in your answer differs from the report.
 
 To explain a rule or answer what the skill checks and does not check, read `references/rules.md`.
+
+## Look up a Georgian HS code
+
+When the user asks what a code means or an HS-01 finding needs related codes, run `node <this-skill-dir>/scripts/check.mjs hs "9403 30"` (or `python3 <this-skill-dir>/scripts/check.py hs "9403 30"`). You can pass Georgian words, such as `"საწერი მაგიდ"`, and add `--json` or `--limit <n>`. Report the edition and source with the result. Use the entries to explain the printed code. The lookup leaves tariff classification to the user.

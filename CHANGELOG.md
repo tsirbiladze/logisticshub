@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 — 2026-11-19
+
+- Added HS-01 for printed HS codes on invoices involving Georgia dated from 2024-01-26. It checks against the original annex of Georgian Order No. 21 (Matsne 6086072, publication 0). Later amendments were not verified.
+- Added offline lookup by code or Georgian description in the CLI, MCP server and both skill scripts.
+- Added two synthetic sets for HS-01, bringing the total to 31. The clean Georgian set now prints valid national codes.
+
 ## 1.0.0 — 2026-11-17
 
 First release.

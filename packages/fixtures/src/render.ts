@@ -99,11 +99,12 @@ function field(label: string, value: string): string {
 export function renderInvoice(source: CommercialInvoice, spec: ShipmentSpec, options: RenderOptions = {}): string {
   const doc = track(source);
   const L = LABELS[spec.language];
+  const withHs = doc.lines.some((line) => line.hsCode.quote);
   const rows = doc.lines.map(
-    (l) => `<tr><td>${q(l.model)}</td><td>${q(l.description)}</td><td class="n">${q(l.quantity)}</td><td>${q(l.unit)}</td>
+    (l) => `<tr><td>${q(l.model)}</td><td>${q(l.description)}</td>${withHs ? `<td class="n">${q(l.hsCode)}</td>` : ""}<td class="n">${q(l.quantity)}</td><td>${q(l.unit)}</td>
       <td class="n">${q(l.unitPrice)}</td><td class="n">${q(l.lineTotal)}</td></tr>`,
   );
-  const header = `<thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th><th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th>
+  const header = `<thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th>${withHs ? '<th class="n">HS</th>' : ""}<th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th>
       <th class="n">${esc(L.unitPrice)}</th><th class="n">${esc(L.amount)}</th></tr></thead>`;
   const table = (body: string) => `<table>${header}<tbody>${body}</tbody></table>`;
   // A table over two pages: the running sum closes page 1 and opens page 2, under the repeated header.
@@ -111,7 +112,7 @@ export function renderInvoice(source: CommercialInvoice, spec: ShipmentSpec, opt
   const carried = (label: string) => {
     const f = formatter(spec.style);
     const amount = toFixed(sum(source.lines.slice(0, cut).map((l) => dec(l.lineTotal.value ?? "0"))), 2);
-    return `<tr class="carry"><td colspan="5">${esc(label)}</td><td class="n">${esc(`${spec.currency} ${f.number(amount)}`)}</td></tr>`;
+    return `<tr class="carry"><td colspan="${withHs ? 6 : 5}">${esc(label)}</td><td class="n">${esc(`${spec.currency} ${f.number(amount)}`)}</td></tr>`;
   };
   const lines =
     cut === undefined

@@ -377,7 +377,7 @@ describe("built skill", () => {
     expect(monthFirst.stdout).toContain("✓ No problems found.");
     // Two invoices: said once, with what to check, and each invoice marked at its number.
     const second = run("second-invoice");
-    expect(second.stdout).toContain("**Errors: 0 · Warnings: 1** · Checked: 5 documents, 16 rules");
+    expect(second.stdout).toContain("**Errors: 0 · Warnings: 1** · Checked: 5 documents, 17 rules");
     expect(second.stdout).toContain("- invoice BL-INV-26-0413 (invoice-2.pdf), p. 1 · number: “BL-INV-26-0413”");
     expect(second.stdout).toContain("→ See whether the first of them is the one that belongs to this shipment");
     expect(second.files).toEqual(["invoice-2.marked.pdf", "invoice.marked.pdf", "report.html", "report.json", "report.md"]);

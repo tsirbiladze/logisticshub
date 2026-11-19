@@ -54,14 +54,14 @@ A model reads the documents (Claude by default; `--model openai:<id>` or `openro
 { "mcpServers": { "logisticshub": { "command": "npx", "args": ["-y", "logisticshub", "mcp"] } } }
 ```
 
-Tools: `get_extraction_guide` (the guide, the JSON Schema and a blank to copy) and `check_documents` (the check; with `pdfDir` it looks every quote up in the PDFs, with `outDir` it writes the reports, with both it also marks the PDFs).
+Tools: `get_extraction_guide` (the guide, the JSON Schema and a blank to copy), `check_documents` (the check; with `pdfDir` it looks every quote up in the PDFs, with `outDir` it writes the reports, with both it also marks the PDFs), and `lookup_hs_code` (the HS lookup).
 </details>
 
-The skill's checker is a single file that needs Node.js 22+, or Python 3.9+ via `scripts/check.py`. The CLI and the MCP server need Node.js 22+.
+The skill's checker needs Node.js 22+, or Python 3.9+ via `scripts/check.py`. The CLI and the MCP server need Node.js 22+.
 
 ## What it checks
 
-16 deterministic rules. The model only reads the documents; arithmetic, reading amounts written out in words, and every comparison are done in code.
+17 deterministic rules. The model only reads the documents; arithmetic, reading amounts written out in words, and every comparison are done in code.
 
 | Group | Rules |
 |---|---|
@@ -69,6 +69,13 @@ The skill's checker is a single file that needs Node.js 22+, or Python 3.9+ via 
 | Quantities and weights | **SUM-03** packing list and CMR lines add up to their totals · **QTY-01** invoice and packing list give the same quantity per item, and invoice, packing list and CMR the same number of packages · **WGT-01** gross ≥ net · **WGT-02** same weights on every document |
 | References and parties | **REF-01** the packing list cites the invoice, the invoice cites the contract, the CMR lists both · **DATE-01** contract ≤ invoice ≤ taking over of the goods · **PTY-01** same seller, buyer and consignee · **DOC-01** an invoice, a packing list and a CMR, one of each |
 | Terms and CMR | **INC-01** one Incoterms 2020 rule on invoice and contract · **INC-02** no sea-only rule on a road shipment · **INC-03** insurance under CIF/CIP · **CMR-01** CMR Convention Art. 6(1)(a)–(k) particulars |
+| Customs codes | **HS-01** printed invoice codes in the Georgian commodity nomenclature |
+
+HS-01 checks printed HS codes on invoices dated 2024-01-26 or later when Georgia is the recorded country of the seller, buyer or consignee. An unreadable code gives a warning. A missing six-digit subheading gives a warning and the nearest heading when available. An absent eleven-digit code under a known subheading gives an error and up to five related codes. Other lengths from six to twelve are checked at six digits.
+
+The checker and lookup use the original annex to the Georgian Minister of Finance’s Order No. 21 of 26 January 2024, in force that day and published 30 January 2024 ([Matsne document 6086072, publication 0](https://matsne.gov.ge/ka/document/download/6086072/0/1)). Later amendments were not verified. Normative texts are not protected by copyright in Georgia ([Law on Copyright and Related Rights, Art. 8(1)(a)](https://matsne.gov.ge/ka/document/view/16198)).
+
+Search by exact code, prefix or Georgian description with `logisticshub hs 940330`, `logisticshub hs "საწერი მაგიდ"`, the skill’s `hs` subcommand or the MCP tool `lookup_hs_code`.
 
 Each rule exactly, with every finding, its severity and its tolerance: [`skills/logisticshub/references/rules.md`](skills/logisticshub/references/rules.md).
 
@@ -105,9 +112,10 @@ The skill folder, [`skills/logisticshub`](skills/logisticshub):
 | `references/extraction-schema.json` | the JSON Schema of `extraction.json` |
 | `references/extraction-blank.json` | every document type and table line with all facts empty, to copy |
 | `references/issues.md` | what each extraction issue and each note means, and what to do; read only when the check lists one |
-| `references/rules.md` | the 16 rules, and what is not checked |
-| `scripts/check.mjs` | the checker, one file, no install |
+| `references/rules.md` | the 17 rules, and what is not checked |
+| `scripts/check.mjs` | the checker and HS lookup, no install |
 | `scripts/check.py`, `scripts/check-data.json` | the same checker in Python, for where there is no Node.js |
+| `scripts/hs-nomenclature.json.gz` | Georgian commodity nomenclature data shared by both scripts |
 | `scripts/THIRD-PARTY-NOTICES.txt` | licenses of what `check.mjs` bundles |
 
 ## Privacy
@@ -130,8 +138,8 @@ Not checked:
 - **Contract value and goods**: the invoice total against the contract value, unit prices against the contract, the contract's goods against the invoice lines.
 - **Volumes across documents**: a packing list's volumes are added up to its own total, not compared with the CMR.
 - **Weights per line across documents**, and net weight on a CMR.
-- **Origin and HS codes**: recorded only. No tariff classification, no duty or tax calculation, no customs declaration.
-- **Addresses, countries, registration and tax numbers, bank details, signatures and stamps**. Only the parties' names are compared, and not across scripts.
+- **Origin and tariff classification**: origin is recorded only. Classification, duty and tax calculations, other countries’ nomenclatures and customs declarations are outside the check. HS-01 skips invoices without a confirmed Georgian party or usable date, and invoices dated before 2024-01-26.
+- **Addresses, countries, registration and tax numbers, bank details, signatures and stamps**. Only the parties' names are compared, and not across scripts. HS-01 reads countries to decide whether it applies.
 - **Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is only added into the invoice total.
 - **A discount printed only as a rate**: the invoice total is then left unchecked.
 - **Units**: nothing is converted. Quantities in different units are not compared, and neither are package counts of different packing methods.
@@ -142,11 +150,11 @@ Not checked:
 
 ## Quality
 
-- 4 synthetic packs (KA, EN, RU, TR) with 29 variants: 7 sets without a problem and 22 with a planted one. Among them are an invoice over two pages, a scanned CMR, two documents in one PDF, a second invoice, dates written month first, and a packing list that prints numbers in two conventions. The checker reports exactly the planted findings and nothing else, on every test run.
-- The planted problems cover 13 of the 16 rules. SUM-03, CUR-01 and INC-01 have no variant: they are covered by the rule tests alone.
+- 4 synthetic packs (KA, EN, RU, TR) with 31 variants: 7 sets without a problem and 24 with a planted one. Among them are an invoice over two pages, a scanned CMR, two documents in one PDF, a second invoice, dates written month first, and a packing list that prints numbers in two conventions. The checker reports exactly the planted findings and nothing else, on every test run.
+- The planted problems cover 14 of the 17 rules. SUM-03, CUR-01 and INC-01 have no variant: they are covered by the rule tests alone.
 - The Python checker produces byte-identical reports to the Node one, tested on every variant in all four languages.
 - Every message of every rule is tested in all four languages.
-- The suite ran on Node.js 22.23.5 with Python 3.9.25 and on Node.js 24.22.1 with Python 3.14.8, on one Linux machine. CI is set up for Node.js 22 and 24 with Python 3.9 and the current Python, but it has not run yet.
+- This version’s suite ran on Linux with Node.js 24.22.1 and Python 3.14.8.
 
 ## Development
 
@@ -168,6 +176,8 @@ pnpm fixtures        # regenerates the synthetic packs and PDFs (needs Chromium 
 | `packages/fixtures` | synthetic packs: specs, templates, generator |
 | `fixtures` | the generated packs: PDFs, a reference `extraction.json` and the expected findings of each variant |
 | `docs` | the skill page text shown on [tsirbiladze.com](https://tsirbiladze.com/skills/logisticshub) |
+
+Rebuild the nomenclature from the saved annex with `python3 packages/core/scripts/build-hs-nomenclature.py <annex.docx>`. The build script verifies its SHA-256.
 
 Contributor notes for people and agents: [AGENTS.md](AGENTS.md).
 

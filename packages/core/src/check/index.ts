@@ -2,6 +2,7 @@ import type { Cmr, CommercialInvoice, Contract, Extraction, OtherDocument, Packi
 import { inspectExtraction, parseAndInspect, type ExtractionIssue } from "../validate.ts";
 import { beginRun, endRun } from "./helpers.ts";
 import { amountInWords, documentTotals, invoiceTotals, lineArithmetic } from "./rules/amounts.ts";
+import { hsCodes } from "./rules/hs.ts";
 import { checklist } from "./rules/checklist.ts";
 import { cmrParticulars } from "./rules/cmr.ts";
 import {
@@ -61,6 +62,7 @@ export const RULES: readonly Rule[] = [
   insurance,
   cmrParticulars,
   checklist,
+  hsCodes,
 ];
 
 const DEFAULT_OPTIONS: Required<CheckOptions> = {

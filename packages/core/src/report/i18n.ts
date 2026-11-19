@@ -19,6 +19,7 @@ export const RULE_TITLES: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "Insurance under CIF/CIP",
     "CMR-01": "CMR required particulars",
     "DOC-01": "Complete document set",
+    "HS-01": "HS code in the Georgian nomenclature",
   },
   ka: {
     "AMT-01": "თანხა სიტყვიერად = თანხა ციფრებით",
@@ -37,6 +38,7 @@ export const RULE_TITLES: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "დაზღვევა CIF/CIP პირობით",
     "CMR-01": "CMR-ის სავალდებულო მონაცემები",
     "DOC-01": "დოკუმენტების სრული ნაკრები",
+    "HS-01": "HS კოდი საქართველოს სასაქონლო ნომენკლატურაში",
   },
   ru: {
     "AMT-01": "Сумма прописью = сумма цифрами",
@@ -55,6 +57,7 @@ export const RULE_TITLES: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "Страхование при CIF/CIP",
     "CMR-01": "Обязательные реквизиты CMR",
     "DOC-01": "Полный комплект документов",
+    "HS-01": "Код ТН ВЭД в грузинской номенклатуре",
   },
   tr: {
     "AMT-01": "Yazıyla tutar = rakamla tutar",
@@ -73,6 +76,7 @@ export const RULE_TITLES: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "CIF/CIP'te sigorta",
     "CMR-01": "CMR zorunlu bilgileri",
     "DOC-01": "Eksiksiz belge seti",
+    "HS-01": "Gürcistan nomenklatüründeki HS kodu",
   },
 };
 
@@ -216,6 +220,7 @@ export const FIELD_LABELS: Record<ReportLanguage, Record<string, string>> = {
     otherCharges: "other charge",
     tax: "tax",
     "lines.model": "item code",
+    "lines.hsCode": "HS code",
     "lines.quantity": "quantity",
     "lines.unitPrice": "unit price",
     "lines.lineTotal": "total",
@@ -257,6 +262,7 @@ export const FIELD_LABELS: Record<ReportLanguage, Record<string, string>> = {
     otherCharges: "დამატებითი ხარჯი",
     tax: "გადასახადი",
     "lines.model": "მოდელი",
+    "lines.hsCode": "HS კოდი",
     "lines.quantity": "რაოდენობა",
     "lines.unitPrice": "ერთეულის ფასი",
     "lines.lineTotal": "ჯამი",
@@ -298,6 +304,7 @@ export const FIELD_LABELS: Record<ReportLanguage, Record<string, string>> = {
     otherCharges: "дополнительный расход",
     tax: "налог",
     "lines.model": "артикул",
+    "lines.hsCode": "код ТН ВЭД",
     "lines.quantity": "количество",
     "lines.unitPrice": "цена",
     "lines.lineTotal": "сумма",
@@ -339,6 +346,7 @@ export const FIELD_LABELS: Record<ReportLanguage, Record<string, string>> = {
     otherCharges: "diğer masraf",
     tax: "vergi",
     "lines.model": "ürün kodu",
+    "lines.hsCode": "HS kodu",
     "lines.quantity": "miktar",
     "lines.unitPrice": "birim fiyat",
     "lines.lineTotal": "tutar",
@@ -390,6 +398,7 @@ export const RULE_CHECKS: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "Ask the seller for the insurance policy or certificate, or find out where the insurance is charged.",
     "CMR-01": "Have the missing particular entered in the CMR before the goods leave.",
     "DOC-01": "Add the missing document and run the check again. Where there are several documents of one type, see whether the right one was compared.",
+    "HS-01": "Verify the printed code and consult the applicable nomenclature edition for the date of the invoice.",
   },
   ka: {
     "AMT-01": "წაიკითხე დოკუმენტში სიტყვიერად დაწერილი თანხა და ციფრებს შეადარე: ერთ-ერთი გასასწორებელია.",
@@ -408,6 +417,7 @@ export const RULE_CHECKS: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "გამყიდველს დაზღვევის პოლისი ან სერტიფიკატი მოსთხოვე, ან გაარკვიე, სად არის გათვალისწინებული დაზღვევის თანხა.",
     "CMR-01": "ტვირთის გაგზავნამდე ნაკლული მონაცემი CMR-ში ჩააწერინე.",
     "DOC-01": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი. თუ ერთი სახის რამდენიმე დოკუმენტია, ნახე, სწორი შედარდა თუ არა.",
+    "HS-01": "შეამოწმე დაბეჭდილი კოდი და ინვოისის თარიღისთვის მოქმედი ნომენკლატურის გამოცემა.",
   },
   ru: {
     "AMT-01": "Прочитайте сумму прописью в документе и сравните её с цифрами: одно из двух нужно исправить.",
@@ -426,6 +436,7 @@ export const RULE_CHECKS: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "Запросите у продавца страховой полис или сертификат либо выясните, где учтена сумма страхования.",
     "CMR-01": "Попросите внести недостающие сведения в CMR до отправки груза.",
     "DOC-01": "Добавьте недостающий документ и запустите проверку снова. Если документов одного вида несколько, посмотрите, тот ли был взят для сверки.",
+    "HS-01": "Проверьте напечатанный код и редакцию номенклатуры, действовавшую на дату инвойса.",
   },
   tr: {
     "AMT-01": "Belgedeki yazıyla tutarı okuyup rakamlarla karşılaştırın: ikisinden biri düzeltilmeli.",
@@ -444,6 +455,7 @@ export const RULE_CHECKS: Record<ReportLanguage, Record<RuleId, string>> = {
     "INC-03": "Satıcıdan sigorta poliçesini veya sertifikasını isteyin ya da sigorta bedelinin nerede yer aldığını öğrenin.",
     "CMR-01": "Eksik bilgiyi eşya yola çıkmadan önce CMR'ye yazdırın.",
     "DOC-01": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın. Aynı türden birden fazla belge varsa karşılaştırmada doğru belgenin kullanılıp kullanılmadığına bakın.",
+    "HS-01": "Basılı kodu ve fatura tarihinde geçerli nomenklatür metnini kontrol edin.",
   },
 };
 
@@ -462,6 +474,7 @@ export const KEY_CHECKS: Record<ReportLanguage, Partial<Record<MessageKey, strin
     "INC-01.unknown": "Look at the delivery terms on the document: the rule may be misspelled or come from an older edition of Incoterms (DAF, DES, DEQ, DDU, DAT). Have it written as an Incoterms 2020 code.",
     "DOC-01.missing": "Add the missing document and run the check again.",
     "DOC-01.multiple": "See whether the first of them is the one that belongs to this shipment: the other documents were compared with the first one only.",
+    "HS-01.unreadable": "Read the HS code on the invoice and check the extraction against it.",
   },
   ka: {
     "AMT-01.currency": "ნახე, რომელი ვალუტა წერია სიტყვიერ თანხაში და რომელია დოკუმენტის ვალუტა: ერთ-ერთი გასასწორებელია.",
@@ -470,6 +483,7 @@ export const KEY_CHECKS: Record<ReportLanguage, Partial<Record<MessageKey, strin
     "INC-01.unknown": "ნახე მიწოდების პირობა დოკუმენტში: შესაძლოა, შეცდომით წერია ან Incoterms-ის ძველი გამოცემიდანაა (DAF, DES, DEQ, DDU, DAT). Incoterms 2020-ის კოდით ჩააწერინე.",
     "DOC-01.missing": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი.",
     "DOC-01.multiple": "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა.",
+    "HS-01.unreadable": "წაიკითხე HS კოდი ინვოისში და ამოკითხულ მონაცემს შეადარე.",
   },
   ru: {
     "AMT-01.currency": "Посмотрите, какая валюта названа в сумме прописью и какова валюта документа: одно из двух нужно исправить.",
@@ -478,6 +492,7 @@ export const KEY_CHECKS: Record<ReportLanguage, Partial<Record<MessageKey, strin
     "INC-01.unknown": "Посмотрите условие поставки в документе: возможно, в нём опечатка или оно взято из старой редакции Инкотермс (DAF, DES, DEQ, DDU, DAT). Попросите указать его кодом Инкотермс 2020.",
     "DOC-01.missing": "Добавьте недостающий документ и запустите проверку снова.",
     "DOC-01.multiple": "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым.",
+    "HS-01.unreadable": "Прочитайте код ТН ВЭД в инвойсе и сверьте его с извлечённым значением.",
   },
   tr: {
     "AMT-01.currency": "Yazıyla tutarda geçen dövize ve belgenin dövizine bakın: ikisinden biri düzeltilmeli.",
@@ -486,6 +501,7 @@ export const KEY_CHECKS: Record<ReportLanguage, Partial<Record<MessageKey, strin
     "INC-01.unknown": "Belgedeki teslim şekline bakın: yanlış yazılmış ya da Incoterms'in eski bir sürümünden alınmış olabilir (DAF, DES, DEQ, DDU, DAT). Incoterms 2020 koduyla yazdırın.",
     "DOC-01.missing": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın.",
     "DOC-01.multiple": "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı.",
+    "HS-01.unreadable": "Faturadaki HS kodunu okuyup çıkarılan değerle karşılaştırın.",
   },
 };
 
@@ -516,6 +532,7 @@ export const RULE_DESCRIPTIONS: Record<RuleId, string> = {
   "INC-03": "Under CIF or CIP the set shows the seller's insurance: an insurance document or an insurance amount on the invoice.",
   "CMR-01": "The CMR carries the particulars of CMR Convention Art. 6(1)(a) to (k).",
   "DOC-01": "The set has a commercial invoice, a packing list and a CMR, and one of each.",
+  "HS-01": "Printed HS codes on invoices involving Georgia are checked for presence in the saved Georgian commodity nomenclature.",
 };
 
 /** One-line Georgian summary of each rule, for the website and Georgian docs. */
@@ -536,4 +553,5 @@ export const RULE_SUMMARIES_KA: Record<RuleId, string> = {
   "INC-03": "CIF/CIP პირობით დაზღვევის პოლისი ან დაზღვევის თანხა.",
   "CMR-01": "CMR კონვენციის მუხ. 6(1)-ის სავალდებულო მონაცემები (a)–(k).",
   "DOC-01": "ნაკრებში ინვოისი, შეფუთვის ფურცელი და CMR არის.",
+  "HS-01": "საქართველოსთან დაკავშირებულ ინვოისში დაბეჭდილ HS კოდებს საქართველოს სასაქონლო ნომენკლატურის პირვანდელ ტექსტში ეძებს.",
 };

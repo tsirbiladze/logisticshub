@@ -220,6 +220,25 @@ export const RULE_REFERENCE: Record<RuleId, RuleReference> = {
     tolerance: "None.",
     silent: ["A missing contract: it is not required.", "`other` documents are not counted."],
   },
+  "HS-01": {
+    reads: "The `hsCode` of every invoice line when the invoice is dated on or after 2024-01-26 and the seller, buyer or consignee has a country of GE, GEO, Georgia, საქართველო, Грузия or Gürcistan. The country must be supported by the quote. No address or country of origin is used to infer it.",
+    tolerance: "Spaces (including non-breaking spaces) and dots are removed. The first six digits must name a printed subheading or be the prefix of a longer printed code. Only eleven-digit values are checked in full, so an eight-, ten- or twelve-digit foreign code is checked at six digits.",
+    details: [
+      "The source is Georgia’s Ministry of Finance Order No. 21 of 26 January 2024, in force that day and published on 30 January 2024, [Matsne document 6086072, publication 0 (original annex)](https://matsne.gov.ge/ka/document/download/6086072/0/1). Later amendments were not verified.",
+      "Normative texts are not protected by copyright in Georgia ([Law on Copyright and Related Rights, Art. 8(1)(a)](https://matsne.gov.ge/ka/document/view/16198)).",
+      "Use `check.mjs hs` or `check.py hs` with a code prefix or Georgian description to look up the printed entries. The heading and neighbours in findings retain their official Georgian descriptions.",
+    ],
+    findings: [
+      { key: "HS-01.unreadable", severity: "warning", when: "the code does not read as 6–12 digits after normalization, or its exact digits cannot be confirmed from the quote" },
+      { key: "HS-01.unknown-subheading", severity: "warning", when: "the six-digit prefix is missing and the four-digit heading is also missing" },
+      { key: "HS-01.unknown-subheading-heading", severity: "warning", when: "the six-digit prefix is missing but the four-digit heading exists and can be shown" },
+      { key: "HS-01.unknown-national", severity: "error", when: "the six-digit prefix exists but the eleven-digit code is missing; up to five codes from the subheading are shown" },
+    ],
+    silent: [
+      "The invoice prints no code, has no usable date, is dated before 2024-01-26, or has no party whose country is clearly Georgia.",
+      "The printed code passes the applicable lookup. The rule never chooses a classification for the goods.",
+    ],
+  },
 };
 
 /**
@@ -242,7 +261,7 @@ export const RULE_PRINCIPLES: string[] = [
   "**Severity.** Errors are discrepancies that need fixing; warnings need a look. Every finding below has its severity.",
   "**Printed values only.** A rule compares values the extraction holds. When a value it needs is null, that comparison is skipped: nothing is assumed, and a document that prints less gets fewer checks.",
   "**Usable values only.** A value with an extraction issue (wrong format, not a reading of its own quote, a percentage where an amount belongs) reaches no rule until it is corrected. The report lists these issues before the findings.",
-  "**The first of each type.** AMT-01, SUM-01, SUM-02, SUM-03, CUR-01, WGT-01, INC-01 and CMR-01 run on every document of their types. QTY-01, WGT-02, REF-01, DATE-01 and PTY-01 compare the first invoice, packing list, CMR and contract in `documents`; DOC-01 warns when there are more.",
+  "**The first of each type.** AMT-01, SUM-01, SUM-02, SUM-03, CUR-01, WGT-01, INC-01, CMR-01 and HS-01 run on every document of their types. QTY-01, WGT-02, REF-01, DATE-01 and PTY-01 compare the first invoice, packing list, CMR and contract in `documents`; DOC-01 warns when there are more.",
   "**Rounding.** \"Half a unit of the last printed digit\" means a computed value may differ from the printed one by what rounding to the printed precision explains: ±0.005 against `4,350.00`, ±0.5 against `1,880`. The tolerances are fixed; no option changes them.",
   "**Output.** Each finding carries its rule, its key (below), a message in the report's language (`--lang`: en, ka, ru, tr), the quoted evidence with document and page, and a `→` line that says what to verify. Errors come first, then warnings, each in rule order.",
 ];
@@ -253,13 +272,13 @@ export const NOT_CHECKED: string[] = [
   "**Contract value and goods**: the invoice total against the contract's `totalAmount`, unit prices against the contract, and the contract's goods against the invoice lines.",
   "**Volumes across documents**: a packing list's lines are added up to its own total (SUM-03); volumes on the CMR and the packing list are not compared.",
   "**Weights per line across documents**, and net weight on a CMR.",
-  "**Origin and HS codes**: `countryOfOrigin` and `hsCode` are recorded only. No tariff classification, no duty or tax calculation, no customs declaration.",
-  "**Addresses, countries, registration and tax numbers, bank details, signatures and stamps** of the parties. Only names are compared, and not across scripts.",
+  "**Origin and tariff classification**: origin is recorded only. No classification, duty or tax calculation, other countries’ nomenclatures or customs declarations. HS codes are not checked when an invoice has no confirmed Georgian party, has no usable date or is dated before 2024-01-26.",
+  "**Addresses, countries, registration and tax numbers, bank details, signatures and stamps** of the parties. Only names are compared, and not across scripts. HS-01 reads countries only to decide whether it applies.",
   "**Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is only added into the invoice total.",
   "**A discount printed only as a rate**: the invoice total is then left unchecked.",
   "**Units**: nothing is converted, quantities in different units are not compared, and neither are package counts of different packing methods.",
   "**Other dates**: delivery and payment terms, validity, the packing list's date.",
-  "**Further documents of a type**: a second invoice, packing list, CMR or contract is checked on its own, and by CUR-01 and INC-01, but left out of QTY-01, WGT-02, REF-01, DATE-01 and PTY-01.",
+  "**Further documents of a type**: a second invoice, packing list, CMR or contract is checked on its own, and by the applicable rules that read every document, but left out of QTY-01, WGT-02, REF-01, DATE-01 and PTY-01.",
   "**Other document types**: a bill of lading, certificate of origin, insurance policy or specification is recorded as `other` and not read; only its title counts, for INC-03.",
   "**The documents against reality**: the goods actually loaded, whether a document is genuine, and whether the extraction left out something the document prints.",
 ];

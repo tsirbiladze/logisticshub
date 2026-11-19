@@ -6,7 +6,7 @@
  *   logisticshub schema
  *   logisticshub mcp
  */
-import { REPORT_LANGUAGES, extractionJsonSchema, ioProblem, type ReportFormat, type ReportLanguage } from "@logisticshub/core";
+import { REPORT_LANGUAGES, extractionJsonSchema, hsLookupOutput, ioProblem, type ReportFormat, type ReportLanguage } from "@logisticshub/core";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./mcp.ts";
 import { DEFAULT_MODEL, ModelConfigError, resolveModel } from "./models.ts";
@@ -20,6 +20,7 @@ const USAGE = `logisticshub ${VERSION}: cross-check a shipment's trade documents
 Usage:
   logisticshub check <files or folder> [options]   read the documents with an AI model, then check them
   logisticshub check extraction.json [options]     check an extraction you already have (no model, no key)
+  logisticshub hs <code or Georgian words> [--json] [--limit <n>]  search the saved Georgian nomenclature
   logisticshub schema                              print the JSON Schema of extraction.json
   logisticshub mcp                                 run as an MCP server (stdio)
 
@@ -41,6 +42,9 @@ Options:
                           no quote looked up
   -h, --help              this text
   -v, --version           the version
+
+HS lookup uses Order No. 21 of 2024-01-26 (publication 0, original text).
+Later amendments were not verified. Results are limited to 20 by default.
 
 Keys: ANTHROPIC_API_KEY, OPENAI_API_KEY or OPENROUTER_API_KEY, for the provider of --model.
 
@@ -140,6 +144,10 @@ async function main() {
   const [command, ...args] = process.argv.slice(2);
   if (!command || command === "--help" || command === "-h" || command === "help") return void process.stdout.write(`${USAGE}\n`);
   if (command === "--version" || command === "-v") return void process.stdout.write(`${VERSION}\n`);
+  if (command === "hs") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    return void process.stdout.write(`${usage(() => hsLookupOutput(args))}\n`);
+  }
   if (command === "schema") return void process.stdout.write(`${JSON.stringify(extractionJsonSchema(), null, 2)}\n`);
   if (command === "mcp") return void (await createServer(VERSION).connect(new StdioServerTransport()));
   if (command === "check") return check(args);

@@ -1,5 +1,12 @@
 import { STYLES } from "../format.ts";
-import { cite, printed, type Pack } from "../model.ts";
+import { cite, printed, type Pack, type ShipmentDocuments } from "../model.ts";
+
+const officePedestalCode = "9403 10 580 00";
+
+function printHsCodes(d: ShipmentDocuments, first = officePedestalCode) {
+  d.invoice.lines[0]!.hsCode = cite(first);
+  d.invoice.lines[1]!.hsCode = cite(officePedestalCode);
+}
 
 /** Georgian pack, based on the original LH-TEST-20260920-01 test shipment. */
 export const kaOfficeFurniture: Pack = {
@@ -78,7 +85,19 @@ export const kaOfficeFurniture: Pack = {
     totalInWords: "ცამეტი ათას სამასი ევრო და ნული ცენტი",
   },
   variants: [
-    { id: "clean", title: { ka: "სუფთა ნაკრები", en: "Clean set" }, expected: [] },
+    { id: "clean", title: { ka: "სუფთა ნაკრები", en: "Clean set" }, expected: [], mutate: (d) => printHsCodes(d) },
+    {
+      id: "unknown-hs-national-code",
+      title: { ka: "ნომენკლატურაში შეტანილი არ არის ინვოისის ეროვნული კოდი", en: "Invoice national code is absent from the nomenclature" },
+      expected: ["HS-01.unknown-national"],
+      mutate: (d) => printHsCodes(d, "9403 10 999 99"),
+    },
+    {
+      id: "unknown-hs-subheading",
+      title: { ka: "ნომენკლატურაში შეტანილი არ არის ინვოისის სასაქონლო სუბპოზიცია", en: "Invoice subheading is absent from the nomenclature" },
+      expected: ["HS-01.unknown-subheading-heading"],
+      mutate: (d) => printHsCodes(d, "9403 98"),
+    },
     {
       id: "words-mismatch",
       title: { ka: "სიტყვიერი თანხა ციფრებს არ ემთხვევა", en: "Amount in words does not match figures" },

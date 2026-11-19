@@ -390,7 +390,7 @@ describe("logisticshub check, from its help alone", () => {
     const help = cli("--help").stdout;
     const readme = readFileSync(join(ROOT, "packages/cli/README.md"), "utf8");
     const options = [...new Set([...help.matchAll(/(?<![\w-])--?[a-z][a-z-]*/g)].map((m) => m[0]))];
-    expect(options.sort()).toEqual(["--format", "--help", "--lang", "--model", "--no-annotate", "--out", "--pdf-dir", "--version", "-h", "-v"]);
+    expect(options.sort()).toEqual(["--format", "--help", "--json", "--lang", "--limit", "--model", "--no-annotate", "--out", "--pdf-dir", "--version", "-h", "-v"]);
     for (const option of options) expect(readme, option).toContain(`\`${option}`);
     for (const fact of [
       ".pdf`, `.png`, `.jpg`, `.jpeg` and `.webp`",
@@ -418,19 +418,33 @@ describe("logisticshub check, from its help alone", () => {
   });
 });
 
+describe("logisticshub hs", () => {
+  it("finds Georgian HS entries in the CLI and Node skill without a model", () => {
+    const args = ["hs", "საწერი მაგიდ", "--limit", "2", "--json"];
+    const ours = cli(...args);
+    expect(ours.status).toBe(0);
+    expect(ours.stdout).toBe(skill(...args).stdout);
+    expect(JSON.parse(ours.stdout)).toMatchObject({ edition: { publication: 0, laterAmendmentsVerified: false }, matches: [{ description: "საწერი მაგიდები" }, { description: "საწერი მაგიდები" }] });
+    expect(cli("hs", "9403 30 110 00").stdout).toContain("94033011000 (national code) · საწერი მაგიდები");
+    expect(cli("hs", "940330", "--limit", "0").status).toBe(2);
+    expect(cli("--help").stdout).toContain("logisticshub hs");
+  });
+});
+
 describe("logisticshub check extraction.json", () => {
-  it("prints what the skill's script prints for the same extraction and folder", () => {
-    for (const dir of ["en-led-lighting/clean", "en-led-lighting/line-arithmetic", "ka-office-furniture/scanned-cmr", "ru-textile/weight-mismatch"]) {
+  it.each(["en-led-lighting/clean", "en-led-lighting/line-arithmetic", "ka-office-furniture/scanned-cmr", "ru-textile/weight-mismatch"])(
+    "%s: prints what the skill's script prints for the same extraction and folder",
+    (dir) => {
       const file = join(FIXTURES, dir, "extraction.json");
       const outDir = out();
       const theirs = skill(file, "--out", outDir);
       const ours = cli("check", file, "--out", outDir);
-      expect(ours.stdout, dir).toBe(theirs.stdout);
-      expect(ours.status, dir).toBe(0);
-      expect(theirs.status, dir).toBe(0);
-      expect(ours.stderr, dir).toBe("");
-    }
-  });
+      expect(ours.stdout).toBe(theirs.stdout);
+      expect(ours.status).toBe(0);
+      expect(theirs.status).toBe(0);
+      expect(ours.stderr).toBe("");
+    },
+  );
 
   it("prints document text as printed, like the skill's script: Markdown escapes are for report.md only", () => {
     const dir = out();
@@ -795,7 +809,7 @@ describe("MCP server", () => {
   it("serves the guide and checks an extraction in memory", async () => {
     const client = await connect();
     const tools = await client.listTools();
-    expect(tools.tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide"]);
+    expect(tools.tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide", "lookup_hs_code"]);
 
     const guide = await client.callTool({ name: "get_extraction_guide", arguments: {} });
     expect(JSON.stringify(guide.content)).toContain("Extraction guide");
@@ -829,6 +843,8 @@ describe("MCP server", () => {
     expect(description).toContain("Not for paying or booking.");
     expect(instructions).toContain("Not for paying or booking an invoice.");
     expect(instructions).not.toContain("single invoice");
+    expect(description).toContain("Look up Georgian HS codes");
+    expect(instructions).toContain("Use lookup_hs_code");
     await client.close();
   });
 
@@ -1053,14 +1069,23 @@ describe("MCP server", () => {
     await client.close();
   });
 
-  it("works as a process over stdio: instructions, both tools, a check, a string of JSON, pdfDir alone and the refusals", async () => {
+  it("works as a process over stdio: instructions, all three tools, a check, a string of JSON, pdfDir alone and the refusals", async () => {
     const transport = new StdioClientTransport({ command: process.execPath, args: [MAIN, "mcp"], stderr: "pipe" });
     const client = new Client({ name: "test", version: "1" });
     await client.connect(transport);
     try {
       expect(client.getServerVersion()).toMatchObject({ name: "logisticshub" });
       expect(client.getInstructions()).toBe(SERVER_INSTRUCTIONS);
-      expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide"]);
+      expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide", "lookup_hs_code"]);
+      for (const [query, matches] of [["9403 30", [{ code: "940330", level: "subheading" }]], ["999999", []]] as const) {
+        const result = await client.callTool({ name: "lookup_hs_code", arguments: { query, limit: 1 } });
+        expect(result.isError).toBeFalsy();
+        expect(result.structuredContent).toMatchObject({
+          edition: { documentId: 6086072, publication: 0, laterAmendmentsVerified: false },
+          sourceUrl: "https://matsne.gov.ge/ka/document/download/6086072/0/1",
+          matches,
+        });
+      }
       const extraction = JSON.parse(fixture("ru-textile/weight-mismatch/extraction.json"));
       const checked = await client.callTool({ name: "check_documents", arguments: { extraction } });
       expect(structured(checked).findings.map((f) => f.key)).toEqual(["WGT-02.gross"]);

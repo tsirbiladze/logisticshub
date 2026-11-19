@@ -1,6 +1,6 @@
 # logisticshub
 
-Cross-check the trade documents of one shipment (commercial invoice, packing list, CMR, sales contract) with AI extraction and 16 deterministic rules. One invoice can be checked on its own too: its line totals, its sums and its amount in words. Every finding comes with the document, the page, the field and the exact quote, and is marked on a copy of the PDF.
+Cross-check the trade documents of one shipment (commercial invoice, packing list, CMR, sales contract) with AI extraction and 17 deterministic rules. One invoice can be checked on its own too: its line totals, its sums and its amount in words. Every finding comes with the document, the page, the field and the exact quote, and is marked on a copy of the PDF.
 
 ```bash
 # read the documents with a model, then check them (Claude by default)
@@ -15,6 +15,19 @@ npx -y logisticshub mcp
 # every option
 npx logisticshub --help
 ```
+
+## Georgian HS codes
+
+HS-01 checks printed HS codes on invoices dated 2024-01-26 or later when Georgia is the recorded country of the seller, buyer or consignee. An unreadable code gives a warning. A missing six-digit subheading gives a warning and the nearest heading when available. An absent eleven-digit code under a known subheading gives an error and up to five related codes. Other lengths from six to twelve are checked at six digits.
+
+```bash
+logisticshub hs 940330
+logisticshub hs "საწერი მაგიდ" --json --limit 5
+```
+
+The lookup accepts an exact or partial code with spaces or dots, or Georgian words. Description search ignores letter case and spaces. It returns official descriptions, ancestor codes, supplementary units where printed, and the edition and source. The default limit is 20 entries. Use `--limit <n>` to change it and `--json` for structured output. The lookup runs locally and needs no model or key.
+
+The checker and lookup use the original annex to the Georgian Minister of Finance’s Order No. 21 of 26 January 2024, in force that day and published 30 January 2024 ([Matsne document 6086072, publication 0](https://matsne.gov.ge/ka/document/download/6086072/0/1)). Later amendments were not verified. Normative texts are not protected by copyright in Georgia ([Law on Copyright and Related Rights, Art. 8(1)(a)](https://matsne.gov.ge/ka/document/view/16198)).
 
 ## Inputs
 
@@ -65,7 +78,7 @@ In `--out`:
 
 Each file gets two model calls: one to say what kind of document it is, one to extract it. The model is given the skill's extraction guide, without the two sections only an agent can act on, and the JSON Schema of that kind of document, and it answers with the document as JSON. Its answer is then checked: the format of every value, each value against its own quote, and every quote against the text of its PDF page. If anything is wrong, the model gets one more call with the list and what each issue code in it means, and its correction is kept unless it leaves more to correct than before. At most 4 calls run at a time.
 
-This path is tested with a stand-in model. Version 1.0.0 was also run once against a real model, on 2026-11-17: `claude-opus-5-5` read three demo sets (`en-led-lighting/two-page-invoice`, `ka-office-furniture/scanned-cmr`, `tr-ceramics/clean`), and each gave exactly its planted findings, with no extraction issue and no correction call. That run called the code behind `check` and signed in with an Anthropic account; the `logisticshub` command with `ANTHROPIC_API_KEY`, every other model and every document that is not a demo are still untried.
+This path is tested with a stand-in model. This version has not been run against a real model.
 
 A file whose model call fails, or whose extraction still breaks the schema, is left out; the other files are still checked. The report names the file, and the exit code is `1`.
 
@@ -77,12 +90,13 @@ A file whose model call fails, or whose extraction still breaks the schema, is l
 
 ## MCP server
 
-`logisticshub mcp` serves two tools over stdio, for an agent that reads the documents itself:
+`logisticshub mcp` serves three tools over stdio, for an agent that reads the documents itself:
 
 - `get_extraction_guide`: how to build the extraction, with the JSON Schema and a blank of every document type to copy.
 - `check_documents`: checks an extraction. Arguments: `extraction`, the object itself (a string of JSON that holds it is read too); `language` (`en`, `ka`, `ru`, `tr`); `pdfDir`, an absolute path, to look every quote up in the PDFs; `outDir`, an absolute path, to write the reports. With both, each PDF that has a finding gets a marked copy in `outDir`. Without `outDir` nothing is written and the report is returned inline.
+- `lookup_hs_code` searches the Georgian catalogue locally. Pass `query` (code or Georgian words) and optionally `limit`. The structured result includes `edition` and `sourceUrl` even when no entries match.
 
-The result carries the report as text, as `check` prints it, and a structured copy: `ok`, `language`, `summary`, `extractionIssues`, `findings` (each with its message, what to check, the currency of its amounts, and its evidence with the name of each field), `files` and `notes`. When the result lists an extraction issue or a note, a second text follows the report: what each issue code and each note means, and what to do. A relative path, an `extraction` that is neither the object nor JSON, and an `outDir` that cannot be written each come back as an error that says what to give instead.
+The check result carries the report as text, as `check` prints it, and a structured copy: `ok`, `language`, `summary`, `extractionIssues`, `findings` (each with its message, what to check, the currency of its amounts, and its evidence with the name of each field), `files` and `notes`. When the result lists an extraction issue or a note, a second text follows the report: what each issue code and each note means, and what to do. A relative path, an `extraction` that is neither the object nor JSON, and an `outDir` that cannot be written each come back as an error that says what to give instead.
 
 ## Limits
 
@@ -90,6 +104,7 @@ The result carries the report as text, as `check` prints it, and a structured co
 - The model does not report where it had to choose between two readings. Where the extraction guide leaves a reading open, it is told to leave the fact empty.
 - Page images are read, never marked, and their quotes are not looked up. The same holds for a scanned page inside a PDF.
 - The documents go to the model provider you choose, with your key. Logisticshub itself has no server.
+- HS-01 skips invoices without a confirmed Georgian party or usable date, and those dated before 2024-01-26. Tariff classification, duties, taxes and other countries’ nomenclatures are outside the check.
 - What the rules do not check: [Limits](https://github.com/tsirbiladze/logisticshub#limits).
 
 Requires Node.js 22+. Bundled third-party packages and their licenses: `dist/THIRD-PARTY-NOTICES.txt`.

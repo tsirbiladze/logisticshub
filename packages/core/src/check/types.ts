@@ -28,6 +28,7 @@ export const RULE_IDS = [
   "INC-03",
   "CMR-01",
   "DOC-01",
+  "HS-01",
 ] as const;
 export type RuleId = (typeof RULE_IDS)[number];
 

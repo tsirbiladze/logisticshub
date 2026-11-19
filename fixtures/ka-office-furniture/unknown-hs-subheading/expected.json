@@ -1,0 +1,13 @@
+[
+  {
+    "rule": "HS-01",
+    "severity": "warning",
+    "key": "HS-01.unknown-subheading-heading",
+    "params": {
+      "line": "1",
+      "subheading": "940398",
+      "heading": "9403",
+      "description": "ავეჯი დანარჩენი და მისი ნაწილები:"
+    }
+  }
+]

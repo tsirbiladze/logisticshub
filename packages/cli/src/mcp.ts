@@ -3,7 +3,7 @@
  * extraction guide from this server, and sends the extraction for checking.
  */
 import { isAbsolute } from "node:path";
-import { EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, ISSUES_GUIDE, parseJson, REPORT_LANGUAGES, RULE_IDS, type ReportLanguage } from "@logisticshub/core";
+import { EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, HS_LOOKUP_LIMIT, ISSUES_GUIDE, lookupHsCode, parseJson, REPORT_LANGUAGES, RULE_IDS, type ReportLanguage } from "@logisticshub/core";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { OutputError, runCheck } from "./run.ts";
@@ -16,6 +16,8 @@ export const SERVER_INSTRUCTIONS = `Logisticshub cross-checks the documents of o
 3. Call check_documents with that object. Give pdfDir (the absolute path of the folder with the PDFs) to have every quote looked up on its page, and outDir (an absolute path) to have the reports written. With both, each PDF that has a finding also gets a copy with the findings marked.
 4. If the result lists extraction issues or notes, its last text part says what each code and each note means and what to do, and which one is not yours to fix. Then correct the extraction against the documents and call check_documents again, at most twice. What is still listed after that goes to the user.
 5. Give the user every finding with its quotes and pages, as a discrepancy to verify against the originals, not as a verdict.
+
+Use lookup_hs_code to explain a Georgian code or see related entries for HS-01. It uses the original text of Order No. 21 of 2024-01-26 (publication 0). Later amendments were not verified.
 
 Not for paying or booking an invoice. Nothing is sent anywhere: the check runs on the machine this server runs on.`;
 
@@ -129,7 +131,7 @@ export function createServer(version: string): McpServer {
     "check_documents",
     {
       title: "Check trade documents",
-      description: `Cross-checks the extracted documents of one shipment with ${RULE_IDS.length} deterministic rules (amount in words against figures, totals, quantities, packages, weights, references, dates, parties, Incoterms, CMR particulars) and returns the report with quoted evidence. With pdfDir it looks every quote up on its page; with outDir it writes the reports; with both it also marks the findings on copies of the PDFs.`,
+      description: `Cross-checks the extracted documents of one shipment with ${RULE_IDS.length} deterministic rules (amount in words against figures, totals, quantities, packages, weights, references, dates, parties, Incoterms, CMR particulars, Georgian HS codes) and returns the report with quoted evidence. With pdfDir it looks every quote up on its page; with outDir it writes the reports; with both it also marks the findings on copies of the PDFs.`,
       inputSchema: {
         extraction: z
           .preprocess(fromJsonString, z.record(z.string(), z.unknown(), { error: NOT_AN_OBJECT }))
@@ -198,6 +200,44 @@ export function createServer(version: string): McpServer {
         },
         isError: !run.result.ok,
       };
+    },
+  );
+
+  const entry = z.object({
+    code: z.string(),
+    level: z.enum(["heading", "subheading", "national code"]),
+    description: z.string(),
+    depth: z.number().int().nonnegative(),
+    supplementaryUnit: z.string().nullable(),
+  });
+  server.registerTool(
+    "lookup_hs_code",
+    {
+      title: "Look up Georgian HS codes",
+      description: "Search the original annex to Georgian Order No. 21 of 2024-01-26 (publication 0) by code or Georgian description. Later amendments were not verified. Returns official descriptions, related headings and units. Use to explain codes or investigate HS-01 findings.",
+      inputSchema: {
+        query: z.string().trim().min(1).describe("Digits (exact code or prefix, with or without spaces and dots) or a substring of the Georgian description."),
+        limit: z.number().int().positive().optional().describe(`Maximum number of matches, default ${HS_LOOKUP_LIMIT}.`),
+      },
+      outputSchema: {
+        edition: z.object({
+          orderNumber: z.number(),
+          orderDate: z.string(),
+          publishedDate: z.string(),
+          inForceFrom: z.string(),
+          title: z.string(),
+          documentId: z.number(),
+          publication: z.number(),
+          laterAmendmentsVerified: z.literal(false),
+        }),
+        sourceUrl: z.url(),
+        matches: z.array(entry.extend({ ancestors: z.array(entry) })),
+      },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async ({ query, limit }) => {
+      const result = lookupHsCode(query, limit);
+      return { content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result };
     },
   );
 

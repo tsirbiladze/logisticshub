@@ -21,8 +21,11 @@ Exit codes:
 The PDFs are not read (no PDF library in the stdlib): no marked copies, and
 quotes are not looked up on their pages.
 """
+import argparse
 import codecs
 import errno
+from functools import lru_cache
+import gzip
 import json
 import os
 import re
@@ -2663,6 +2666,64 @@ def rule_cmr_particulars(ctx):
     return findings
 
 
+GEORGIA_COUNTRIES = set(DATA["georgiaCountries"])
+HS_CODE_SEPARATORS = str.maketrans("", "", JS_WS + ".")
+HS_DESCRIPTION_SEPARATORS = str.maketrans("", "", JS_WS)
+
+
+@lru_cache(maxsize=1)
+def hs_nomenclature():
+    with gzip.open(os.path.join(HERE, "hs-nomenclature.json.gz"), "rt", encoding="utf-8") as source:
+        data = json.load(source)
+    by_code = {row[0]: row for row in data["entries"]}
+    by_subheading = {}
+    for row in data["entries"]:
+        if len(row[0]) >= 6:
+            by_subheading.setdefault(row[0][:6], []).append(row)
+    return data, by_code, by_subheading
+
+
+def is_georgia(value):
+    return js_trim(value or "").replace("İ", "i").lower() in GEORGIA_COUNTRIES
+
+
+def rule_hs_codes(ctx):
+    findings = []
+    for invoice in ctx["invoices"]:
+        date = iso_date(invoice["date"])
+        countries = (invoice[role]["country"] for role in ("seller", "buyer", "consignee"))
+        if not date or not any(item["hsCode"]["value"] is not None for item in invoice["lines"]):
+            continue
+        if not any(is_georgia(country["value"]) and is_georgia(country["quote"]) for country in countries):
+            continue
+        data, by_code, by_subheading = hs_nomenclature()
+        if date < data["edition"]["inForceFrom"]:
+            continue
+        for index, item in enumerate(invoice["lines"]):
+            field = item["hsCode"]
+            if field["value"] is None:
+                continue
+            code = field["value"].translate(HS_CODE_SEPARATORS)
+            params = {"line": str(index + 1)}
+            cited = [evidence(invoice, "lines[%d].hsCode" % index, field)]
+            subheading = code[:6]
+            if not re.fullmatch(r"[0-9]{6,12}", code) or code != (field["quote"] or "").translate(HS_CODE_SEPARATORS):
+                findings.append(finding("HS-01", "warning", "HS-01.unreadable", params, cited))
+            elif subheading not in by_subheading:
+                heading = by_code.get(code[:4])
+                params["subheading"] = subheading
+                if heading:
+                    params.update(heading=heading[0], description=heading[1])
+                key = "HS-01.unknown-subheading-heading" if heading else "HS-01.unknown-subheading"
+                findings.append(finding("HS-01", "warning", key, params, cited))
+            elif len(code) == 11 and code not in by_code:
+                alternatives = [row for row in by_subheading[subheading] if len(row[0]) == 11][:5]
+                neighbours = "; ".join("%s · %s" % tuple(row[:2]) for row in alternatives)
+                params.update(code=code, subheading=subheading, neighbours=neighbours)
+                findings.append(finding("HS-01", "error", "HS-01.unknown-national", params, cited))
+    return findings
+
+
 def rule_checklist(ctx):
     findings = []
     documents = ctx["extraction"]["documents"]
@@ -2694,6 +2755,7 @@ RULES = [
     rule_insurance,
     rule_cmr_particulars,
     rule_checklist,
+    rule_hs_codes,
 ]
 DEFAULT_OPTIONS = {"weightToleranceKg": "0.5", "volumeToleranceM3": "0.01"}
 
@@ -3214,6 +3276,7 @@ USAGE = """Logisticshub %s: cross-check trade documents (Python port)
 Usage:
   python3 check.py <extraction.json> [--lang en|ka|ru|tr] [--out <dir>] [--format md,json,html]
   python3 check.py --schema
+  python3 check.py hs <code or Georgian words> [--json] [--limit <n>]
 
 Writes report.md, report.json and report.html (default: next to the extraction)
 and prints the report. Same reports as check.mjs. The PDFs are not
@@ -3325,7 +3388,64 @@ def read_text(path):
         return decode_text(f.read())
 
 
+def describe_hs_entry(row):
+    code, description, depth, *unit = row
+    level = {4: "heading", 11: "national code"}.get(len(code), "subheading")
+    return {"code": code, "level": level, "description": description, "depth": depth, "supplementaryUnit": unit[0] if unit else None}
+
+
+def hs_lookup(argv):
+    if "--help" in argv or "-h" in argv:
+        write_out(sys.stdout, USAGE + "\n")
+        return 0
+    parser = argparse.ArgumentParser(prog="check.py hs", allow_abbrev=False)
+    parser.add_argument("query")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--limit", default=str(DATA["hsLookupLimit"]))
+    args = parser.parse_args(argv)
+    if not js_trim(args.query):
+        stop("Give one HS code or Georgian description.")
+    digits = args.limit.lstrip("0")
+    limit = int(digits) if re.fullmatch(r"[0-9]{1,16}", digits) else 0
+    if not 1 <= limit <= 9007199254740991:
+        stop("Limit must be a positive integer.")
+
+    data, by_code, _ = hs_nomenclature()
+    digits = args.query.translate(HS_CODE_SEPARATORS)
+    numeric = re.fullmatch(r"[0-9]+", digits)
+    needle = args.query.lower().translate(HS_DESCRIPTION_SEPARATORS)
+    matches = []
+    for row in data["entries"]:
+        code, description = row[:2]
+        if not (code.startswith(digits) if numeric else needle in description.lower().translate(HS_DESCRIPTION_SEPARATORS)):
+            continue
+        ancestors = [describe_hs_entry(by_code[code[:length]]) for length in (4, 6, 8, 9) if length < len(code) and code[:length] in by_code]
+        matches.append(dict(describe_hs_entry(row), ancestors=ancestors))
+        if len(matches) == limit:
+            break
+
+    edition, url = data["edition"], data["sourceUrl"]
+    if args.json:
+        write_out(sys.stdout, js_stringify({"edition": edition, "sourceUrl": url, "matches": matches}) + "\n")
+        return 0
+    lines = [
+        "Georgian nomenclature · Order No. {orderNumber} of {orderDate} · publication {publication} (original text). Later amendments were not verified.".format(**edition),
+        url, "",
+    ]
+    for match in matches:
+        unit = " [%s]" % match["supplementaryUnit"] if match["supplementaryUnit"] else ""
+        lines.append("{code} ({level}) · {description}".format(**match) + unit)
+        if match["ancestors"]:
+            lines.append("  " + " › ".join("{code} {description}".format(**parent) for parent in match["ancestors"]))
+    if not matches:
+        lines.append("No matches.")
+    write_out(sys.stdout, "\n".join(lines) + "\n")
+    return 0
+
+
 def main(argv):
+    if argv[:1] == ["hs"]:
+        return hs_lookup(argv[1:])
     options = parse_args(argv)
     if options["parseWords"] is not None:
         write_out(sys.stdout, parse_words_file(options["parseWords"]))

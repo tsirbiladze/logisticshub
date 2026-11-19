@@ -351,6 +351,10 @@ export const MESSAGES = {
     "CMR-01.missing": "CMR is missing Art. 6(1)({item}): {particular}.",
     "DOC-01.missing": "Missing document: {document}.",
     "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one.",
+    "HS-01.unreadable": "Line {line}: the HS code could not be read.",
+    "HS-01.unknown-subheading": "Line {line}: subheading {subheading} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified.",
+    "HS-01.unknown-subheading-heading": "Line {line}: subheading {subheading} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: {heading} · {description}",
+    "HS-01.unknown-national": "Line {line}: national code {code} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under {subheading}: {neighbours}",
   },
   ka: {
     "AMT-01.mismatch": "სიტყვიერად წერია {wordsAmount}, ციფრებით კი {amount}.",
@@ -383,6 +387,10 @@ export const MESSAGES = {
     "CMR-01.missing": "CMR-ს აკლია მუხ. 6(1)({item}): {particular}.",
     "DOC-01.missing": "აკლია დოკუმენტი: {document}.",
     "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება.",
+    "HS-01.unreadable": "სტრიქონი {line}: HS კოდი ვერ იკითხება.",
+    "HS-01.unknown-subheading": "სტრიქონი {line}: სასაქონლო სუბპოზიცია {subheading} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის.",
+    "HS-01.unknown-subheading-heading": "სტრიქონი {line}: სასაქონლო სუბპოზიცია {subheading} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. უახლოესი სასაქონლო პოზიცია: {heading} · {description}",
+    "HS-01.unknown-national": "სტრიქონი {line}: ეროვნული კოდი {code} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. კოდები {subheading}-ის ფარგლებში: {neighbours}",
   },
   ru: {
     "AMT-01.mismatch": "Прописью указано {wordsAmount}, а цифрами — {amount}.",
@@ -415,6 +423,10 @@ export const MESSAGES = {
     "CMR-01.missing": "В CMR нет реквизита ст. 6(1)({item}): {particular}.",
     "DOC-01.missing": "Нет документа: {document}.",
     "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый.",
+    "HS-01.unreadable": "Строка {line}: не удалось прочитать код ТН ВЭД.",
+    "HS-01.unknown-subheading": "Строка {line}: субпозиции {subheading} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись.",
+    "HS-01.unknown-subheading-heading": "Строка {line}: субпозиции {subheading} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: {heading} · {description}",
+    "HS-01.unknown-national": "Строка {line}: национального кода {code} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции {subheading}: {neighbours}",
   },
   tr: {
     "AMT-01.mismatch": "Yazıyla {wordsAmount} yazıyor, rakamla tutar ise {amount}.",
@@ -447,6 +459,10 @@ export const MESSAGES = {
     "CMR-01.missing": "CMR'de Madde 6(1)({item}) eksik: {particular}.",
     "DOC-01.missing": "Eksik belge: {document}.",
     "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır.",
+    "HS-01.unreadable": "Satır {line}: HS kodu okunamadı.",
+    "HS-01.unknown-subheading": "Satır {line}: {subheading} alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor.",
+    "HS-01.unknown-subheading-heading": "Satır {line}: {subheading} alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. En yakın pozisyon: {heading} · {description}",
+    "HS-01.unknown-national": "Satır {line}: {code} ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. {subheading} alt pozisyonundaki kodlar: {neighbours}",
   },
 } as const satisfies Record<ReportLanguage, Record<string, string>>;
 

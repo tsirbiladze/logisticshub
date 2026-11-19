@@ -97,6 +97,10 @@ const CASES: Record<MessageKey, (docs: Docs) => void> = {
   "CMR-01.missing": ({ cmr }) => void (cmr.carrier.address = c(null)),
   "DOC-01.missing": ({ pack }) => void (pack.documents = pack.documents.filter((d) => d.type !== "cmr")),
   "DOC-01.multiple": ({ pack }) => void pack.documents.push(blankDocument("commercial_invoice", "invoice-2")),
+  "HS-01.unreadable": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("94O310")),
+  "HS-01.unknown-subheading": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("999999")),
+  "HS-01.unknown-subheading-heading": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("940398")),
+  "HS-01.unknown-national": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("94033099999")),
 };
 
 /** What each case reads as. Read them aloud before changing one: every line is a sentence someone has to act on. */
@@ -280,6 +284,30 @@ const EXPECTED: Record<MessageKey, Record<ReportLanguage, string>> = {
     ka: "ინვოისი: 2 დოკუმენტი; შედარებისას პირველი გამოიყენება.",
     ru: "Инвойс: 2 документа; при сверке используется первый.",
     tr: "Fatura: 2 belge; karşılaştırmada ilki kullanılır.",
+  },
+  "HS-01.unreadable": {
+    en: "Line 1: the HS code could not be read.",
+    ka: "სტრიქონი 1: HS კოდი ვერ იკითხება.",
+    ru: "Строка 1: не удалось прочитать код ТН ВЭД.",
+    tr: "Satır 1: HS kodu okunamadı.",
+  },
+  "HS-01.unknown-subheading": {
+    en: "Line 1: subheading 999999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified.",
+    ka: "სტრიქონი 1: სასაქონლო სუბპოზიცია 999999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის.",
+    ru: "Строка 1: субпозиции 999999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись.",
+    tr: "Satır 1: 999999 alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor.",
+  },
+  "HS-01.unknown-subheading-heading": {
+    en: "Line 1: subheading 940398 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    ka: "სტრიქონი 1: სასაქონლო სუბპოზიცია 940398 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. უახლოესი სასაქონლო პოზიცია: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    ru: "Строка 1: субпозиции 940398 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    tr: "Satır 1: 940398 alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. En yakın pozisyon: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+  },
+  "HS-01.unknown-national": {
+    en: "Line 1: national code 94033099999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under 940330: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    ka: "სტრიქონი 1: ეროვნული კოდი 94033099999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. კოდები 940330-ის ფარგლებში: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    ru: "Строка 1: национального кода 94033099999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции 940330: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    tr: "Satır 1: 94033099999 ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. 940330 alt pozisyonundaki kodlar: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
   },
 };
 
@@ -539,6 +567,12 @@ describe("what to check", () => {
       ka: "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა.",
       ru: "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым.",
       tr: "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı.",
+    },
+    "HS-01.unreadable": {
+      en: "Read the HS code on the invoice and check the extraction against it.",
+      ka: "წაიკითხე HS კოდი ინვოისში და ამოკითხულ მონაცემს შეადარე.",
+      ru: "Прочитайте код ТН ВЭД в инвойсе и сверьте его с извлечённым значением.",
+      tr: "Faturadaki HS kodunu okuyup çıkarılan değerle karşılaştırın.",
     },
   };
 

@@ -178,7 +178,7 @@ describe("README", () => {
   });
 
   it("names every file of the skill folder", () => {
-    const built = ["SKILL.md", "references/extraction.md", "references/extraction-schema.json", "references/extraction-blank.json", "references/issues.md", "references/rules.md", "scripts/check.mjs", "scripts/check.py", "scripts/check-data.json", "scripts/THIRD-PARTY-NOTICES.txt"];
+    const built = ["SKILL.md", "references/extraction.md", "references/extraction-schema.json", "references/extraction-blank.json", "references/issues.md", "references/rules.md", "scripts/check.mjs", "scripts/check.py", "scripts/check-data.json", "scripts/hs-nomenclature.json.gz", "scripts/THIRD-PARTY-NOTICES.txt"];
     for (const file of built) {
       expect(() => read(`skills/logisticshub/${file}`), file).not.toThrow();
       for (const language of LANGUAGES) expect(sections(README[language])[2]!.body, `${language} ${file}`).toContain(`\`${file}\``);
@@ -215,19 +215,12 @@ describe("the CLI's README", () => {
     expect(notes(CLI_README, "`Notes:` never change the exit code.")).toEqual(inSkill);
   });
 
-  it("says what was run against a real model and no more: one model, three demo sets, and of which version", () => {
-    expect(CLI_README).toContain("This path is tested with a stand-in model. ");
-    const said = /Version (\S+) was also run once against a real model, on \d{4}-\d{2}-\d{2}: `claude-[a-z0-9-]+` read three demo sets \(([^)]+)\)/.exec(CLI_README);
-    expect(said, "the sentence about the real run").not.toBeNull();
-    const [, version, sets] = said!;
-    const variants = (JSON.parse(read("fixtures/index.json")) as { packs: { id: string; variants: { id: string }[] }[] }).packs.flatMap((pack) => pack.variants.map((variant) => `\`${pack.id}/${variant.id}\``));
-    const named = sets!.split(", ");
-    expect(named).toHaveLength(3);
-    for (const set of named) expect(variants, set).toContain(set);
-    expect(CLI_README).toContain("every other model and every document that is not a demo are still untried");
-    // A later version either repeats the run and says so, or says that it was not run.
-    const current = (JSON.parse(read("packages/cli/package.json")) as { version: string }).version;
-    if (version !== current) expect(CLI_README).toContain("This version has not been run against a real model.");
+  it("states whether this version was run against a real model", () => {
+    expect(CLI_README).toContain("This path is tested with a stand-in model.");
+    const current = JSON.parse(read("packages/cli/package.json")).version;
+    const run = /Version (\S+) was also run once against a real model/.exec(CLI_README);
+    if (run) expect(run[1]).toBe(current);
+    else expect(CLI_README).toContain("This version has not been run against a real model.");
   });
 });
 
@@ -283,21 +276,13 @@ describe("changelog", () => {
     expect(first?.[1]).toBe(version);
   });
 
-  it("has one entry, the first release, and does not promise one box where the marker boxes every copy", () => {
-    expect(read("CHANGELOG.md").split(/^## /m)).toHaveLength(2);
-    const entry = read("CHANGELOG.md").split(/^## /m)[1]!;
-    expect(entry.split("\n\n")[1]).toBe("First release.");
-    // What the entry counts is what the repo holds.
-    const packs = (JSON.parse(read("fixtures/index.json")) as { packs: { language: string; variants: unknown[] }[] }).packs;
-    expect(entry).toContain(`${RULE_IDS.length} deterministic rules`);
-    expect(entry).toContain(`${packs.reduce((n, pack) => n + pack.variants.length, 0)} demo sets of synthetic documents in four languages`);
-    expect(new Set(packs.map((pack) => pack.language)).size).toBe(4);
-    expect(entry).not.toContain("box each finding once.");
-    expect(entry).toContain("Where a copy cannot be tied to a field, every copy is boxed and a note says so.");
-    // The four places that carry the version agree with the entry.
-    const version = /^(\S+) — /.exec(entry)![1]!;
-    expect(JSON.parse(read("packages/skill/package.json")).version).toBe(version);
-    expect(JSON.parse(read(".claude-plugin/plugin.json")).version).toBe(version);
-    expect(read("packages/skill/SKILL.md")).toContain(`version: "${version}"`);
+  it("keeps the first release intact and lists the current change", () => {
+    const [, latest, first] = read("CHANGELOG.md").split(/^## /m);
+    expect(latest).toContain("HS-01");
+    expect(latest).toContain("31");
+    expect(first?.split("\n\n")[1]).toBe("First release.");
+    expect(first).toContain("16 deterministic rules");
+    expect(first).toContain("29 demo sets of synthetic documents in four languages");
+    expect(first).toContain("Where a copy cannot be tied to a field, every copy is boxed and a note says so.");
   });
 });

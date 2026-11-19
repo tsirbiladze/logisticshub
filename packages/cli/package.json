@@ -1,6 +1,6 @@
 {
   "name": "logisticshub",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cross-check trade documents (invoice, packing list, CMR, contract) with AI extraction and deterministic rules. CLI and MCP server.",
   "type": "module",
   "license": "MIT",

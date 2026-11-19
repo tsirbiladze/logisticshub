@@ -34,6 +34,7 @@ import {
   checkDocuments,
   decodeText,
   extractionJsonSchema,
+  hsLookupOutput,
   ioProblem,
   parseJson,
   pickLanguage,
@@ -56,6 +57,7 @@ Usage:
   node check.mjs <extraction.json> [--lang en|ka|ru|tr] [--out <dir>] [--format md,json,html]
                  [--pdf-dir <dir>] [--no-annotate]
   node check.mjs --schema
+  node check.mjs hs <code or Georgian words> [--json] [--limit <n>]
 
 Writes report.md, report.json and report.html (default: next to the extraction)
 and prints the report. PDFs named in sourceFile (looked up in --pdf-dir,
@@ -129,7 +131,16 @@ function parseArgs(argv: string[]) {
 }
 
 async function main() {
-  const options = parseArgs(process.argv.slice(2));
+  const args = process.argv.slice(2);
+  if (args[0] === "hs") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    try {
+      return void process.stdout.write(`${hsLookupOutput(args.slice(1))}\n`);
+    } catch (error) {
+      stop((error as Error).message);
+    }
+  }
+  const options = parseArgs(args);
   if (options.schema) {
     process.stdout.write(`${JSON.stringify(extractionJsonSchema(), null, 2)}\n`);
     return;

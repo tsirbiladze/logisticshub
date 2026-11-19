@@ -65,6 +65,11 @@ describe("published skill", () => {
     expect(dev).toEqual([]);
   });
 
+  it("ships one shared copy of the nomenclature beside the Node and Python checkers", () => {
+    expect(files(SKILL).filter((file) => file.includes("hs-nomenclature"))).toEqual(["scripts/hs-nomenclature.json.gz"]);
+    expect(readFileSync(join(SKILL, "scripts/hs-nomenclature.json.gz"))).toEqual(readFileSync(join(ROOT, "packages/core/src/hs-nomenclature.json.gz")));
+  });
+
   it("has one version across SKILL.md, the plugin and the npm package", () => {
     const skillVersion = /version:\s*"([^"]+)"/.exec(markdown)?.[1];
     const versions = [

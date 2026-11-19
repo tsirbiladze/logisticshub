@@ -1,5 +1,14 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "georgiaCountries": [
+    "ge",
+    "geo",
+    "georgia",
+    "საქართველო",
+    "грузия",
+    "gürcistan"
+  ],
+  "hsLookupLimit": 20,
   "schemaVersion": "2",
   "reportVersion": "1",
   "languages": [
@@ -24,7 +33,8 @@
     "INC-02",
     "INC-03",
     "CMR-01",
-    "DOC-01"
+    "DOC-01",
+    "HS-01"
   ],
   "ruleTitles": {
     "en": {
@@ -43,7 +53,8 @@
       "INC-02": "Incoterms and transport mode",
       "INC-03": "Insurance under CIF/CIP",
       "CMR-01": "CMR required particulars",
-      "DOC-01": "Complete document set"
+      "DOC-01": "Complete document set",
+      "HS-01": "HS code in the Georgian nomenclature"
     },
     "ka": {
       "AMT-01": "თანხა სიტყვიერად = თანხა ციფრებით",
@@ -61,7 +72,8 @@
       "INC-02": "Incoterms და ტრანსპორტის სახე",
       "INC-03": "დაზღვევა CIF/CIP პირობით",
       "CMR-01": "CMR-ის სავალდებულო მონაცემები",
-      "DOC-01": "დოკუმენტების სრული ნაკრები"
+      "DOC-01": "დოკუმენტების სრული ნაკრები",
+      "HS-01": "HS კოდი საქართველოს სასაქონლო ნომენკლატურაში"
     },
     "ru": {
       "AMT-01": "Сумма прописью = сумма цифрами",
@@ -79,7 +91,8 @@
       "INC-02": "Инкотермс и вид транспорта",
       "INC-03": "Страхование при CIF/CIP",
       "CMR-01": "Обязательные реквизиты CMR",
-      "DOC-01": "Полный комплект документов"
+      "DOC-01": "Полный комплект документов",
+      "HS-01": "Код ТН ВЭД в грузинской номенклатуре"
     },
     "tr": {
       "AMT-01": "Yazıyla tutar = rakamla tutar",
@@ -97,7 +110,8 @@
       "INC-02": "Incoterms ve taşıma şekli",
       "INC-03": "CIF/CIP'te sigorta",
       "CMR-01": "CMR zorunlu bilgileri",
-      "DOC-01": "Eksiksiz belge seti"
+      "DOC-01": "Eksiksiz belge seti",
+      "HS-01": "Gürcistan nomenklatüründeki HS kodu"
     }
   },
   "ruleChecks": {
@@ -117,7 +131,8 @@
       "INC-02": "Ask the parties whether they meant the rule for any mode of transport: FCA for FOB or FAS, CPT for CFR, CIP for CIF.",
       "INC-03": "Ask the seller for the insurance policy or certificate, or find out where the insurance is charged.",
       "CMR-01": "Have the missing particular entered in the CMR before the goods leave.",
-      "DOC-01": "Add the missing document and run the check again. Where there are several documents of one type, see whether the right one was compared."
+      "DOC-01": "Add the missing document and run the check again. Where there are several documents of one type, see whether the right one was compared.",
+      "HS-01": "Verify the printed code and consult the applicable nomenclature edition for the date of the invoice."
     },
     "ka": {
       "AMT-01": "წაიკითხე დოკუმენტში სიტყვიერად დაწერილი თანხა და ციფრებს შეადარე: ერთ-ერთი გასასწორებელია.",
@@ -135,7 +150,8 @@
       "INC-02": "ჰკითხე მხარეებს, ხომ არ გულისხმობდნენ ნებისმიერი ტრანსპორტისთვის განკუთვნილ პირობას: FOB-ის ან FAS-ის ნაცვლად FCA-ს, CFR-ის ნაცვლად CPT-ს, CIF-ის ნაცვლად CIP-ს.",
       "INC-03": "გამყიდველს დაზღვევის პოლისი ან სერტიფიკატი მოსთხოვე, ან გაარკვიე, სად არის გათვალისწინებული დაზღვევის თანხა.",
       "CMR-01": "ტვირთის გაგზავნამდე ნაკლული მონაცემი CMR-ში ჩააწერინე.",
-      "DOC-01": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი. თუ ერთი სახის რამდენიმე დოკუმენტია, ნახე, სწორი შედარდა თუ არა."
+      "DOC-01": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი. თუ ერთი სახის რამდენიმე დოკუმენტია, ნახე, სწორი შედარდა თუ არა.",
+      "HS-01": "შეამოწმე დაბეჭდილი კოდი და ინვოისის თარიღისთვის მოქმედი ნომენკლატურის გამოცემა."
     },
     "ru": {
       "AMT-01": "Прочитайте сумму прописью в документе и сравните её с цифрами: одно из двух нужно исправить.",
@@ -153,7 +169,8 @@
       "INC-02": "Уточните у сторон, не имелось ли в виду условие для любого вида транспорта: FCA вместо FOB или FAS, CPT вместо CFR, CIP вместо CIF.",
       "INC-03": "Запросите у продавца страховой полис или сертификат либо выясните, где учтена сумма страхования.",
       "CMR-01": "Попросите внести недостающие сведения в CMR до отправки груза.",
-      "DOC-01": "Добавьте недостающий документ и запустите проверку снова. Если документов одного вида несколько, посмотрите, тот ли был взят для сверки."
+      "DOC-01": "Добавьте недостающий документ и запустите проверку снова. Если документов одного вида несколько, посмотрите, тот ли был взят для сверки.",
+      "HS-01": "Проверьте напечатанный код и редакцию номенклатуры, действовавшую на дату инвойса."
     },
     "tr": {
       "AMT-01": "Belgedeki yazıyla tutarı okuyup rakamlarla karşılaştırın: ikisinden biri düzeltilmeli.",
@@ -171,7 +188,8 @@
       "INC-02": "Taraflara, her taşıma şekline uygun kuralı kastedip kastetmediklerini sorun: FOB veya FAS yerine FCA, CFR yerine CPT, CIF yerine CIP.",
       "INC-03": "Satıcıdan sigorta poliçesini veya sertifikasını isteyin ya da sigorta bedelinin nerede yer aldığını öğrenin.",
       "CMR-01": "Eksik bilgiyi eşya yola çıkmadan önce CMR'ye yazdırın.",
-      "DOC-01": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın. Aynı türden birden fazla belge varsa karşılaştırmada doğru belgenin kullanılıp kullanılmadığına bakın."
+      "DOC-01": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın. Aynı türden birden fazla belge varsa karşılaştırmada doğru belgenin kullanılıp kullanılmadığına bakın.",
+      "HS-01": "Basılı kodu ve fatura tarihinde geçerli nomenklatür metnini kontrol edin."
     }
   },
   "keyChecks": {
@@ -181,7 +199,8 @@
       "REF-01.cmr-missing-document": "Have the document entered among the documents attached to the CMR (box 5), or see whether it is listed there under another number.",
       "INC-01.unknown": "Look at the delivery terms on the document: the rule may be misspelled or come from an older edition of Incoterms (DAF, DES, DEQ, DDU, DAT). Have it written as an Incoterms 2020 code.",
       "DOC-01.missing": "Add the missing document and run the check again.",
-      "DOC-01.multiple": "See whether the first of them is the one that belongs to this shipment: the other documents were compared with the first one only."
+      "DOC-01.multiple": "See whether the first of them is the one that belongs to this shipment: the other documents were compared with the first one only.",
+      "HS-01.unreadable": "Read the HS code on the invoice and check the extraction against it."
     },
     "ka": {
       "AMT-01.currency": "ნახე, რომელი ვალუტა წერია სიტყვიერ თანხაში და რომელია დოკუმენტის ვალუტა: ერთ-ერთი გასასწორებელია.",
@@ -189,7 +208,8 @@
       "REF-01.cmr-missing-document": "ეს დოკუმენტი CMR-ის თანდართული დოკუმენტების სიაში (გრაფა 5) ჩააწერინე, ან ნახე, ხომ არ არის იქ სხვა ნომრით მითითებული.",
       "INC-01.unknown": "ნახე მიწოდების პირობა დოკუმენტში: შესაძლოა, შეცდომით წერია ან Incoterms-ის ძველი გამოცემიდანაა (DAF, DES, DEQ, DDU, DAT). Incoterms 2020-ის კოდით ჩააწერინე.",
       "DOC-01.missing": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი.",
-      "DOC-01.multiple": "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა."
+      "DOC-01.multiple": "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა.",
+      "HS-01.unreadable": "წაიკითხე HS კოდი ინვოისში და ამოკითხულ მონაცემს შეადარე."
     },
     "ru": {
       "AMT-01.currency": "Посмотрите, какая валюта названа в сумме прописью и какова валюта документа: одно из двух нужно исправить.",
@@ -197,7 +217,8 @@
       "REF-01.cmr-missing-document": "Попросите внести этот документ в графу 5 CMR (прилагаемые документы) или посмотрите, не указан ли он там под другим номером.",
       "INC-01.unknown": "Посмотрите условие поставки в документе: возможно, в нём опечатка или оно взято из старой редакции Инкотермс (DAF, DES, DEQ, DDU, DAT). Попросите указать его кодом Инкотермс 2020.",
       "DOC-01.missing": "Добавьте недостающий документ и запустите проверку снова.",
-      "DOC-01.multiple": "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым."
+      "DOC-01.multiple": "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым.",
+      "HS-01.unreadable": "Прочитайте код ТН ВЭД в инвойсе и сверьте его с извлечённым значением."
     },
     "tr": {
       "AMT-01.currency": "Yazıyla tutarda geçen dövize ve belgenin dövizine bakın: ikisinden biri düzeltilmeli.",
@@ -205,7 +226,8 @@
       "REF-01.cmr-missing-document": "Bu belgeyi CMR'nin ekli belgeler kutusuna (kutu 5) yazdırın ya da orada başka bir numarayla geçip geçmediğine bakın.",
       "INC-01.unknown": "Belgedeki teslim şekline bakın: yanlış yazılmış ya da Incoterms'in eski bir sürümünden alınmış olabilir (DAF, DES, DEQ, DDU, DAT). Incoterms 2020 koduyla yazdırın.",
       "DOC-01.missing": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın.",
-      "DOC-01.multiple": "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı."
+      "DOC-01.multiple": "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı.",
+      "HS-01.unreadable": "Faturadaki HS kodunu okuyup çıkarılan değerle karşılaştırın."
     }
   },
   "fieldLabels": {
@@ -225,6 +247,7 @@
       "otherCharges": "other charge",
       "tax": "tax",
       "lines.model": "item code",
+      "lines.hsCode": "HS code",
       "lines.quantity": "quantity",
       "lines.unitPrice": "unit price",
       "lines.lineTotal": "total",
@@ -266,6 +289,7 @@
       "otherCharges": "დამატებითი ხარჯი",
       "tax": "გადასახადი",
       "lines.model": "მოდელი",
+      "lines.hsCode": "HS კოდი",
       "lines.quantity": "რაოდენობა",
       "lines.unitPrice": "ერთეულის ფასი",
       "lines.lineTotal": "ჯამი",
@@ -307,6 +331,7 @@
       "otherCharges": "дополнительный расход",
       "tax": "налог",
       "lines.model": "артикул",
+      "lines.hsCode": "код ТН ВЭД",
       "lines.quantity": "количество",
       "lines.unitPrice": "цена",
       "lines.lineTotal": "сумма",
@@ -348,6 +373,7 @@
       "otherCharges": "diğer masraf",
       "tax": "vergi",
       "lines.model": "ürün kodu",
+      "lines.hsCode": "HS kodu",
       "lines.quantity": "miktar",
       "lines.unitPrice": "birim fiyat",
       "lines.lineTotal": "tutar",
@@ -405,7 +431,11 @@
       "INC-03.no-insurance": "Under {code} the seller insures the goods, but the documents show neither an insurance policy nor an insurance charge.",
       "CMR-01.missing": "CMR is missing Art. 6(1)({item}): {particular}.",
       "DOC-01.missing": "Missing document: {document}.",
-      "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one."
+      "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one.",
+      "HS-01.unreadable": "Line {line}: the HS code could not be read.",
+      "HS-01.unknown-subheading": "Line {line}: subheading {subheading} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified.",
+      "HS-01.unknown-subheading-heading": "Line {line}: subheading {subheading} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: {heading} · {description}",
+      "HS-01.unknown-national": "Line {line}: national code {code} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under {subheading}: {neighbours}"
     },
     "ka": {
       "AMT-01.mismatch": "სიტყვიერად წერია {wordsAmount}, ციფრებით კი {amount}.",
@@ -437,7 +467,11 @@
       "INC-03.no-insurance": "{code} პირობით ტვირთს გამყიდველი აზღვევს, დოკუმენტებში კი არც დაზღვევის პოლისია და არც დაზღვევის თანხა.",
       "CMR-01.missing": "CMR-ს აკლია მუხ. 6(1)({item}): {particular}.",
       "DOC-01.missing": "აკლია დოკუმენტი: {document}.",
-      "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება."
+      "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება.",
+      "HS-01.unreadable": "სტრიქონი {line}: HS კოდი ვერ იკითხება.",
+      "HS-01.unknown-subheading": "სტრიქონი {line}: სასაქონლო სუბპოზიცია {subheading} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის.",
+      "HS-01.unknown-subheading-heading": "სტრიქონი {line}: სასაქონლო სუბპოზიცია {subheading} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. უახლოესი სასაქონლო პოზიცია: {heading} · {description}",
+      "HS-01.unknown-national": "სტრიქონი {line}: ეროვნული კოდი {code} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. კოდები {subheading}-ის ფარგლებში: {neighbours}"
     },
     "ru": {
       "AMT-01.mismatch": "Прописью указано {wordsAmount}, а цифрами — {amount}.",
@@ -469,7 +503,11 @@
       "INC-03.no-insurance": "По условию {code} груз страхует продавец, но в документах нет ни страхового полиса, ни суммы страхования.",
       "CMR-01.missing": "В CMR нет реквизита ст. 6(1)({item}): {particular}.",
       "DOC-01.missing": "Нет документа: {document}.",
-      "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый."
+      "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый.",
+      "HS-01.unreadable": "Строка {line}: не удалось прочитать код ТН ВЭД.",
+      "HS-01.unknown-subheading": "Строка {line}: субпозиции {subheading} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись.",
+      "HS-01.unknown-subheading-heading": "Строка {line}: субпозиции {subheading} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: {heading} · {description}",
+      "HS-01.unknown-national": "Строка {line}: национального кода {code} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции {subheading}: {neighbours}"
     },
     "tr": {
       "AMT-01.mismatch": "Yazıyla {wordsAmount} yazıyor, rakamla tutar ise {amount}.",
@@ -501,7 +539,11 @@
       "INC-03.no-insurance": "{code} teslim şeklinde sigortayı satıcı yaptırır, ancak belgeler arasında ne sigorta poliçesi ne de sigorta bedeli var.",
       "CMR-01.missing": "CMR'de Madde 6(1)({item}) eksik: {particular}.",
       "DOC-01.missing": "Eksik belge: {document}.",
-      "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır."
+      "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır.",
+      "HS-01.unreadable": "Satır {line}: HS kodu okunamadı.",
+      "HS-01.unknown-subheading": "Satır {line}: {subheading} alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor.",
+      "HS-01.unknown-subheading-heading": "Satır {line}: {subheading} alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. En yakın pozisyon: {heading} · {description}",
+      "HS-01.unknown-national": "Satır {line}: {code} ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. {subheading} alt pozisyonundaki kodlar: {neighbours}"
     }
   },
   "dateParams": {

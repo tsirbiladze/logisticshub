@@ -149,6 +149,15 @@ function regressionInputs(): [string, unknown][] {
       Object.assign(line, { quantity: cite("250"), packages: cite("25"), netWeightKg: cite("200"), grossWeightKg: cite("230"), volumeM3: cite("1.5") });
     });
   return [
+    [
+      "hs-from-consignee",
+      variant("ka-office-furniture", ({ commercial_invoice: inv }) => {
+        inv!.buyer.country = cite(null);
+        inv!.consignee.country = cite("GÜRCİSTAN");
+        inv!.lines[0].hsCode = cite("94O3 10");
+        inv!.lines[1].hsCode = cite("9999 99");
+      }),
+    ],
     ["split-model", splitModel("150")],
     ["split-model-mismatch", splitModel("100")],
     [
@@ -436,6 +445,20 @@ describe("Python port: the interpreter", () => {
 });
 
 describe.skipIf(!python)("Python port", () => {
+  it("looks up the same Georgian entries in both installed scripts", () => {
+    for (const args of [
+      ["9403 30 110 00"],
+      ["საწერი  მაგიდ".toUpperCase(), "--json", "--limit", "3"],
+      ["999999", "--json"],
+    ]) {
+      const [a, b] = [node("hs", ...args), py("hs", ...args)];
+      expect(a.status).toBe(0);
+      expect(b.status).toBe(0);
+      expect(b.stderr).toBe("");
+      expect(b.stdout).toBe(a.stdout);
+    }
+  });
+
   it("prints the same JSON Schema", () => {
     const ts = JSON.parse(readFileSync(join(ROOT, "skills/logisticshub/references/extraction-schema.json"), "utf8"));
     expect(JSON.parse(py("--schema").stdout)).toEqual(ts);

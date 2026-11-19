@@ -3,6 +3,7 @@
  *   SKILL.md, scripts/check.mjs (single file, no dependencies) and
  *   scripts/THIRD-PARTY-NOTICES.txt (licenses of what check.mjs bundles),
  *   scripts/check.py + check-data.json (Python port),
+ *   scripts/hs-nomenclature.json.gz (shared by Node and Python),
  *   references/extraction.md, extraction-schema.json, extraction-blank.json,
  *   references/issues.md, rules.md
  * The output is committed so `npx skills add` works without a build.
@@ -49,6 +50,7 @@ import {
   UNIT_ALIASES,
   VOCAB,
 } from "@logisticshub/core";
+import { GEORGIA_COUNTRIES, HS_LOOKUP_LIMIT } from "../core/src/hs.ts";
 import { thirdPartyNotices } from "../cli/notices.ts";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -77,6 +79,7 @@ const { metafile } = await build({
 });
 
 writeFileSync(`${OUT}scripts/THIRD-PARTY-NOTICES.txt`, thirdPartyNotices(metafile, `Logisticshub ${version} (scripts/check.mjs)`));
+copyFileSync(here("../core/src/hs-nomenclature.json.gz"), `${OUT}scripts/hs-nomenclature.json.gz`);
 copyFileSync(here("SKILL.md"), `${OUT}SKILL.md`);
 
 // Python port (claude.ai / Claude API, no Node): logic in check.py, every text
@@ -90,6 +93,8 @@ const lexicons = Object.fromEntries(
 );
 const data = {
   version,
+  georgiaCountries: GEORGIA_COUNTRIES,
+  hsLookupLimit: HS_LOOKUP_LIMIT,
   schemaVersion: SCHEMA_VERSION,
   reportVersion: REPORT_VERSION,
   languages: REPORT_LANGUAGES,
