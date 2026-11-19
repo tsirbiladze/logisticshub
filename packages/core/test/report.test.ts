@@ -93,7 +93,7 @@ describe("reports", () => {
   });
 
   describe("which field each piece of evidence is", () => {
-    /** The judge's case: an invoice whose subtotal and total print the same text, with a tax between them. */
+    /** Where the quote alone cannot say which field it is: an invoice whose subtotal and total print the same text, with a tax between them. */
     function taxLeftOut() {
       const pack = kaPack();
       const invoice = pack.documents[0]!;

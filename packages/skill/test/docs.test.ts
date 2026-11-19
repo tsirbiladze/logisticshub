@@ -119,11 +119,11 @@ describe("README", () => {
   it("has the same sections in English and in Georgian", () => {
     const en = sections(README.en);
     const ka = sections(README.ka);
-    expect(en.map((s) => s.heading)).toEqual(["Install", "What it checks", "How it works", "Privacy", "Limits", "Quality", "Development", "License"]);
+    expect(en.map((s) => s.heading)).toEqual(["Install", "What it checks", "How it works", "Privacy", "Limits", "Quality", "Design decisions", "Development", "How this was built", "License"]);
     expect(ka).toHaveLength(en.length);
-    // What can be compared without reading Georgian: the rule table, the skill folder, the commands, the paths.
+    // What can be compared without reading Georgian: the rule table, the skill folder, the files the design decisions name, the commands, the paths.
     const code = (body: string) => [...body.matchAll(/`([^`\n]+)`/g)].map((m) => m[1]!);
-    for (const i of [1, 2, 6]) {
+    for (const i of [1, 2, 6, 7]) {
       expect(tableRows(ka[i]!.body).length, en[i]!.heading).toBe(tableRows(en[i]!.body).length);
       expect(new Set(code(ka[i]!.body).filter((c) => !c.includes("<"))), en[i]!.heading).toEqual(new Set(code(en[i]!.body).filter((c) => !c.includes("<"))));
     }
@@ -248,7 +248,7 @@ describe("Georgian docs", () => {
     }
   });
 
-  it("keep the round 1 judge's wording: მონაცემი for a fact, one word for synthetic, no calques", () => {
+  it("read as natural Georgian: მონაცემი for a fact, one word for synthetic, no calques", () => {
     for (const text of georgian) {
       // ფაქტი for an item of data, "to the byte" and "its title" carried over word for word, and the second spelling of "synthetic".
       expect(text).not.toMatch(/ფაქტ(?!ობრივ)|ბაიტამდე|მისი სათაური|სინთეტიკ|აირჩიე ერთი\.|იმასაც, როცა/);
@@ -276,14 +276,29 @@ describe("changelog", () => {
     expect(first?.[1]).toBe(version);
   });
 
-  it("keeps the first release intact and lists the current change", () => {
-    const [, latest, first] = read("CHANGELOG.md").split(/^## /m);
-    expect(latest).toContain("HS-01");
-    expect(latest).toContain("45 synthetic variants");
-    expect(latest).toContain("declaration-from-rs");
-    expect(first?.split("\n\n")[1]).toBe("First release.");
-    expect(first).toContain("16 deterministic rules");
-    expect(first).toContain("29 demo sets of synthetic documents in four languages");
-    expect(first).toContain("Where a copy cannot be tied to a field, every copy is boxed and a note says so.");
+  it("has one release, the first, and does not promise one box where the marker boxes every copy", () => {
+    // What is not released yet stands above the release, under "Unreleased".
+    const released = read("CHANGELOG.md").split(/^## /m).slice(1).filter((entry) => !entry.startsWith("Unreleased\n"));
+    expect(released).toHaveLength(1);
+    const entry = released[0]!;
+    expect(entry.split("\n\n")[1]).toBe("First release.");
+    // What the entry counts is what the repo holds.
+    const packs = (JSON.parse(read("fixtures/index.json")) as { packs: { language: string; variants: unknown[] }[] }).packs;
+    // The first release keeps the counts it shipped with.
+    expect(entry).toContain("16 deterministic rules");
+    expect(entry).toContain("29 demo sets of synthetic documents in four languages");
+    // What came after it is listed above it, with the counts the repo holds now.
+    const unreleased = read("CHANGELOG.md").split(/^## /m).slice(1).find((part) => part.startsWith("Unreleased\n"));
+    expect(unreleased).toContain("HS-01");
+    expect(unreleased).toContain("declaration-from-rs");
+    expect(unreleased).toContain(`${packs.reduce((n, pack) => n + pack.variants.length, 0)} synthetic variants`);
+    expect(new Set(packs.map((pack) => pack.language)).size).toBe(4);
+    expect(entry).not.toContain("box each finding once.");
+    expect(entry).toContain("Where a copy cannot be tied to a field, every copy is boxed and a note says so.");
+    // The four places that carry the version agree with the entry.
+    const version = /^(\S+) — /.exec(entry)![1]!;
+    expect(JSON.parse(read("packages/skill/package.json")).version).toBe(version);
+    expect(JSON.parse(read(".claude-plugin/plugin.json")).version).toBe(version);
+    expect(read("packages/skill/SKILL.md")).toContain(`version: "${version}"`);
   });
 });

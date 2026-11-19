@@ -356,6 +356,19 @@ describe("cross-document rules", () => {
     expect(finding.evidence[1]).toMatchObject({ path: "lines[*]", value: "100", quote: null });
   });
 
+  it("QTY-01 holds two package counts to the coarser of the two, whichever document prints it", () => {
+    // Whole counts must be equal. Should a count ever carry decimals, "100" is what "100.4" rounds to, on either side.
+    const packages = (pack: Extraction) => keys(run(pack)).filter((key) => key === "QTY-01.packages");
+    const finer = setup();
+    finer.invoice.packages = c("100.4");
+    expect(packages(finer.pack)).toEqual([]);
+    const { pack, cmr } = setup();
+    cmr.totalPackages = c("100.4");
+    expect(packages(pack)).toEqual([]);
+    cmr.totalPackages = c("100.6");
+    expect(packages(pack)).toEqual(["QTY-01.packages"]);
+  });
+
   it("WGT-01 catches gross below net", () => {
     const { pack, pl } = setup();
     pl.lines[1]!.grossWeightKg = c("580");
@@ -363,6 +376,48 @@ describe("cross-document rules", () => {
     expect(finding.params).toEqual({ where: "packing_list:line:2", net: "600", gross: "580" });
     expect(text(finding)).toBe("Packing list, line 2: gross weight 580 kg is less than net weight 600 kg.");
     expect(text(finding, "ka")).toBe("შეფუთვის ფურცელი, სტრიქონი 2: ბრუტო წონა 580 კგ ნეტო წონაზე (600 კგ) ნაკლებია.");
+  });
+
+  it("WGT-02 holds every two documents to the tolerance, whichever of them prints which weight", () => {
+    // 1,880.0, 1,880.5 and 1,879.5 kg: the first is within 0.5 kg of each of the others, and those two are 1.0 kg apart.
+    const weights = ["1880.0", "1880.5", "1879.5"] as const;
+    for (const [onPackingList, onCmr, onInvoice] of [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]] as const) {
+      const { pack, invoice, pl, cmr } = setup();
+      pl.totalGrossWeightKg = c(weights[onPackingList]);
+      cmr.totalGrossWeightKg = c(weights[onCmr]);
+      invoice.grossWeightKg = c(weights[onInvoice]);
+      expect(keys(run(pack)), `${onPackingList}${onCmr}${onInvoice}`).toEqual(["WGT-02.gross"]);
+      // The order of the documents in the extraction changes nothing either.
+      pack.documents.reverse();
+      expect(keys(run(pack)), `${onPackingList}${onCmr}${onInvoice}, reversed`).toEqual(["WGT-02.gross"]);
+    }
+    const { pack, invoice, pl, cmr } = setup();
+    pl.totalGrossWeightKg = c("1880.0");
+    cmr.totalGrossWeightKg = c("1880.5");
+    invoice.grossWeightKg = c("1879.5");
+    expect(text(find(run(pack), "WGT-02.gross")!)).toBe("Gross weight differs: packing list 1,880.0 kg, CMR 1,880.5 kg, invoice 1,879.5 kg.");
+  });
+
+  it("WGT-02 passes three weights that are within the tolerance of each other", () => {
+    const { pack, invoice, pl, cmr } = setup();
+    pl.totalGrossWeightKg = c("1880.0");
+    cmr.totalGrossWeightKg = c("1880.5");
+    invoice.grossWeightKg = c("1880.25");
+    expect(run(pack)).toEqual([]);
+    // Exactly 0.5 kg between the lightest and the heaviest still passes; 0.6 kg does not.
+    invoice.grossWeightKg = c("1880.0");
+    expect(run(pack)).toEqual([]);
+    invoice.grossWeightKg = c("1879.9");
+    expect(keys(run(pack))).toEqual(["WGT-02.gross"]);
+  });
+
+  it("WGT-02 compares two documents with the same tolerance", () => {
+    const { pack, invoice } = setup();
+    // Only the packing list (1,680 kg) and the invoice print a net weight.
+    invoice.netWeightKg = c("1680.5");
+    expect(run(pack)).toEqual([]);
+    invoice.netWeightKg = c("1680.6");
+    expect(text(find(run(pack), "WGT-02.net")!)).toBe("Net weight differs: packing list 1,680 kg, invoice 1,680.6 kg.");
   });
 
   it("REF-01 catches a wrong invoice reference but ignores formatting", () => {

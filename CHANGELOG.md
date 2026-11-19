@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.1.0 — 2026-11-19
+## Unreleased
 
+- WGT-02 and the package counts of QTY-01 compare every two documents, not each document with the first one. Gross weights of 1,000.0, 1,000.5 and 999.5 kg on the packing list, the CMR and the invoice gave no finding, although the last two are 1.0 kg apart; they are now reported. The 0.5 kg tolerance is unchanged, and so is the result for whole package counts.
 - Added HS-01 for invoice codes involving Georgia dated from 2024-01-26, and offline lookup by code, prefix or Georgian description in the CLI, MCP server and both skill scripts. The data is the original annex to Georgian Order No. 21 (Matsne 6086072, publication 0). Later amendments were not verified.
 - Extraction schema 3 adds party identification numbers and the optional Georgian goods declaration. PTY-02 compares printed tax or registration numbers. TAX-01, TAX-02 and TAX-03 use a saved Revenue Service taxpayer snapshot for names, VAT status and the status −1 reply. The opt-in registry client was tested with a local stub and synthetic snapshots.
 - Six declaration rules compare parties, HS prefixes, shipment weights, package counts, invoice value and origin. They also check declared national codes and add up item invoice values. DATE-01 and REF-01 check the declaration registration date and the invoice reference in box 44. Declaration PDFs support quoted evidence and marked copies.

@@ -430,6 +430,24 @@ function regressionInputs(): [string, unknown][] {
         for (const line of pl!.lines) line.packingMethod = cite("KOLİ");
       }),
     ],
+    [
+      // Each within 0.5 kg of the packing list, and 1.0 kg from each other: a finding.
+      "weights-three-documents-apart",
+      variant("en-led-lighting", ({ commercial_invoice: inv, packing_list: pl, cmr }) => {
+        pl!.totalGrossWeightKg = cite("785.0");
+        cmr!.totalGrossWeightKg = cite("785.5");
+        inv!.grossWeightKg = cite("784.5");
+      }),
+    ],
+    [
+      // All three within 0.5 kg of each other: no finding.
+      "weights-three-documents-within",
+      variant("en-led-lighting", ({ commercial_invoice: inv, packing_list: pl, cmr }) => {
+        pl!.totalGrossWeightKg = cite("785.0");
+        cmr!.totalGrossWeightKg = cite("785.5");
+        inv!.grossWeightKg = cite("785.2");
+      }),
+    ],
   ];
 }
 

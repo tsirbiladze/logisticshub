@@ -795,7 +795,7 @@ describe("what to check", () => {
         expect(line).not.toMatch(/[{}\n]|\s{2}/);
       }
     }
-    // The four the judge named are among them.
+    // Four that must keep a line of their own, named here so that none of them drops out with a change to the list above.
     for (const key of ["REF-01.cmr-missing-document", "DOC-01.multiple", "AMT-01.unreadable", "INC-01.unknown"]) expect(Object.keys(KEY_CHECKS.en)).toContain(key);
   });
 
@@ -912,12 +912,12 @@ describe("Georgian texts", () => {
     expect(formatMessage("SUM-03.total", { document: "packing_list", expected: "1", metric: "packages", found: "2" }, "tr")).toMatch(/^Çeki listesi: /);
   });
 
-  it("read as the round 1 judge asked: one word for “may”, a document that is named and not written, the whole formula", () => {
+  it("read as plain Georgian, not office language: one word for “may”, a document that is named and not written, the whole formula", () => {
     expect(UI.ka.extractionIssuesEffect).toBe("შესაძლოა, ხარვეზიანი მნიშვნელობა შემოწმებაში არ მოხვდა და ქვემოთ მოცემული შედეგი არასრულია.");
     expect(RULE_CHECKS.ka["REF-01"]).toBe("ნახე მითითებული დოკუმენტის ნომერი და თარიღი და მითითება გაასწორებინე.");
     expect(MESSAGES.ka["REF-01.cmr-missing-document"]).toBe("CMR-ის თანდართულ დოკუმენტებში {document} {number} არ არის მითითებული.");
     expect(RULE_SUMMARIES_KA["AMT-01"]).toBe("სიტყვიერ თანხას (KA, EN, RU, TR) კითხულობს და ციფრებსა და ვალუტას ადარებს.");
-    // SUM-02's formula has a tax and other charges since round 1; the summary says so now.
+    // SUM-02's formula includes a tax and other charges, so its summary names them too.
     expect(RULE_SUMMARIES_KA["SUM-02"]).toBe("სტრიქონები → საქონლის ღირებულება → გადასახდელი, ფასდაკლების, ხარჯებისა და გადასახადის გათვალისწინებით.");
     // Office language and doubled words the texts no longer use.
     expect(georgian.filter((text) => /მონაწილეობდეს|შესაძლოა არასრული|რომელიც მითითებულია|ციფრებს და ვალუტას/u.test(text))).toEqual([]);

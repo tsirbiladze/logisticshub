@@ -96,7 +96,7 @@ export const RULE_REFERENCE: Record<RuleId, RuleReference> = {
         when: "the package counts differ between the invoice's `packages`, the packing list's `totalPackages` and the CMR's `totalPackages` (for the last two, the sum of the lines when no total is printed)",
       },
     ],
-    tolerance: "None for quantities. Package counts: half a unit of the last printed digit (whole numbers must be equal).",
+    tolerance: "None for quantities. Package counts: half a unit of the last printed digit (whole numbers must be equal), between every two documents; of two counts printed to different precision, the coarser one sets it.",
     silent: [
       "Quantities in different units: 400 pieces are not compared with 40 cartons. Units are compared without case, accents, dots and spaces; common spellings are one unit (`pcs`, `pieces`, `шт`, `ცალი`, `adet`; sets, pairs, kg, m, m2, l), and so is a plain English plural with its singular (`roll` and `rolls`, `box` and `boxes`: a Latin word of four letters or more ending in one `s`). Nothing is converted (kg to t, pieces per carton). A side that names no unit is compared.",
       "One model printed in two units on one document, or a line of it without a quantity.",
@@ -116,7 +116,7 @@ export const RULE_REFERENCE: Record<RuleId, RuleReference> = {
       { key: "WGT-02.gross", severity: "error", when: "the gross weights differ; one finding lists every document's value" },
       { key: "WGT-02.net", severity: "error", when: "the net weights differ" },
     ],
-    tolerance: "0.5 kg.",
+    tolerance: "0.5 kg between every two documents: `1,000.0`, `1,000.5` and `999.5` kg are reported, because the last two are 1.0 kg apart.",
     silent: ["Fewer than two documents print the weight.", "Weights of single lines are not compared across documents."],
   },
   "REF-01": {

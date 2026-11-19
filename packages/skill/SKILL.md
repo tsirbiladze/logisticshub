@@ -3,7 +3,7 @@ name: logisticshub
 description: Cross-check invoices, packing lists, CMRs, contracts and Georgian customs declarations. Check invoice sums and words or look up Georgian HS codes. EN, KA, RU, TR. Not for paying or booking.
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.0.0"
   homepage: "https://tsirbiladze.com/skills/logisticshub"
 ---
 

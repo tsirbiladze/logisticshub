@@ -46,11 +46,11 @@ describe("published skill", () => {
     expect(Buffer.byteLength(markdown)).toBeLessThan(20_000);
   });
 
-  it("keeps the extraction guide below its round 1 size: what is read before the first field must not grow back", () => {
-    // SKILL.md has the agent read references/extraction.md in full before the first field. At round 1 of the
-    // hillclimb it was 184 lines and 16,610 bytes, four times its first size, and the judge counted that as a
-    // regression. The ceiling sits just under that size. What is needed only after the check (issue codes,
-    // notes) belongs in references/issues.md, which is opened when an issue or a note appears.
+  it("keeps the extraction guide within 180 lines and 16,600 bytes: what is read before the first field must not grow back", () => {
+    // SKILL.md has the agent read references/extraction.md in full before the first field, so its length is
+    // paid for on every run. It once grew to 184 lines and 16,610 bytes, four times its first size; the
+    // ceiling sits just under that size. What is needed only after the check (issue codes, notes) belongs
+    // in references/issues.md, which is opened when an issue or a note appears.
     const guide = read("skills/logisticshub/references/extraction.md");
     expect(guide.split("\n").length).toBeLessThanOrEqual(180);
     expect(Buffer.byteLength(guide)).toBeLessThanOrEqual(16_600);

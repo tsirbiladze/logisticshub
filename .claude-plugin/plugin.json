@@ -1,6 +1,6 @@
 {
   "name": "logisticshub",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Cross-check a commercial invoice, packing list, CMR, contract and optional Georgian customs declaration: 27 deterministic rules, exact quotes and pages, reports in EN/KA/RU/TR and marked PDFs.",
   "author": { "name": "Tornike Sirbiladze", "url": "https://tsirbiladze.com" },
   "homepage": "https://tsirbiladze.com/skills/logisticshub",
