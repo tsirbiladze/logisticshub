@@ -4,7 +4,7 @@
 
 [სკილის გვერდი](https://tsirbiladze.com/ka/skills/logisticshub) · [English](README.md) · [ცვლილებები](CHANGELOG.md) · MIT
 
-[![skills.sh](https://skills.sh/b/tsirbiladze/logisticshub)](https://skills.sh/tsirbiladze/logisticshub)
+[![npm](https://img.shields.io/npm/v/logisticshub)](https://www.npmjs.com/package/logisticshub)
 
 ![მონიშნული ინვოისი: მე-2 სტრიქონის ჯამი არასწორია, საქონლის ღირებულება კი სტრიქონების ჯამს არ ემთხვევა](docs/marked-invoice.png)
 
