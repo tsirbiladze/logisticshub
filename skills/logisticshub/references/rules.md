@@ -122,7 +122,7 @@ Not reported:
 Invoice and packing list give the same quantity for each item (or in total), and invoice, packing list and CMR the same number of packages.
 
 - **Reads:** The first invoice, the first packing list and the first CMR: quantities per item or in total, and package counts.
-- **Tolerance:** None for quantities. Package counts: half a unit of the last printed digit (whole numbers must be equal).
+- **Tolerance:** None for quantities. Package counts: half a unit of the last printed digit (whole numbers must be equal), between every two documents; of two counts printed to different precision, the coarser one sets it.
 
 | Finding | Severity | Reported when |
 |---|---|---|
@@ -159,7 +159,7 @@ Not reported:
 Invoice, packing list and CMR give the same gross weight, and invoice and packing list the same net weight.
 
 - **Reads:** The first invoice, packing list and CMR. Gross: the packing list's `totalGrossWeightKg`, the CMR's `totalGrossWeightKg` (for both, the sum of the lines when no total is printed) and the invoice's `grossWeightKg`. Net: the packing list's `totalNetWeightKg` (or the sum of its lines) and the invoice's `netWeightKg`.
-- **Tolerance:** 0.5 kg.
+- **Tolerance:** 0.5 kg between every two documents: `1,000.0`, `1,000.5` and `999.5` kg are reported, because the last two are 1.0 kg apart.
 
 | Finding | Severity | Reported when |
 |---|---|---|

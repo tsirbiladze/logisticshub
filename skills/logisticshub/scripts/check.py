@@ -2122,8 +2122,12 @@ def _agree(observed, tolerance, make):
     present = [o for o in observed if o is not None]
     if len(present) < 2:
         return []
-    first = present[0]
-    if all(same_within(o["value"], first["value"], tolerance(o)) for o in present[1:]):
+
+    # Every two documents, not each with the first: within the tolerance of either value of the pair.
+    def same(a, b):
+        return same_within(a["value"], b["value"], tolerance(a)) or same_within(a["value"], b["value"], tolerance(b))
+
+    if all(same(a, b) for i, a in enumerate(present) for b in present[i + 1:]):
         return []
     values = _encode([(o["doc"]["type"], o["field"]["value"]) for o in present])
     return [make(values, [_cite(o) for o in present])]
