@@ -1,0 +1,9 @@
+# GitHub Linguist: what the repository's language bar counts.
+#
+# skills/logisticshub/scripts is written by `pnpm build:skill` (packages/skill/build.ts)
+# and committed: the minified bundle check.mjs, the copy of packages/skill/python/check.py,
+# its data file and the license notices. None of it is written by hand.
+skills/logisticshub/scripts/** linguist-generated
+
+# The demo packs are generated documents (PDFs and JSON), not source code.
+fixtures/** linguist-vendored

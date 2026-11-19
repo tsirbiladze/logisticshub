@@ -4,7 +4,7 @@
 
 [Skill page](https://tsirbiladze.com/skills/logisticshub) · [ქართულად](README.ka.md) · [Changelog](CHANGELOG.md) · MIT
 
-[![skills.sh](https://skills.sh/b/tsirbiladze/logisticshub)](https://skills.sh/tsirbiladze/logisticshub)
+[![npm](https://img.shields.io/npm/v/logisticshub)](https://www.npmjs.com/package/logisticshub)
 
 ![A marked invoice: line 2 does not add up, and the subtotal does not match the lines](docs/marked-invoice.png)
 
