@@ -255,7 +255,7 @@ describe("Georgian docs", () => {
     }
   });
 
-  it("keep the round 1 judge's wording: მონაცემი for a fact, one word for synthetic, no calques", () => {
+  it("read as natural Georgian: მონაცემი for a fact, one word for synthetic, no calques", () => {
     for (const text of georgian) {
       // ფაქტი for an item of data, "to the byte" and "its title" carried over word for word, and the second spelling of "synthetic".
       expect(text).not.toMatch(/ფაქტ(?!ობრივ)|ბაიტამდე|მისი სათაური|სინთეტიკ|აირჩიე ერთი\.|იმასაც, როცა/);
