@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- WGT-02 and the package counts of QTY-01 compare every two documents, not each document with the first one. Gross weights of 1,000.0, 1,000.5 and 999.5 kg on the packing list, the CMR and the invoice gave no finding, although the last two are 1.0 kg apart; they are now reported. The 0.5 kg tolerance is unchanged, and so is the result for whole package counts.
+
 ## 1.0.0 — 2026-11-17
 
 First release.
