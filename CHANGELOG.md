@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The Turkish demo pack's seller is now "Erguvan Seramik Sanayi ve Ticaret A.Ş.", an invented name. The name it had is that of a real company, and the demo packs are meant to hold fictional companies only. The five `tr-ceramics` sets were regenerated: their PDFs and `extraction.json`; the expected findings are the same.
+
 ## 1.0.0 — 2026-11-17
 
 First release.

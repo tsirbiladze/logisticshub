@@ -283,9 +283,11 @@ describe("changelog", () => {
     expect(first?.[1]).toBe(version);
   });
 
-  it("has one entry, the first release, and does not promise one box where the marker boxes every copy", () => {
-    expect(read("CHANGELOG.md").split(/^## /m)).toHaveLength(2);
-    const entry = read("CHANGELOG.md").split(/^## /m)[1]!;
+  it("has one release, the first, and does not promise one box where the marker boxes every copy", () => {
+    // What is not released yet stands above the release, under "Unreleased".
+    const released = read("CHANGELOG.md").split(/^## /m).slice(1).filter((entry) => !entry.startsWith("Unreleased\n"));
+    expect(released).toHaveLength(1);
+    const entry = released[0]!;
     expect(entry.split("\n\n")[1]).toBe("First release.");
     // What the entry counts is what the repo holds.
     const packs = (JSON.parse(read("fixtures/index.json")) as { packs: { language: string; variants: unknown[] }[] }).packs;
