@@ -315,7 +315,7 @@ describe("values against their quotes", () => {
   });
 
   it("does not call an amount a percentage because a rate stands next to it", () => {
-    // The judge's case: a rate printed before the amount, in the English and in the Turkish form.
+    // A rate printed before the amount, in the English and in the Turkish form.
     expect(check((d) => void (d.tax = c("3124.00", "20% 3,124.00")))).toEqual([]);
     expect(check((d) => void (d.tax = c("1743.12", "%18 1.743,12")))).toEqual([]);
     expect(check((d) => void (d.tax = c("3124.00", "3,124.00 (20%)")))).toEqual([]);

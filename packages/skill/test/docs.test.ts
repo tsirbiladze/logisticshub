@@ -119,11 +119,11 @@ describe("README", () => {
   it("has the same sections in English and in Georgian", () => {
     const en = sections(README.en);
     const ka = sections(README.ka);
-    expect(en.map((s) => s.heading)).toEqual(["Install", "What it checks", "How it works", "Privacy", "Limits", "Quality", "Development", "License"]);
+    expect(en.map((s) => s.heading)).toEqual(["Install", "What it checks", "How it works", "Privacy", "Limits", "Quality", "Design decisions", "Development", "How this was built", "License"]);
     expect(ka).toHaveLength(en.length);
-    // What can be compared without reading Georgian: the rule table, the skill folder, the commands, the paths.
+    // What can be compared without reading Georgian: the rule table, the skill folder, the files the design decisions name, the commands, the paths.
     const code = (body: string) => [...body.matchAll(/`([^`\n]+)`/g)].map((m) => m[1]!);
-    for (const i of [1, 2, 6]) {
+    for (const i of [1, 2, 6, 7]) {
       expect(tableRows(ka[i]!.body).length, en[i]!.heading).toBe(tableRows(en[i]!.body).length);
       expect(new Set(code(ka[i]!.body).filter((c) => !c.includes("<"))), en[i]!.heading).toEqual(new Set(code(en[i]!.body).filter((c) => !c.includes("<"))));
     }
@@ -255,7 +255,7 @@ describe("Georgian docs", () => {
     }
   });
 
-  it("keep the round 1 judge's wording: მონაცემი for a fact, one word for synthetic, no calques", () => {
+  it("read as natural Georgian: მონაცემი for a fact, one word for synthetic, no calques", () => {
     for (const text of georgian) {
       // ფაქტი for an item of data, "to the byte" and "its title" carried over word for word, and the second spelling of "synthetic".
       expect(text).not.toMatch(/ფაქტ(?!ობრივ)|ბაიტამდე|მისი სათაური|სინთეტიკ|აირჩიე ერთი\.|იმასაც, როცა/);

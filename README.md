@@ -4,7 +4,7 @@
 
 [Skill page](https://tsirbiladze.com/skills/logisticshub) · [ქართულად](README.ka.md) · [Changelog](CHANGELOG.md) · MIT
 
-[![skills.sh](https://skills.sh/b/tsirbiladze/logisticshub)](https://skills.sh/tsirbiladze/logisticshub)
+[![npm](https://img.shields.io/npm/v/logisticshub)](https://www.npmjs.com/package/logisticshub)
 
 ![A marked invoice: line 2 does not add up, and the subtotal does not match the lines](docs/marked-invoice.png)
 
@@ -148,6 +148,14 @@ Not checked:
 - Every message of every rule is tested in all four languages.
 - The suite ran on Node.js 22.23.5 with Python 3.9.25 and on Node.js 24.22.1 with Python 3.14.8, on one Linux machine. CI is set up for Node.js 22 and 24 with Python 3.9 and the current Python, but it has not run yet.
 
+## Design decisions
+
+Three choices that the code does not explain on its own:
+
+- **Every rule is written twice.** The skill has to work where `node` is not available: on claude.ai and the Claude API it runs `scripts/check.py`. That checker is a second implementation, ported by hand in `packages/skill/python/check.py`. A test keeps the two from drifting apart: `packages/skill/test/python.test.ts` runs the Python checker on every variant of the demo packs and on malformed and edge-case inputs, in all four languages, and its Markdown, JSON and HTML reports must be byte-identical to the TypeScript checker's. Messages, vocabulary and most constants are not ported at all: the build writes them from the TypeScript sources into `scripts/check-data.json`.
+- **The built skill is committed.** `npx skills`, the Claude Code plugin and the claude.ai zip take `skills/logisticshub` straight from the repository and never run a build, so the build output has to be in the tree. A stale copy is caught in two places: CI rebuilds the skill and fails on any difference (`pnpm build:skill && git diff --exit-code -- skills/`), and the tests run the committed `check.mjs` and `check.py`, not the sources, and hold the committed references to what the sources generate (`packages/skill/test/skill.test.ts`).
+- **Every value carries its quote and its page.** A model reads the documents, and a model can misread. So the extraction schema asks for evidence, `{ value, quote, page }` for every fact, and the checker checks it before it trusts it: in `packages/core/src/validate.ts` each number, date and currency must be a reading of its own quote. A value that is not is listed as an extraction issue and kept out of every rule, so a misread figure cannot turn into a finding. The same quote and page are what a finding cites.
+
 ## Development
 
 ```bash
@@ -170,6 +178,10 @@ pnpm fixtures        # regenerates the synthetic packs and PDFs (needs Chromium 
 | `docs` | the skill page text shown on [tsirbiladze.com](https://tsirbiladze.com/skills/logisticshub) |
 
 Contributor notes for people and agents: [AGENTS.md](AGENTS.md).
+
+## How this was built
+
+The project was developed in a private repository and published here as a snapshot at v1.0.0, which is why the history starts with one commit. It was built with coding agents working from written specs; the author designed it, reviewed the work and tested it. From here on, changes land as pull requests.
 
 ## License
 
