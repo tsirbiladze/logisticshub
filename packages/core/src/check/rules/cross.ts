@@ -55,7 +55,15 @@ function statedOrSum<L>(
   return { doc, path: `${linesPath}[*]`, field: { value: show(summed), quote: null, page }, value: summed, computed: true };
 }
 
-/** Compares the same quantity across documents; one finding listing all values. */
+/**
+ * Compares the same quantity across documents; one finding listing all values.
+ *
+ * Every two documents must agree, not each with the first one: 1000.0, 1000.5
+ * and 999.5 kg are each within 0.5 kg of the first, and the last two are
+ * still 1.0 kg apart. Two values agree when they are within the tolerance of
+ * either, so where the tolerance follows the printed precision the coarser
+ * value of a pair sets it, whichever document prints it.
+ */
 function agree(
   observed: (Observed | null)[],
   tolerance: (o: Observed) => Decimal | string,
@@ -63,8 +71,8 @@ function agree(
 ): Finding[] {
   const present = observed.filter((o): o is Observed => o !== null);
   if (present.length < 2) return [];
-  const [first, ...rest] = present as [Observed, ...Observed[]];
-  if (rest.every((o) => sameWithin(o.value, first.value, tolerance(o)))) return [];
+  const same = (a: Observed, b: Observed) => sameWithin(a.value, b.value, tolerance(a)) || sameWithin(a.value, b.value, tolerance(b));
+  if (present.every((a, i) => present.slice(i + 1).every((b) => same(a, b)))) return [];
   const values = encode(present.map((o) => [o.doc.type, o.field.value]));
   return [finding(values, present.map(cite))];
 }
