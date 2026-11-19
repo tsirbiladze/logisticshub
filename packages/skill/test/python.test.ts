@@ -198,8 +198,8 @@ function regressionInputs(): [string, unknown][] {
     [
       "parties",
       variant("tr-ceramics", ({ commercial_invoice: inv, packing_list: pl, cmr, contract }) => {
-        inv!.seller.name = cite("EGE SERAMİK SANAYİ VE TİCARET ANONİM ŞİRKETİ");
-        pl!.shipper.name = cite("Ege Seramik San. ve Tic. A.Ş.");
+        inv!.seller.name = cite("ERGUVAN SERAMİK SANAYİ VE TİCARET ANONİM ŞİRKETİ");
+        pl!.shipper.name = cite("Erguvan Seramik San. ve Tic. A.Ş.");
         contract!.buyer.name = cite("Batumi Yapı Market Limited Liability Company");
         cmr!.consignee.name = cite("Tex LLC");
         pl!.consignee.name = cite("Batumi Yapı Market Group L.L.C.");

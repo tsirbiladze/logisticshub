@@ -10,7 +10,7 @@ export const trCeramics: Pack = {
     title: { ka: "კერამიკული ფილა · იზმირი → ბათუმი", en: "Ceramic tiles · İzmir → Batumi" },
     currency: "EUR",
     seller: {
-      name: "Ege Seramik Sanayi ve Ticaret A.Ş.",
+      name: "Erguvan Seramik Sanayi ve Ticaret A.Ş.",
       address: "Atatürk OSB 10003 Sk. No:5, 35620 Çiğli / İzmir",
       country: "Türkiye",
       taxId: "TR-1234567890",
