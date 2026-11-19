@@ -6,7 +6,7 @@
  *   logisticshub schema
  *   logisticshub mcp
  */
-import { RegistryInputError, registryCommand, REPORT_LANGUAGES, extractionJsonSchema, hsLookupOutput, ioProblem, type ReportFormat, type ReportLanguage } from "@logisticshub/core";
+import { declarationCommand, DECLARATION_USAGE, RegistryInputError, registryCommand, REPORT_LANGUAGES, extractionJsonSchema, hsLookupOutput, ioProblem, type ReportFormat, type ReportLanguage } from "@logisticshub/core";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./mcp.ts";
 import { DEFAULT_MODEL, ModelConfigError, resolveModel } from "./models.ts";
@@ -15,11 +15,12 @@ import { DOCUMENT_TYPES_TEXT, NothingChecked, OutputError, parseFormats, runChec
 declare const __VERSION__: string;
 const VERSION = typeof __VERSION__ === "string" ? __VERSION__ : "dev";
 
-const USAGE = `logisticshub ${VERSION}: cross-check a shipment's trade documents (invoice, packing list, CMR, contract)
+const USAGE = `logisticshub ${VERSION}: cross-check a shipment's trade documents (invoice, packing list, CMR, contract and optional Georgian customs declaration)
 
 Usage:
   logisticshub check <files or folder> [options]   read the documents with an AI model, then check them
   logisticshub check extraction.json [options]     check an extraction you already have (no model, no key)
+  logisticshub ${DECLARATION_USAGE}
   logisticshub hs <code or Georgian words> [--json] [--limit <n>]  search the saved Georgian nomenclature
   logisticshub taxpayer <code> [--json]           look up one 9-digit Georgian company code
   logisticshub registry <extraction.json> [-o registry.json]  fetch a registry snapshot
@@ -155,6 +156,14 @@ async function main() {
   const [command, ...args] = process.argv.slice(2);
   if (!command || command === "--help" || command === "-h" || command === "help") return void process.stdout.write(`${USAGE}\n`);
   if (command === "--version" || command === "-v") return void process.stdout.write(`${VERSION}\n`);
+  if (command === "declaration-from-rs") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    try {
+      return void process.stdout.write(declarationCommand(args));
+    } catch (error) {
+      stop((error as Error).message);
+    }
+  }
   if (command === "hs") {
     if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
     return void process.stdout.write(`${usage(() => hsLookupOutput(args))}\n`);

@@ -2,7 +2,7 @@
  * HTML for the synthetic documents. Every cited field prints exactly its
  * quote, so the PDF text and the extraction always agree.
  */
-import { dec, sum, toFixed, type Cmr, type CommercialInvoice, type Contract, type PackingList, type Party } from "@logisticshub/core";
+import { dec, sum, toFixed, type Cmr, type CommercialInvoice, type Contract, type CustomsDeclaration, type PackingList, type Party } from "@logisticshub/core";
 import { formatter } from "./format.ts";
 import { LABELS, type Labels } from "./labels.ts";
 import type { ShipmentSpec } from "./model.ts";
@@ -210,4 +210,37 @@ export function renderContract(source: Contract, spec: ShipmentSpec, options: Re
     <p><b>3. ${esc(L.incoterm)}:</b> ${q(doc.incoterm.code)} ${q(doc.incoterm.place)}, ${q(doc.incoterm.version)}. ${esc(L.currency)}: ${q(doc.currency)}.</p>
     <div class="sign"><div>${esc(L.seller)} · ${esc(L.signature)}</div><div>${esc(L.buyer)} · ${esc(L.signature)}</div></div>`;
   return page(L.contract, doc.number, doc.date, L, body, spec.language, options);
+}
+
+export function renderDeclaration(source: CustomsDeclaration): string {
+  const doc = track(source);
+  const L = LABELS.ka;
+  const body = `
+    <div class="grid">
+      ${field("A · საბაჟო ორგანო", `${q(doc.customsOfficeCode)} · ${q(doc.customsOfficeName)}`)}
+      ${field("B · შეფასება", `${q(doc.assessmentNumber)} · ${q(doc.assessmentDate)}`)}
+      ${field("1 · რეჟიმი", q(doc.regime))}
+      ${field("6 · შეფუთვების ჯამი", q(doc.totalPackages))}
+      ${partyBox("2 · ექსპორტიორი", doc.exporter, L.taxId)}
+      ${partyBox("8 · იმპორტიორი", doc.importer, L.taxId)}
+      ${field("15 · გამომგზავნი ქვეყანა", q(doc.countryOfDispatch))}
+      ${field("17 · დანიშნულების ქვეყანა", q(doc.countryOfDestination))}
+      ${field("22 · ვალუტა და ფაქტურული ღირებულება", `${q(doc.currency)} ${q(doc.totalInvoiceAmount)}`)}
+      ${field("23 · გაცვლითი კურსი", q(doc.exchangeRate))}
+    </div>
+    ${doc.items.map((item) => `<div class="grid">
+      ${field("32 · საქონლის ნომერი", q(item.itemNumber))}
+      ${field("31 · აღწერა და შეფუთვა", `${q(item.description)}<br>${q(item.packages)} ${q(item.packingMethod)}`)}
+      ${field("33 · სასაქონლო კოდი", q(item.hsCode))}
+      ${field("34ა · წარმოშობა", q(item.countryOfOrigin))}
+      ${field("35 · ბრუტო წონა (კგ)", q(item.grossWeightKg))}
+      ${field("37 · პროცედურა", q(item.procedure))}
+      ${field("38 · ნეტო წონა (კგ)", q(item.netWeightKg))}
+      ${field("41 · დამატებითი ერთეული", `${q(item.supplementaryQuantity)} ${q(item.supplementaryUnit)}`)}
+      ${field("42 · ფაქტურული ღირებულება", q(item.invoiceValue))}
+      ${field("46 · საბაჟო ღირებულება (ლარი)", q(item.customsValueGel))}
+    </div>`).join("")}
+    ${field("44 · თანდართული დოკუმენტები", doc.attachedDocuments.map(q).join("<br>"))}
+  `;
+  return page("საქონლის საბაჟო დეკლარაცია", doc.number, doc.date, { ...L, number: "A · რეგისტრაციის ნომერი", date: "რეგისტრაციის თარიღი" }, body, "ka");
 }

@@ -2,6 +2,7 @@ import type {
   Cmr,
   CommercialInvoice,
   Contract,
+  CustomsDeclaration,
   DocumentType,
   Extraction,
   OtherDocument,
@@ -35,6 +36,12 @@ export const RULE_IDS = [
   "TAX-01",
   "TAX-02",
   "TAX-03",
+  "DEC-01",
+  "DEC-02",
+  "DEC-03",
+  "DEC-04",
+  "DEC-05",
+  "DEC-06",
 ] as const;
 export type RuleId = (typeof RULE_IDS)[number];
 
@@ -82,6 +89,7 @@ export interface RuleContext {
   packingLists: PackingList[];
   cmrs: Cmr[];
   contracts: Contract[];
+  declarations: CustomsDeclaration[];
   others: OtherDocument[];
   options: CheckOptions & Required<Pick<CheckOptions, "weightToleranceKg" | "volumeToleranceM3">>;
 }

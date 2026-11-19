@@ -24,7 +24,7 @@ import { promisify } from "node:util";
 import { extractionSchema, walkCited } from "@logisticshub/core";
 import { buildAll, type BuiltVariant } from "./build.ts";
 import { DOCUMENT_NAMES, documentNames, pageCount, variantFiles, type DocumentName } from "./model.ts";
-import { renderCmr, renderContract, renderInvoice, renderPackingList } from "./render.ts";
+import { renderCmr, renderContract, renderDeclaration, renderInvoice, renderPackingList } from "./render.ts";
 
 const run = promisify(execFile);
 const OUT = fileURLToPath(new URL("../../../fixtures/", import.meta.url));
@@ -40,6 +40,7 @@ function documentsHtml(built: BuiltVariant): Map<DocumentName, string> {
     ["packing-list", renderPackingList(d.packingList, pack.spec)],
     ["cmr", renderCmr(d.cmr, pack.spec)],
     ["contract", renderContract(d.contract, pack.spec)],
+    ...(d.declaration ? [["declaration", renderDeclaration(d.declaration)] as [DocumentName, string]] : []),
     ...(d.secondInvoice ? [["invoice-2", renderInvoice(d.secondInvoice, pack.spec)] as [DocumentName, string]] : []),
   ]);
 }
@@ -149,6 +150,7 @@ async function main() {
     const expected = built.findings.map(({ rule, severity, key, params }) => ({ rule, severity, key, params }));
     writeFileSync(join(dir, "expected.json"), `${JSON.stringify(expected, null, 2)}\n`);
     const { layout, registry } = built.variant;
+    if (built.variant.rsResponse) writeFileSync(join(dir, "rs-response.json"), built.variant.rsResponse);
     if (registry) writeFileSync(join(dir, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
     const html = documentsHtml(built);
     const names = documentNames(built.documents);
@@ -216,6 +218,7 @@ function packIndex(all: BuiltVariant[]) {
           title: v.title,
           expected: v.expected,
           ...(v.expectedIssues ? { expectedIssues: v.expectedIssues } : {}),
+          ...(v.rsResponse ? { rsResponse: "rs-response.json" } : {}),
           ...(v.registry ? { registry: "registry.json" } : {}),
           ...(v.layout ? { layout: v.layout } : {}),
           ...(files.join() === DOCUMENT_NAMES.map((name) => `${name}.pdf`).join() ? {} : { files }),

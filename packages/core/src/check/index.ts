@@ -1,4 +1,4 @@
-import type { Cmr, CommercialInvoice, Contract, Extraction, OtherDocument, PackingList } from "../schema.ts";
+import type { Cmr, CommercialInvoice, Contract, CustomsDeclaration, Extraction, OtherDocument, PackingList } from "../schema.ts";
 import { inspectExtraction, parseAndInspect, type ExtractionIssue } from "../validate.ts";
 import { beginRun, endRun } from "./helpers.ts";
 import { amountInWords, documentTotals, invoiceTotals, lineArithmetic } from "./rules/amounts.ts";
@@ -6,6 +6,7 @@ import { companyParties } from "../parties.ts";
 import type { RegistrySnapshot } from "../registry.ts";
 import { partyTaxIds, taxpayerName, taxpayerVat, taxpayerNotRegistered } from "./rules/tax.ts";
 import { hsCodes } from "./rules/hs.ts";
+import { declarationRules } from "./rules/declaration.ts";
 import { checklist } from "./rules/checklist.ts";
 import { cmrParticulars } from "./rules/cmr.ts";
 import {
@@ -70,6 +71,7 @@ export const RULES: readonly Rule[] = [
   taxpayerName,
   taxpayerVat,
   taxpayerNotRegistered,
+  ...declarationRules,
 ];
 
 const DEFAULT_OPTIONS: RuleContext["options"] = {
@@ -85,6 +87,7 @@ function context(extraction: Extraction, options: CheckOptions): RuleContext {
     packingLists: docs.filter((d): d is PackingList => d.type === "packing_list"),
     cmrs: docs.filter((d): d is Cmr => d.type === "cmr"),
     contracts: docs.filter((d): d is Contract => d.type === "contract"),
+    declarations: docs.filter((d): d is CustomsDeclaration => d.type === "customs_declaration"),
     others: docs.filter((d): d is OtherDocument => d.type === "other"),
     options: { ...DEFAULT_OPTIONS, ...options },
   };

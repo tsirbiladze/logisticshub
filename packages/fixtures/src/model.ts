@@ -14,6 +14,7 @@ import {
   toFixed,
   walkCited,
   type Cmr,
+  type CustomsDeclaration,
   type CommercialInvoice,
   type Contract,
   type MessageKey,
@@ -88,10 +89,11 @@ export interface ShipmentDocuments {
   cmr: Cmr;
   contract: Contract;
   /** A second invoice in the set ("invoice-2"), when the variant adds one. It is the last document of the extraction. */
+  declaration?: CustomsDeclaration;
   secondInvoice?: CommercialInvoice;
 }
 
-export type DocumentName = "invoice" | "packing-list" | "cmr" | "contract" | "invoice-2";
+export type DocumentName = "invoice" | "packing-list" | "cmr" | "contract" | "invoice-2" | "declaration";
 
 /** The four documents every variant has, in the order of the extraction. */
 export const DOCUMENT_NAMES: readonly DocumentName[] = ["invoice", "packing-list", "cmr", "contract"];
@@ -133,6 +135,7 @@ export interface Variant {
   mutate?: (docs: ShipmentDocuments, f: Formatter) => void;
   layout?: Layout;
   registry?: RegistrySnapshot;
+  rsResponse?: string;
 }
 
 export interface Pack {
@@ -286,12 +289,12 @@ export function buildDocuments(spec: ShipmentSpec): ShipmentDocuments {
 
 /** The document of a variant by its name; undefined for a second invoice the variant does not have. */
 export function documentOf(docs: ShipmentDocuments, name: DocumentName): ShipmentDocuments[keyof ShipmentDocuments] {
-  return { invoice: docs.invoice, "packing-list": docs.packingList, cmr: docs.cmr, contract: docs.contract, "invoice-2": docs.secondInvoice }[name];
+  return { invoice: docs.invoice, "packing-list": docs.packingList, cmr: docs.cmr, contract: docs.contract, "invoice-2": docs.secondInvoice, declaration: docs.declaration }[name];
 }
 
 /** The documents a variant has, in the order of its extraction: the four of every pack, then a second invoice. */
 export function documentNames(docs: ShipmentDocuments): DocumentName[] {
-  return [...DOCUMENT_NAMES, ...(docs.secondInvoice ? (["invoice-2"] as const) : [])];
+  return [...DOCUMENT_NAMES, ...(docs.secondInvoice ? (["invoice-2"] as const) : []), ...(docs.declaration ? (["declaration"] as const) : [])];
 }
 
 /** The PDF files of a variant, each with the documents it holds in page order. */

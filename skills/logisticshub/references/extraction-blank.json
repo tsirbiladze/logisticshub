@@ -153,6 +153,40 @@
       "totalInWords": { "value": null, "quote": null, "page": null },
       "goodsDescription": { "value": null, "quote": null, "page": null }
     },
+    "customs_declaration": {
+      "type": "customs_declaration",
+      "id": "declaration",
+      "sourceFile": null,
+      "language": null,
+      "number": { "value": null, "quote": null, "page": null },
+      "date": { "value": null, "quote": null, "page": null },
+      "sourceKind": null,
+      "customsOfficeCode": { "value": null, "quote": null, "page": null },
+      "customsOfficeName": { "value": null, "quote": null, "page": null },
+      "regime": { "value": null, "quote": null, "page": null },
+      "assessmentNumber": { "value": null, "quote": null, "page": null },
+      "assessmentDate": { "value": null, "quote": null, "page": null },
+      "exporter": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
+      },
+      "importer": {
+        "name": { "value": null, "quote": null, "page": null },
+        "address": { "value": null, "quote": null, "page": null },
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
+      },
+      "countryOfDispatch": { "value": null, "quote": null, "page": null },
+      "countryOfDestination": { "value": null, "quote": null, "page": null },
+      "currency": { "value": null, "quote": null, "page": null },
+      "totalInvoiceAmount": { "value": null, "quote": null, "page": null },
+      "exchangeRate": { "value": null, "quote": null, "page": null },
+      "totalPackages": { "value": null, "quote": null, "page": null },
+      "attachedDocuments": [],
+      "items": []
+    },
     "other": {
       "type": "other",
       "id": "other",
@@ -199,6 +233,25 @@
         "volumeM3": { "value": null, "quote": null, "page": null }
       },
       "attachedDocuments": { "value": null, "quote": null, "page": null }
+    },
+    "customs_declaration": {
+      "attachedDocuments": { "value": null, "quote": null, "page": null },
+      "items": {
+        "itemNumber": { "value": null, "quote": null, "page": null },
+        "description": { "value": null, "quote": null, "page": null },
+        "packages": { "value": null, "quote": null, "page": null },
+        "packingMethod": { "value": null, "quote": null, "page": null },
+        "hsCode": { "value": null, "quote": null, "page": null },
+        "countryOfOrigin": { "value": null, "quote": null, "page": null },
+        "grossWeightKg": { "value": null, "quote": null, "page": null },
+        "procedure": { "value": null, "quote": null, "page": null },
+        "netWeightKg": { "value": null, "quote": null, "page": null },
+        "supplementaryQuantity": { "value": null, "quote": null, "page": null },
+        "supplementaryUnit": { "value": null, "quote": null, "page": null },
+        "invoiceValue": { "value": null, "quote": null, "page": null },
+        "customsValueGel": { "value": null, "quote": null, "page": null },
+        "rsValueInGel": { "value": null, "quote": null, "page": null }
+      }
     }
   }
 }

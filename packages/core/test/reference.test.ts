@@ -37,11 +37,10 @@ describe("rule reference", () => {
   it("gives each finding the severity its rule reports it with", () => {
     // Every finding is built as { …, severity: "…", key: "…" }; CMR-01 takes its severity from the particular.
     const inCode = new Map([...source.matchAll(/severity: "(error|warning)",\s+key: "([A-Z]+-\d+\.[a-z-]+)"/g)].map((match) => [match[2]!, match[1]!]));
-    for (const finding of stated) {
-      if (finding.key === "CMR-01.missing") continue;
-      expect(inCode.get(finding.key), finding.key).toBe(finding.severity);
-    }
-    expect(inCode.size).toBe(stated.length - 1);
+    // The declaration and duplicate-document cases also check severity at runtime in messages.test.ts.
+    const literal = stated.filter((f) => f.key !== "CMR-01.missing" && !f.id.startsWith("DEC-") && !f.key.startsWith("DOC-01.multiple"));
+    for (const finding of literal) expect(inCode.get(finding.key), finding.key).toBe(finding.severity);
+    expect(inCode.size).toBe(literal.length);
     expect(stated.find((finding) => finding.key === "CMR-01.missing")!.severity).toBe("error or warning");
   });
 

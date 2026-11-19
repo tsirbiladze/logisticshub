@@ -16,7 +16,7 @@ function cited(value: string | null) {
   return { value, quote: value, page: value === null ? null : 1 };
 }
 
-const TYPES = "commercial_invoice, packing_list, cmr, contract or other";
+const TYPES = "commercial_invoice, packing_list, cmr, contract, customs_declaration or other";
 const BLANK = '{ "value": null, "quote": null, "page": null }';
 
 describe("shapeIssues", () => {
@@ -78,7 +78,7 @@ describe("shapeIssues", () => {
   });
 
   it("accepts every document type with every fact null", () => {
-    const documents: TradeDocument[] = (["commercial_invoice", "packing_list", "cmr", "contract", "other"] as const).map((type) => blankDocument(type, type));
+    const documents: TradeDocument[] = (["commercial_invoice", "packing_list", "cmr", "contract", "customs_declaration", "other"] as const).map((type) => blankDocument(type, type));
     expect(shapeIssues({ schemaVersion: SCHEMA_VERSION, documents })).toEqual([]);
     expect(parseExtraction({ schemaVersion: SCHEMA_VERSION, documents }).ok).toBe(true);
   });

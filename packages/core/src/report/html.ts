@@ -112,6 +112,9 @@ export function renderHtml(view: ReportView): string {
       body.push(`<h3>${entry.code}</h3><ul>${rows}</ul>`);
     }
   }
+  if (view.sourceNotes.length) {
+    body.push(`<h2>${esc(ui.notes)}</h2><ul>${view.sourceNotes.map((note) => `<li>${esc(note)}</li>`).join("")}</ul>`);
+  }
   return `<!doctype html>
 <html lang="${view.language}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

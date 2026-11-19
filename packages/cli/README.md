@@ -1,6 +1,6 @@
 # logisticshub
 
-Cross-check the trade documents of one shipment (commercial invoice, packing list, CMR, sales contract) with AI extraction and 21 deterministic rules. One invoice can be checked on its own too: its line totals, its sums and its amount in words. Every finding comes with the document, the page, the field and the exact quote, and is marked on a copy of the PDF.
+Cross-check the trade documents of one shipment (commercial invoice, packing list, CMR, sales contract and optional Georgian goods declaration) with AI extraction and 27 deterministic rules. One invoice can be checked on its own too: its line totals, its sums and its amount in words. Every finding comes with the document, the page, the field and the exact quote, and is marked on a copy of the PDF.
 
 ```bash
 # read the documents with a model, then check them (Claude by default)
@@ -43,6 +43,23 @@ logisticshub check extraction.json --fetch-registry
 The batch lookup sends each distinct code once, one at a time, with at least a second between calls. It stops after 20 codes, with a notice if it skipped more. Each call times out after 15 seconds and is attempted once. Set the standalone output file with `-o <file>`. The snapshot defaults to `registry.json` in the current directory for `registry`, or in `--out` for `--fetch-registry`. It has `schemaVersion: "1"`, the `sourceUrl`, and `entries` with `code`, `checkedAt` (ISO 8601 UTC) and either `answer` (the returned rows) or `error` (`Status` and `Message`, or `transport`).
 
 A service reply of `System error` is recorded as `-100`. The check still runs and the registry section says that the code could not be checked. PTY-02 always compares printed tax numbers. TAX-01, TAX-02 and TAX-03 read the saved replies and use the snapshot time for VAT status. The registry client follows the published OpenAPI 1.0.1 description, tested with a local HTTP stub and synthetic snapshots. Both live calls observed on 2026-11-19 returned `System error`; no successful live reply was seen.
+
+## Georgian goods declarations
+
+Pass a Georgian goods declaration PDF or image with the shipment, including a draft. The checker compares parties, HS prefixes, weights, packages, invoice amounts and currency, origin, the registration date and the box 44 reference. It also checks national codes and sums the item invoice values.
+
+Convert a saved `GetAsycudaDeclarationsResponse` offline:
+
+```bash
+logisticshub declaration-from-rs response.json > declaration.json
+logisticshub declaration-from-rs response.json --registration C-DEMO-2041 --append extraction.json > with-declaration.json
+```
+
+Use `--registration <number>` to select one registration number. Without it, you get all declarations in the response, grouped by customs office, registration number and date. Use a single shipment’s documents for the check. A registration number that identifies several groups is an error. `--append` reads an existing extraction and writes the combined result to stdout. The input stays intact. Both skill scripts provide the same command.
+
+The report cites the response filename and each original JSON value, with exact numeric digits and a null page. The notes say that there are no PDF pages or marks for this source. The response does not supply packages or boxes 22, 23, 42, 44 or 46. `ValueInGEL` is recorded in `rsValueInGel` without assigning a box. An invalid response or nonzero `STATUS.ID` gives exit code 2.
+
+The declaration converter follows the published Revenue Service protocol 1.0.0 (catalog date 2024-12-31). It has been tested with synthetic responses. It has never been run against the live declaration service. Logging in and fetching declarations are outside the tool.
 
 ## Inputs
 
@@ -110,7 +127,7 @@ A file whose model call fails, or whose extraction still breaks the schema, is l
 
 `logisticshub mcp` serves four tools over stdio, for an agent that reads the documents itself:
 
-- `get_extraction_guide`: how to build the extraction, with the JSON Schema and a blank of every document type to copy.
+- `get_extraction_guide`: how to build the extraction, with the JSON Schema and a blank of every document type to copy. Set the optional `includeDeclaration` boolean to `true` to include the Georgian declaration guide.
 - `check_documents`: checks an extraction. Arguments: `extraction`, the object itself (a string of JSON that holds it is read too); `language` (`en`, `ka`, `ru`, `tr`); `pdfDir`, an absolute path, to look every quote up in the PDFs; `outDir`, an absolute path, to write the reports. With both, each PDF that has a finding gets a marked copy in `outDir`. Give `registryFile` as an absolute path to read a saved snapshot. Without `outDir` nothing is written and the report is returned inline.
 - `lookup_hs_code` searches the Georgian catalogue locally. Pass `query` (code or Georgian words) and optionally `limit`. The structured result includes `edition` and `sourceUrl` even when no entries match.
 

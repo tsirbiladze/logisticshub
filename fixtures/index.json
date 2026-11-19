@@ -161,6 +161,149 @@
             "CMR-01.missing",
             "CMR-01.missing"
           ]
+        },
+        {
+          "id": "declaration-clean",
+          "title": {
+            "ka": "სუფთა ნაკრები დეკლარაციით",
+            "en": "Clean set with a declaration"
+          },
+          "expected": [],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-gross-mismatch",
+          "title": {
+            "ka": "დეკლარაციის ბრუტო წონა განსხვავდება",
+            "en": "Declared gross weight differs"
+          },
+          "expected": [
+            "DEC-03.gross"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-national-code",
+          "title": {
+            "ka": "დეკლარაციის ეროვნული კოდი არ არსებობს",
+            "en": "Unknown declared national code"
+          },
+          "expected": [
+            "DEC-02.unknown-national"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-invoice-prefix",
+          "title": {
+            "ka": "ინვოისის კოდი დეკლარაციაში არ ჩანს",
+            "en": "Invoice code missing from the declaration"
+          },
+          "expected": [
+            "DEC-02.invoice-prefix"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-invoice-total",
+          "title": {
+            "ka": "დეკლარაციაში ინვოისის თანხა განსხვავდება",
+            "en": "Box 22 differs from the invoice total"
+          },
+          "expected": [
+            "DEC-05.invoice-total"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-importer-tax-id",
+          "title": {
+            "ka": "იმპორტიორის საიდენტიფიკაციო ნომერი განსხვავდება",
+            "en": "Declared importer tax ID differs"
+          },
+          "expected": [
+            "DEC-01.tax-id"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-packages",
+          "title": {
+            "ka": "შეფუთვების რაოდენობა განსხვავდება",
+            "en": "Declared package count differs"
+          },
+          "expected": [
+            "DEC-04.packages"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-origin",
+          "title": {
+            "ka": "დეკლარირებული წარმოშობა განსხვავდება",
+            "en": "Declared origin differs"
+          },
+          "expected": [
+            "DEC-06.origin"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-rs-clean",
+          "title": {
+            "ka": "სუფთა ნაკრები შემოსავლების სამსახურის პასუხით",
+            "en": "Clean set with a saved Revenue Service response"
+          },
+          "expected": [],
+          "rsResponse": "rs-response.json"
         }
       ]
     },

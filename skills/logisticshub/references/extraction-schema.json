@@ -22,6 +22,9 @@
             "$ref": "#/$defs/contract"
           },
           {
+            "$ref": "#/$defs/customsDeclaration"
+          },
+          {
             "$ref": "#/$defs/otherDocument"
           }
         ]
@@ -890,6 +893,239 @@
         "totalAmount",
         "totalInWords",
         "goodsDescription"
+      ],
+      "additionalProperties": false
+    },
+    "customsDeclaration": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "customs_declaration"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique id of this document within the set: 'invoice', 'packing-list', 'cmr', 'contract', or a short name for another document; 'invoice-2' for a second document of a type."
+        },
+        "sourceFile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of the file the document came from, without folders. For a document spread over several image files, the first file."
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "tr",
+                "ka",
+                "other"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Main language of the document text. An amount in words is read in it, and a month name in a date is checked in it or in English."
+        },
+        "number": {
+          "description": "Registration number (box A), when printed.",
+          "$ref": "#/$defs/citedText"
+        },
+        "date": {
+          "description": "Registration date (box A), when printed.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "sourceKind": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "rs_json"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null for a PDF or image. rs_json only for documents created by declaration-from-rs, whose facts have null pages."
+        },
+        "customsOfficeCode": {
+          "description": "Customs office code (box A).",
+          "$ref": "#/$defs/citedText"
+        },
+        "customsOfficeName": {
+          "description": "Customs office name (box A).",
+          "$ref": "#/$defs/citedText"
+        },
+        "regime": {
+          "description": "Regime exactly as printed (box 1), e.g. 'იმ 4'.",
+          "$ref": "#/$defs/citedText"
+        },
+        "assessmentNumber": {
+          "description": "Assessment number (box B), when printed.",
+          "$ref": "#/$defs/citedText"
+        },
+        "assessmentDate": {
+          "description": "Assessment date (box B), when printed.",
+          "$ref": "#/$defs/citedDate"
+        },
+        "exporter": {
+          "description": "Exporter (box 2).",
+          "$ref": "#/$defs/party"
+        },
+        "importer": {
+          "description": "Importer (box 8).",
+          "$ref": "#/$defs/party"
+        },
+        "countryOfDispatch": {
+          "description": "Country of dispatch (box 15), as printed.",
+          "$ref": "#/$defs/citedText"
+        },
+        "countryOfDestination": {
+          "description": "Country of destination (box 17), as printed.",
+          "$ref": "#/$defs/citedText"
+        },
+        "currency": {
+          "description": "Invoice currency (box 22).",
+          "$ref": "#/$defs/citedCurrency"
+        },
+        "totalInvoiceAmount": {
+          "description": "Total invoice amount (box 22).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "exchangeRate": {
+          "description": "Exchange rate (box 23).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "totalPackages": {
+          "description": "Total packages (box 6), retaining the packing word in the quote if printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "attachedDocuments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/citedText"
+          },
+          "description": "Documents listed in box 44, one text entry per document, including its code and number where printed."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/declarationItem"
+          },
+          "description": "One entry per declared goods item identified by box 32, in document order."
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "sourceFile",
+        "language",
+        "number",
+        "date",
+        "sourceKind",
+        "customsOfficeCode",
+        "customsOfficeName",
+        "regime",
+        "assessmentNumber",
+        "assessmentDate",
+        "exporter",
+        "importer",
+        "countryOfDispatch",
+        "countryOfDestination",
+        "currency",
+        "totalInvoiceAmount",
+        "exchangeRate",
+        "totalPackages",
+        "attachedDocuments",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "declarationItem": {
+      "type": "object",
+      "properties": {
+        "itemNumber": {
+          "description": "Goods item number (box 32).",
+          "$ref": "#/$defs/citedText"
+        },
+        "description": {
+          "description": "Goods description (box 31).",
+          "$ref": "#/$defs/citedText"
+        },
+        "packages": {
+          "description": "Number of packages for the item (box 31), when printed.",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "packingMethod": {
+          "description": "Packing method for the item (box 31), when printed.",
+          "$ref": "#/$defs/citedText"
+        },
+        "hsCode": {
+          "description": "Tariff code as printed (box 33), keeping leading zeros.",
+          "$ref": "#/$defs/citedText"
+        },
+        "countryOfOrigin": {
+          "description": "Country of origin or its code as printed (box 34a).",
+          "$ref": "#/$defs/citedText"
+        },
+        "grossWeightKg": {
+          "description": "Gross weight in kilograms (box 35).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "procedure": {
+          "description": "Procedure as printed (box 37).",
+          "$ref": "#/$defs/citedText"
+        },
+        "netWeightKg": {
+          "description": "Net weight in kilograms (box 38).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "supplementaryQuantity": {
+          "description": "Quantity in the supplementary unit (box 41).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "supplementaryUnit": {
+          "description": "Supplementary unit as printed (box 41).",
+          "$ref": "#/$defs/citedText"
+        },
+        "invoiceValue": {
+          "description": "Item value in box 22's invoice currency (box 42).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "customsValueGel": {
+          "description": "Customs value in GEL (box 46).",
+          "$ref": "#/$defs/citedDecimal"
+        },
+        "rsValueInGel": {
+          "description": "Only for an RS response: ValueInGEL as supplied, with no box assigned. Null for a PDF.",
+          "$ref": "#/$defs/citedDecimal"
+        }
+      },
+      "required": [
+        "itemNumber",
+        "description",
+        "packages",
+        "packingMethod",
+        "hsCode",
+        "countryOfOrigin",
+        "grossWeightKg",
+        "procedure",
+        "netWeightKg",
+        "supplementaryQuantity",
+        "supplementaryUnit",
+        "invoiceValue",
+        "customsValueGel",
+        "rsValueInGel"
       ],
       "additionalProperties": false
     },

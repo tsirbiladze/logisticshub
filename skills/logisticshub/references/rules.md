@@ -1,13 +1,13 @@
 # Rules
 
-`scripts/check.mjs` (and `check.py`) applies these 21 rules to the extraction. This page states each rule exactly: what it reads, every finding it can report with its severity, its tolerance, and when it reports nothing. The last section lists what is not checked at all.
+`scripts/check.mjs` (and `check.py`) applies these 27 rules to the extraction. This page states each rule exactly: what it reads, every finding it can report with its severity, its tolerance, and when it reports nothing. The last section lists what is not checked at all.
 
 ## How every rule works
 
 - **Severity.** Errors are discrepancies that need fixing; warnings need a look. Every finding below has its severity.
 - **Printed values only.** A rule compares values the extraction holds. When a value it needs is null, that comparison is skipped: nothing is assumed, and a document that prints less gets fewer checks.
 - **Usable values only.** A value with an extraction issue (wrong format, not a reading of its own quote, a percentage where an amount belongs) reaches no rule until it is corrected. The report lists these issues before the findings.
-- **The first of each type.** AMT-01, SUM-01, SUM-02, SUM-03, CUR-01, WGT-01, INC-01, CMR-01 HS-01, PTY-02 and the snapshot rules run on every document of their types. QTY-01, WGT-02, REF-01, DATE-01 and PTY-01 compare the first invoice, packing list, CMR and contract in `documents`; DOC-01 warns when there are more.
+- **The first of each type.** AMT-01, SUM-01, SUM-02, SUM-03, CUR-01, WGT-01, INC-01, CMR-01, HS-01, PTY-02 and the snapshot rules run on every document of their types. QTY-01, WGT-02, REF-01, DATE-01 and PTY-01 compare the first document of each type in `documents`. Declaration cross-checks use the first declaration. National HS codes, item invoice sums and origin code 999 are checked on each declaration. DEC-02 and DEC-05 compare prefixes and currency and value across all invoices. DOC-01 warns about duplicates.
 - **Rounding.** "Half a unit of the last printed digit" means a computed value may differ from the printed one by what rounding to the printed precision explains: ±0.005 against `4,350.00`, ±0.5 against `1,880`. The tolerances are fixed; no option changes them.
 - **Output.** Each finding carries its rule, its key (below), a message in the report's language (`--lang`: en, ka, ru, tr), the quoted evidence with document and page, and a `→` line that says what to verify. Errors come first, then warnings, each in rule order.
 
@@ -173,10 +173,10 @@ Not reported:
 
 ### REF-01 · Cross-references
 
-The packing list cites the invoice's number and date, the invoice cites the contract's, and the CMR lists the invoice and the packing list among its attached documents.
+The packing list cites the invoice's number and date, the invoice cites the contract's, and the CMR lists the invoice and the packing list, and box 44 of a declaration that lists attached documents includes the invoice number.
 
-- **Reads:** The first of each type: the packing list's `invoiceRef` against the invoice's `number` and `date`, the invoice's `contractRef` against the contract's `number` and `date`, and the CMR's `attachedDocuments` against the numbers of the invoice and the packing list.
-- **Tolerance:** Numbers are compared without case, spaces, the separators `- _ . / \ :` and a leading `No.`, `Nr`, `№`, `#` or `N°`. In the CMR's list a number must stand as a whole number: `AT-2026/118` is not found inside `AT-2026/118-UL`. Dates must be the same day.
+- **Reads:** The first of each type: the packing list's `invoiceRef` against the invoice's `number` and `date`, the invoice's `contractRef` against the contract's `number` and `date`, the CMR's `attachedDocuments` against the numbers of the invoice and the packing list, and box 44 of the declaration against the invoice number.
+- **Tolerance:** Numbers are compared without case, spaces, the separators `- _ . / \ :` and a leading `No.`, `Nr`, `№`, `#` or `N°`. In attached-document lists a number must stand as a whole number: `AT-2026/118` is not found inside `AT-2026/118-UL`. Dates must be the same day.
 
 | Finding | Severity | Reported when |
 |---|---|---|
@@ -185,24 +185,26 @@ The packing list cites the invoice's number and date, the invoice cites the cont
 | `REF-01.contract-number` | error | the invoice cites another contract number |
 | `REF-01.contract-date` | error | the invoice cites another contract date |
 | `REF-01.cmr-missing-document` | warning | the CMR lists attached documents and none of the entries contains the invoice's number, or the packing list's; one finding for each |
+| `REF-01.declaration-missing-invoice` | warning | box 44 lists documents with usable quotes and none contains the invoice number |
 
 Not reported:
 
 - One side of a comparison is not printed.
-- The CMR lists no attached documents.
+- The CMR or declaration lists no attached documents.
 - The contract is not looked for in the CMR's list.
 
 ### DATE-01 · Date order
 
-The contract is not dated after the invoice, and the invoice not after the day the goods were taken over.
+The contract is not dated after the invoice, and the invoice is dated by the day the goods were taken over or the declaration was registered.
 
-- **Reads:** The first contract, invoice and CMR: their dates.
+- **Reads:** The first contract, invoice, CMR and customs declaration: their dates.
 - **Tolerance:** None. The same day passes.
 
 | Finding | Severity | Reported when |
 |---|---|---|
 | `DATE-01.contract-after-invoice` | error | the contract is dated after the invoice |
 | `DATE-01.invoice-after-shipment` | warning | the invoice is dated after the CMR's `dateOfTakingOver` (or after the CMR's own `date` when no taking-over date is printed) |
+| `DATE-01.invoice-after-declaration` | error | the invoice is dated after the declaration was registered |
 
 Not reported:
 
@@ -305,11 +307,12 @@ The set has a commercial invoice, a packing list and a CMR, and one of each.
 | Finding | Severity | Reported when |
 |---|---|---|
 | `DOC-01.missing` | warning | the set has no commercial invoice, no packing list or no CMR; one finding per missing type |
-| `DOC-01.multiple` | warning | the set has more than one invoice, packing list, CMR or contract. The rules that compare documents use the first of each type in `documents` |
+| `DOC-01.multiple` | warning | the set has more than one invoice, packing list, CMR, contract or declaration. Cross-checks use the first of that type |
+| `DOC-01.multiple-invoices-declaration` | warning | the set includes multiple invoices and a declaration. DEC-02 and DEC-05 use all invoices for HS prefixes and invoice currency and value |
 
 Not reported:
 
-- A missing contract: it is not required.
+- A missing contract or customs declaration: both are optional.
 - `other` documents are not counted.
 
 ### HS-01 · HS code in the Georgian nomenclature
@@ -395,18 +398,124 @@ Not reported:
 
 - No snapshot, no reply, or any other status or transport failure. The registry section still shows when a code could not be checked.
 
+### DEC-01 · Declaration parties
+
+Compare the declared exporter and importer with the invoice seller and buyer.
+
+- **Reads:** The first invoice’s seller and buyer against the first declaration’s exporter (box 2) and importer (box 8).
+- **Tolerance:** Compare digits when both tax IDs are printed. Otherwise apply PTY-01 name normalization within the same script.
+
+| Finding | Severity | Reported when |
+|---|---|---|
+| `DEC-01.tax-id` | error | the two tax IDs differ |
+| `DEC-01.name` | error | the two comparable names differ |
+
+Not reported:
+
+- No declaration, or a fact needed for the comparison is missing or unusable.
+
+### DEC-02 · Declaration HS codes
+
+Check declared national codes and compare the sets of six-digit HS prefixes.
+
+- **Reads:** Box 33 of every declaration, and the first declaration’s six-digit prefixes against all invoice lines in the set.
+- **Tolerance:** As in HS-01, spaces and dots are ignored. Box 33 must read as 11 digits for the national lookup. Up to five national codes from the same subheading are shown, or the heading when available.
+
+| Finding | Severity | Reported when |
+|---|---|---|
+| `DEC-02.unreadable` | warning | box 33 is filled but its 11 digits cannot be confirmed |
+| `DEC-02.unknown-national` | error | the national code is absent and subheading neighbours are available |
+| `DEC-02.unknown-national-heading` | error | the national code is absent and only the heading can be shown |
+| `DEC-02.unknown-national-alone` | error | the national code is absent with no related codes to show |
+| `DEC-02.invoice-prefix` | warning | an invoice line’s prefix is missing from the declaration |
+| `DEC-02.declaration-prefix` | warning | a declared item’s prefix is missing from the invoices |
+
+Not reported:
+
+- The national lookup needs a usable registration date on or after 2024-01-26. An empty code is skipped.
+- The comparison needs goods lines and items on both sides, all with readable codes of 6–12 digits.
+
+### DEC-03 · Declaration weights
+
+Compare the sums of declared item weights with shipment totals.
+
+- **Reads:** The first declaration’s item weights (boxes 35 and 38), summed separately, and the first usable printed shipment total for each weight, in order: packing list, CMR (gross only), invoice.
+- **Tolerance:** 0.5 kg, as in WGT-02.
+
+| Finding | Severity | Reported when |
+|---|---|---|
+| `DEC-03.gross` | error | the gross weights differ beyond tolerance |
+| `DEC-03.net` | error | the net weights differ beyond tolerance |
+
+Not reported:
+
+- No shipment total, or a declared item weight needed for the sum is missing or unusable.
+
+### DEC-04 · Declaration packages
+
+Compare totals for comparable packing methods.
+
+- **Reads:** The first declaration’s package total (box 6), and the first usable count from the packing list, CMR or invoice, in that order. Packing list and CMR counts can be sums of lines as in QTY-01. The declaration’s packing method comes from box 6 or, when unnamed there, box 31.
+- **Tolerance:** Exact equality.
+
+| Finding | Severity | Reported when |
+|---|---|---|
+| `DEC-04.packages` | error | the two comparable package counts differ |
+
+Not reported:
+
+- Either count is unavailable, the counts name different methods, or a method is unstated and several are known in the set.
+
+### DEC-05 · Declaration invoice value
+
+Compare the invoice currency and value with the declaration and add up the declared item invoice values.
+
+- **Reads:** Box 22 of the first declaration and the currency and total of every invoice. For each declaration, compare box 22 with the sum of its box 42 values.
+- **Tolerance:** Exact decimal equality. Invoice totals are added only in one shared currency, and compared only against that currency.
+
+| Finding | Severity | Reported when |
+|---|---|---|
+| `DEC-05.currency` | error | the invoice currency differs from box 22 |
+| `DEC-05.invoice-total` | error | the sum of the invoice totals differs from box 22 in the same currency |
+| `DEC-05.item-total` | error | the sum of the item values in box 42 differs from box 22 |
+
+Not reported:
+
+- A required value is absent or unusable. Mixed or unknown invoice currencies prevent a cross-document currency or total comparison.
+
+### DEC-06 · Declared origin
+
+Compare known origins and report the code for unestablished origin.
+
+- **Reads:** Box 34a of every declaration for 999, and box 34a of the first declaration against the first invoice’s stated country of origin.
+- **Tolerance:** Exact aliases after case and accent folding, from a fixed list of ISO 3166 alpha-2 codes and names in ka/en/ru/tr.
+
+| Finding | Severity | Reported when |
+|---|---|---|
+| `DEC-06.unestablished` | warning | box 34a prints 999 |
+| `DEC-06.origin` | warning | the invoice and a declared item identify different known countries of origin |
+
+Not reported:
+
+- Either side is missing, unusable or does not resolve to a known country. Dispatch and destination do not establish origin.
+
 ## Not checked
 
 - **Incoterms place and edition**: `incoterm.place` and `incoterm.version` are recorded and not compared; whether the named place suits the rule is not judged.
 - **Contract value and goods**: the invoice total against the contract's `totalAmount`, unit prices against the contract, and the contract's goods against the invoice lines.
 - **Volumes across documents**: a packing list's lines are added up to its own total (SUM-03); volumes on the CMR and the packing list are not compared.
 - **Weights per line across documents**, and net weight on a CMR.
-- **Origin and tariff classification**: origin is recorded only. No classification, duty or tax calculation, other countries’ nomenclatures or customs declarations. HS codes are not checked when an invoice has no confirmed Georgian party, has no usable date or is dated before 2024-01-26.
+- **Tariff classification**: the checker looks up printed codes under HS-01 and DEC-02. It does not classify goods or use other countries’ nomenclatures.
 - **Addresses, countries, bank details, signatures and stamps** of the parties. Printed registration and tax numbers are compared. Country is used to decide which checks apply. Registry Status, RegisteredSubject, Mortgage, Sequestration, AdditionalStatus and NonResident are shown as supplied.
 - **Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is added into the invoice total. With a snapshot, TAX-02 checks the seller’s VAT status at lookup time.
 - **A discount printed only as a rate**: the invoice total is then left unchecked.
 - **Units**: nothing is converted, quantities in different units are not compared, and neither are package counts of different packing methods.
 - **Other dates**: delivery and payment terms, validity, the packing list's date.
-- **Further documents of a type**: a second invoice, packing list, CMR or contract is checked on its own, and by the applicable rules that read every document, but left out of QTY-01, WGT-02, REF-01, DATE-01 and PTY-01.
+- **Further documents of a type**: cross-checks generally use the first of each type. DEC-02 and DEC-05 use all invoices for the prefix sets, currency and invoice total.
 - **Other document types**: a bill of lading, certificate of origin, insurance policy or specification is recorded as `other` and not read; only its title counts, for INC-03.
+- **Declaration exchange rate (box 23)**: no comparison with the National Bank’s official rate. The applicable day depends on the case.
+- **Declaration customs value (box 46), duties and taxes**: no valuation or duty and tax check. The service’s `ValueInGEL` is recorded separately, without assigning a box.
+- **Declaration regime and procedure**: the printed codes are recorded without judging whether they apply.
+- **Invoice lines per declared item**: no assignment of lines to individual goods items.
+- **Latest declaration version**: whether a later amendment or replacement exists.
 - **The documents against reality**: the goods actually loaded, whether a document is genuine, and whether the extraction left out something the document prints.

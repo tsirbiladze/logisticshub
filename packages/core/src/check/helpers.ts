@@ -48,6 +48,16 @@ export function text(field: CitedText): string | null {
   return value ? value : null;
 }
 
+/** Declaration comparisons require supporting evidence on both sides. */
+export function quoted(field: CitedText): boolean {
+  return !unusableFields.has(field) && (field.page === null || field.page >= 1) && Boolean(field.quote?.trim());
+}
+
+export function citedWrittenText(field: CitedText): string | null {
+  const value = text(field);
+  return quoted(field) && value === field.quote?.trim() ? value : null;
+}
+
 export function isoDate(field: CitedDate): string | null {
   return field.value !== null && !unusableFields.has(field) && isIsoDate(field.value) ? field.value : null;
 }

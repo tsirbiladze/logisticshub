@@ -114,6 +114,7 @@ const BLANK_IDS: Record<DocumentType, string> = {
   packing_list: "packing-list",
   cmr: "cmr",
   contract: "contract",
+  customs_declaration: "declaration",
   other: "other",
 };
 

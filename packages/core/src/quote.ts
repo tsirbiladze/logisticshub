@@ -402,3 +402,26 @@ export function otherCurrency(value: string, quote: string): string | null {
   const named = [...new Set([...codes, ...signs.map((sign) => CURRENCY_SIGNS[sign]![0]!)])];
   return named.length === 1 ? named[0]! : null;
 }
+
+export function rsDate(quote: string): string | null {
+  const m = /^([0-9]{2})\.([0-9]{2})\.([0-9]{4})$/.exec(quote);
+  if (!m) return null;
+  const value = `${m[3]}-${m[2]}-${m[1]}`;
+  return isIsoDate(value) ? value : null;
+}
+
+/** Expand scientific notation using digits, never floating-point arithmetic. */
+export function jsonDecimal(quote: string): string | null {
+  const m = /^(-?)(0|[1-9][0-9]*)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?$/.exec(quote);
+  if (!m) return null;
+  const [, sign, whole, fraction = "", exponent] = m;
+  if (exponent === undefined) return quote;
+  const shift = Number(exponent);
+  // shortcut: cap exponent expansion to bound allocation on untrusted input; raise for a documented larger range.
+  if (!Number.isInteger(shift) || Math.abs(shift) > 1000) return null;
+  const digits = whole! + fraction;
+  const point = whole!.length + shift;
+  if (point <= 0) return `${sign}0.${"0".repeat(-point)}${digits}`;
+  const left = digits.slice(0, point).padEnd(point, "0").replace(/^0+(?=[0-9])/, "");
+  return `${sign}${left}${point < digits.length ? "." + digits.slice(point) : ""}`;
+}

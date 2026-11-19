@@ -6,7 +6,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFile
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { documentJsonSchema, EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, ISSUES_GUIDE, RULE_IDS } from "@logisticshub/core";
+import { DECLARATION_GUIDE, documentJsonSchema, EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, ISSUES_GUIDE, RULE_IDS } from "@logisticshub/core";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
@@ -159,6 +159,46 @@ describe("logisticshub check", () => {
     expect(answerObject(JSON.stringify(doc))).toEqual(doc);
     expect(answerObject(`  \n${JSON.stringify(doc, null, 2)}\n`)).toEqual(doc);
     for (const text of ["", "I cannot read this file.", "[1, 2]", '{"type": "other"', "{ type: other }", "} {"]) expect(() => answerObject(text), text).toThrow("the answer is not JSON");
+  });
+
+  it("classifies a declaration PDF and sends the declaration guide only for it", async () => {
+    const dir = "ka-office-furniture/declaration-gross-mismatch";
+    const { model, calls } = mockModel(fixture(`${dir}/extraction.json`));
+    const outDir = out();
+    const run = await runCheck({ inputs: [join(FIXTURES, dir)], outDir, model: () => model });
+    expect(run.result.extractionIssues).toEqual([]);
+    expect(run.result.findings.map((f) => f.key)).toEqual(["DEC-03.gross"]);
+    const extractions = calls.filter((call) => call.format === "text");
+    expect(extractions).toHaveLength(5);
+    expect(extractions.filter(({ prompt }) => prompt.includes("# Georgian goods declaration")).map(({ prompt }) => prompt.includes("File: declaration.pdf"))).toEqual([true]);
+    expect(existsSync(join(outDir, "declaration.marked.pdf"))).toBe(true);
+    expect(run.notes).toEqual([]);
+  });
+
+  it("appends and checks a saved Revenue Service response without a model or PDF for that source", () => {
+    const dir = join(FIXTURES, "ka-office-furniture/declaration-rs-clean");
+    const appended = cli("declaration-from-rs", join(dir, "rs-response.json"), "--registration", "C-DEMO-2041",
+      "--append", join(FIXTURES, "ka-office-furniture/declaration-clean/extraction.json"));
+    expect(appended.status).toBe(0);
+    expect(JSON.parse(appended.stdout).documents.at(-1)).toMatchObject({ id: "declaration-2", sourceFile: "rs-response.json", sourceKind: "rs_json" });
+
+    const converted = cli("declaration-from-rs", join(dir, "rs-response.json"));
+    expect(converted.status).toBe(0);
+    const doc = JSON.parse(converted.stdout).documents[0];
+    doc.importer.taxId = { value: "900000009", quote: "900000009", page: null };
+    const extraction = readJson(join(dir, "extraction.json"));
+    extraction.documents[4] = doc;
+    const output = out();
+    const input = join(output, "extraction.json");
+    writeFileSync(input, JSON.stringify(extraction));
+    const checked = cli("check", input, "--out", output, "--lang", "en", "--pdf-dir", dir);
+    expect(checked.status).toBe(0);
+    const report = readJson(join(output, "report.json"));
+    expect(report.findings.map((f: { key: string }) => f.key)).toEqual(["DEC-01.tax-id"]);
+    expect(report.documents[4]).toMatchObject({ sourceFile: "rs-response.json" });
+    expect(report.findings[0].evidence[1]).toMatchObject({ quote: "900000009", page: null });
+    expect(report.sourceNotes.join()).toContain("rs-response.json");
+    expect(readdirSync(output).filter((file) => file.endsWith(".marked.pdf"))).toEqual(["invoice.marked.pdf"]);
   });
 
   it("leaves a file out when its answer is not JSON or was cut off, and says which", async () => {
@@ -390,7 +430,7 @@ describe("logisticshub check, from its help alone", () => {
     const help = cli("--help").stdout;
     const readme = readFileSync(join(ROOT, "packages/cli/README.md"), "utf8");
     const options = [...new Set([...help.matchAll(/(?<![\w-])--?[a-z][a-z-]*/g)].map((m) => m[0]))];
-    expect(options.sort()).toEqual(["--fetch-registry", "--format", "--help", "--json", "--lang", "--limit", "--model", "--no-annotate", "--out", "--pdf-dir", "--registry", "--version", "-h", "-o", "-v"]);
+    expect(options.sort()).toEqual(["--append", "--fetch-registry", "--format", "--help", "--json", "--lang", "--limit", "--model", "--no-annotate", "--out", "--pdf-dir", "--registration", "--registry", "--version", "-h", "-o", "-v"]);
     for (const option of options) expect(readme, option).toContain(`\`${option}`);
     for (const fact of [
       ".pdf`, `.png`, `.jpg`, `.jpeg` and `.webp`",
@@ -660,7 +700,7 @@ describe("the model call", () => {
   });
 
   it("tells the model what it cannot do: the guide's files, commands and user are not there", async () => {
-    expect(agentOnly.sort()).toEqual(["extraction-blank.json", "extraction-schema.json", "extraction.json", "issues.md", "pdftoppm", "pdftotext", "scripts/check.mjs"]);
+    expect(agentOnly.sort()).toEqual(["declaration.md", "extraction-blank.json", "extraction-schema.json", "extraction.json", "issues.md", "pdftoppm", "pdftotext", "scripts/check.mjs"]);
     for (const name of agentOnly) expect(MODEL_INSTRUCTIONS, name).toContain(`\`${name}\``);
     // What the guide asks of an agent and a called model cannot do.
     for (const [inGuide, answered] of [
@@ -911,12 +951,12 @@ describe("MCP server", () => {
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     // What the skill's description says: one invoice can be checked on its own; paying and booking are not its job.
     const description = /^description: (.+)$/m.exec(readFileSync(join(ROOT, "packages/skill/SKILL.md"), "utf8"))![1]!;
-    expect(description).toContain("or one invoice's sums and amount in words");
+    expect(description).toContain("Check invoice sums and words");
     expect(instructions).toContain("an invoice on its own gets its line totals, its sums and its amount in words checked");
     expect(description).toContain("Not for paying or booking.");
     expect(instructions).toContain("Not for paying or booking an invoice.");
     expect(instructions).not.toContain("single invoice");
-    expect(description).toContain("Look up Georgian HS codes");
+    expect(description).toContain("look up Georgian HS codes");
     expect(instructions).toContain("Use lookup_hs_code");
     await client.close();
   });
@@ -928,9 +968,11 @@ describe("MCP server", () => {
     expect(texts).toHaveLength(4);
     // Every file or script the guide names is either served here or mapped to a tool.
     const named = [...new Set([...EXTRACTION_GUIDE.matchAll(/`([^`\n]+)`/g)].map((m) => m[1]!.split(" ")[0]!))].filter((name) => /^scripts\/|^[\w-]+\.(json|md)$/.test(name));
-    expect(named.sort()).toEqual(["extraction-blank.json", "extraction-schema.json", "extraction.json", "issues.md", "scripts/check.mjs"]);
+    expect(named.sort()).toEqual(["declaration.md", "extraction-blank.json", "extraction-schema.json", "extraction.json", "issues.md", "scripts/check.mjs"]);
     for (const name of [...named.filter((n) => n !== "extraction.json"), "Notes:"]) expect(texts[0], name).toContain(name);
     expect(texts[1]).toBe(EXTRACTION_GUIDE);
+    const withDeclaration = await client.callTool({ name: "get_extraction_guide", arguments: { includeDeclaration: true } });
+    expect(parts(withDeclaration)).toContain(DECLARATION_GUIDE);
     expect(JSON.parse(texts[2]!.slice(texts[2]!.indexOf("{")))).toEqual(extractionJsonSchema());
     expect(JSON.parse(texts[3]!.slice(texts[3]!.indexOf("{")))).toEqual(extractionBlank());
     await client.close();

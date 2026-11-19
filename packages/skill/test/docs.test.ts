@@ -178,7 +178,7 @@ describe("README", () => {
   });
 
   it("names every file of the skill folder", () => {
-    const built = ["SKILL.md", "references/extraction.md", "references/extraction-schema.json", "references/extraction-blank.json", "references/issues.md", "references/rules.md", "scripts/check.mjs", "scripts/check.py", "scripts/check-data.json", "scripts/hs-nomenclature.json.gz", "scripts/THIRD-PARTY-NOTICES.txt"];
+    const built = ["SKILL.md", "references/extraction.md", "references/extraction-schema.json", "references/extraction-blank.json", "references/issues.md", "references/declaration.md", "references/rules.md", "scripts/check.mjs", "scripts/check.py", "scripts/check-data.json", "scripts/hs-nomenclature.json.gz", "scripts/THIRD-PARTY-NOTICES.txt"];
     for (const file of built) {
       expect(() => read(`skills/logisticshub/${file}`), file).not.toThrow();
       for (const language of LANGUAGES) expect(sections(README[language])[2]!.body, `${language} ${file}`).toContain(`\`${file}\``);
@@ -279,7 +279,8 @@ describe("changelog", () => {
   it("keeps the first release intact and lists the current change", () => {
     const [, latest, first] = read("CHANGELOG.md").split(/^## /m);
     expect(latest).toContain("HS-01");
-    expect(latest).toContain("36");
+    expect(latest).toContain("45 synthetic variants");
+    expect(latest).toContain("declaration-from-rs");
     expect(first?.split("\n\n")[1]).toBe("First release.");
     expect(first).toContain("16 deterministic rules");
     expect(first).toContain("29 demo sets of synthetic documents in four languages");

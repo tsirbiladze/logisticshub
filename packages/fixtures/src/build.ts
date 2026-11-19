@@ -1,7 +1,7 @@
 /** Builds every variant in memory: documents, extraction and the checker's verdict. */
-import { checkExtraction, inspectExtraction, SCHEMA_VERSION, type Extraction, type Finding } from "@logisticshub/core";
+import { checkExtraction, declarationsFromRs, inspectExtraction, SCHEMA_VERSION, type Extraction, type Finding } from "@logisticshub/core";
 import { formatter } from "./format.ts";
-import { applyLayout, buildDocuments, type Pack, type ShipmentDocuments, type Variant } from "./model.ts";
+import { applyLayout, buildDocuments, documentNames, documentOf, type Pack, type ShipmentDocuments, type Variant } from "./model.ts";
 import { PACKS } from "./packs/index.ts";
 
 export interface BuiltVariant {
@@ -25,7 +25,8 @@ export function buildVariant(pack: Pack, variant: Variant): BuiltVariant {
   applyLayout(documents, variant.layout);
   const extraction: Extraction = {
     schemaVersion: SCHEMA_VERSION,
-    documents: [documents.invoice, documents.packingList, documents.cmr, documents.contract, ...(documents.secondInvoice ? [documents.secondInvoice] : [])],
+    documents: [...documentNames(documents).map((name) => documentOf(documents, name)!),
+      ...(variant.rsResponse ? declarationsFromRs(variant.rsResponse, "rs-response.json") : [])],
   };
   const findings = checkExtraction(extraction, variant.registry ? { registry: variant.registry } : {});
   return {

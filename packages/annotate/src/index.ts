@@ -479,7 +479,7 @@ export function marksBySourceFile(view: ReportView): Map<string, Mark[]> {
   const bySource = new Map<string, Mark[]>();
   for (const finding of [...view.errors, ...view.warnings]) {
     for (const e of finding.evidence) {
-      if (!e.sourceFile || e.quote === null || e.page === null) continue;
+      if (e.dataSource || !e.sourceFile || e.quote === null || e.page === null) continue;
       const marks = bySource.get(e.sourceFile) ?? [];
       // One mark per finding and field on a file: two fields that share a quote are two places on the page.
       const field = { documentIndex: e.documentIndex, path: e.path };
@@ -706,7 +706,7 @@ export async function checkQuotes(extraction: Extraction, read: (sourceFile: str
   /** Quotes of the files that are not PDFs: counted, never read. */
   const uncounted = new Map<string, CitedQuote[]>();
   extraction.documents.forEach((doc, index) => {
-    if (!doc.sourceFile) return;
+    if (!doc.sourceFile || (doc.type === "customs_declaration" && doc.sourceKind === "rs_json")) return;
     const group = isPdf(doc.sourceFile) ? bySource : uncounted;
     const quotes = group.get(doc.sourceFile) ?? [];
     group.set(doc.sourceFile, quotes);

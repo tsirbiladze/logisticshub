@@ -17,6 +17,7 @@ import {
   CURRENCY_CODES,
   CURRENCY_SIGNS,
   DATE_PARAMS,
+  DECLARATION_GUIDE,
   EXTRACTION_CHECKS,
   EXTRACTION_GUIDE,
   FIELD_LABELS,
@@ -54,6 +55,8 @@ import {
   UNIT_ALIASES,
   VOCAB,
 } from "@logisticshub/core";
+import { RS_FIELDS } from "../core/src/declaration.ts";
+import { COUNTRIES } from "../core/src/check/rules/declaration.ts";
 import { GEORGIA_COUNTRIES, HS_LOOKUP_LIMIT } from "../core/src/hs.ts";
 import { thirdPartyNotices } from "../cli/notices.ts";
 
@@ -98,6 +101,8 @@ const lexicons = Object.fromEntries(
 const data = {
   version,
   georgiaCountries: GEORGIA_COUNTRIES,
+  countries: COUNTRIES,
+  rsFields: RS_FIELDS,
   hsLookupLimit: HS_LOOKUP_LIMIT,
   schemaVersion: SCHEMA_VERSION,
   reportVersion: REPORT_VERSION,
@@ -135,6 +140,7 @@ const data = {
 writeFileSync(`${OUT}scripts/check-data.json`, `${JSON.stringify(data, null, 2)}\n`);
 writeFileSync(`${OUT}references/extraction.md`, EXTRACTION_GUIDE);
 writeFileSync(`${OUT}references/issues.md`, ISSUES_GUIDE);
+writeFileSync(`${OUT}references/declaration.md`, DECLARATION_GUIDE);
 writeFileSync(`${OUT}references/extraction-schema.json`, `${JSON.stringify(extractionJsonSchema(), null, 2)}\n`);
 writeFileSync(`${OUT}references/extraction-blank.json`, `${blankJson(extractionBlank())}\n`);
 

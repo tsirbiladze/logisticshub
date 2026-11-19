@@ -86,6 +86,7 @@ export function renderMarkdown(view: ReportView, escape: Escape = markdownText):
       out.push("");
     }
   }
+  if (view.sourceNotes.length) out.push(`## ${ui.notes}`, "", ...view.sourceNotes.map((note) => `- ${escape(note)}`), "");
   out.push(`---`, `${ui.generatedBy}`);
   return `${out.join("\n").trim()}\n`;
 }

@@ -1,6 +1,6 @@
 ---
 name: logisticshub
-description: Cross-check trade documents (invoice, packing list, CMR, contract), or one invoice's sums and amount in words. Look up Georgian HS codes. EN, KA, RU, TR. Not for paying or booking.
+description: Cross-check invoices, packing lists, CMRs, contracts and Georgian customs declarations. Check invoice sums and words or look up Georgian HS codes. EN, KA, RU, TR. Not for paying or booking.
 license: MIT
 metadata:
   version: "1.1.0"
@@ -9,11 +9,11 @@ metadata:
 
 # Logisticshub: trade document cross-check
 
-You read the documents; `scripts/check.mjs` (in this skill's directory) applies 21 deterministic rules to your extraction and writes the report. The rules see only what you extract, so record what is **printed**, quoted **verbatim**, and nothing you worked out yourself.
+You read the documents; `scripts/check.mjs` (in this skill's directory) applies 27 deterministic rules to your extraction and writes the report. The rules see only what you extract, so record what is **printed**, quoted **verbatim**, and nothing you worked out yourself.
 
 ## 1. Collect the set
 
-One run checks one shipment. List every file the user provided and give each document a type: `commercial_invoice`, `packing_list`, `cmr`, `contract`, or `other` (insurance policy, freight statement, specification…). Read every page of every file.
+One run checks one shipment. List every file the user provided and give each document a type: `commercial_invoice`, `packing_list`, `cmr`, `contract`, `customs_declaration` (optional, including a draft), or `other` (insurance policy, freight statement, specification…). Read every page of every file.
 
 - Inputs are PDFs and page images (JPG, PNG). Read a text PDF from its text; read a scan or an image from the picture.
 - Files of several shipments: group them by the document numbers they cite, and do steps 2 to 4 once per shipment, each with its own extraction file and `--out` folder.
@@ -25,13 +25,15 @@ Done when every document has a type, every page has been read, and every documen
 
 Read `references/extraction.md` in full before the first field: it decides every hard case (decimal signs, dates, what a quote covers, tables over several pages, scans, each field of each document). Then write `extraction.json` in the folder of the user's documents. Copy each document's keys from `references/extraction-blank.json`; the JSON Schema is `references/extraction-schema.json`.
 
+If the set includes a Georgian customs declaration, open `references/declaration.md` before extracting it. For a saved Revenue Service response, use `node <this-skill-dir>/scripts/check.mjs declaration-from-rs response.json --append extraction.json` or the same subcommand with `python3 <this-skill-dir>/scripts/check.py`. Add `--registration <number>` to select one. Save stdout to a new extraction file. The converter works offline and accepts responses from protocol 1.0.0 (catalog date 2024-12-31). It has never been run against the live declaration service. Logging in and fetching declarations are outside the tool.
+
 The rules that keep the check honest:
 
 - Every fact is `{ "value": …, "quote": …, "page": … }`. `quote` is the text exactly as printed: same digits, separators, spelling and script. `value` is its normal form: a canonical decimal (`13,300.00` → `"13300.00"`), a date as `YYYY-MM-DD`, an ISO currency code.
 - Record only what is printed. A fact the document does not print is `{ "value": null, "quote": null, "page": null }`; the script computes every sum and comparison itself.
 - A character you cannot read for certain makes the fact null. Keep a list of these fields for step 4, and of every number or date whose reading you had to choose.
 
-Done when every field of every document holds a printed value with its verbatim quote and page, or null, and no value is a sum, a conversion or a guess.
+Done when every field of every document holds a printed value with its verbatim quote and page, a JSON value with a quote and null page from the converter, or a null fact, and no value is a sum, a conversion or a guess.
 
 ## 3. Check
 
@@ -42,7 +44,7 @@ node <this-skill-dir>/scripts/check.mjs extraction.json --lang <en|ka|ru|tr> --o
 - `--lang`: the user's language when it is one of the four; otherwise `en`, and you translate in step 4.
 - The script prints the report, then `Files:` and, when there is something to say, `Notes:`. It writes `report.md`, `report.json` and `report.html` into `--out` (default: next to `extraction.json`).
 - Each PDF that has a finding gets a copy with the findings boxed and numbered, `<name>.marked.pdf`. A PDF without findings gets none, so a clean run writes no marked PDF. PDFs are looked up next to `extraction.json`, or in `--pdf-dir`. Images are never marked.
-- It needs no install. Reading the PDFs needs Node.js 22 or newer; on an older one the reports are still written. Where `node` is unavailable (claude.ai, the Claude API), run `python3 <this-skill-dir>/scripts/check.py` with the same arguments: the same reports, but the PDFs are not read, so there are no marked copies and no `Notes:`.
+- It needs no install. Reading the PDFs needs Node.js 22 or newer; on an older one the reports are still written. Where `node` is unavailable (claude.ai, the Claude API), run `python3 <this-skill-dir>/scripts/check.py` with the same arguments: the same reports, but the PDFs are not read, so there are no marked copies and no PDF notes. Both scripts report saved JSON sources in their own notes.
 
 Offer a registry check when the user wants to verify a Georgian company. Ask for agreement before using the live commands: they send only 9-digit company codes to Georgia’s Revenue Service. The scripts skip 11-digit personal numbers.
 
@@ -69,7 +71,7 @@ Done when no issue and no note is left that asks for a correction, or after two 
 Answer in the user's language; when it is not one of the four, translate the report yourself. Give:
 
 - the counts of errors and warnings, and the documents checked;
-- every finding: its message, each piece of evidence (document, page, field and quote), and its `→` line, which says what to verify;
+- every finding: its message, each piece of evidence (document or response file, page where available, field and quote), and its `→` line, which says what to verify;
 - the paths of `report.html` (opens in any browser) and of each `.marked.pdf` that was written;
 - what limits the result: extraction issues left after the correction rounds, notes for the user, every fact you left null because you could not read it, and every number or date whose reading you had to choose.
 

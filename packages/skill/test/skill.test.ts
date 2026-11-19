@@ -11,6 +11,7 @@ import { checkNotes, pdfProblem, type AnnotatedFile, type Mark, type Marking, ty
 import {
   blankDocument,
   checkDocuments,
+  DECLARATION_GUIDE,
   EXTRACTION_CHECKS,
   EXTRACTION_GUIDE,
   extractionBlank,
@@ -55,6 +56,7 @@ describe("built skill", () => {
     expect(readFileSync(join(SKILL, "references/extraction.md"), "utf8")).toBe(EXTRACTION_GUIDE);
     expect(JSON.parse(readFileSync(join(SKILL, "references/extraction-blank.json"), "utf8"))).toEqual(extractionBlank());
     expect(readFileSync(join(SKILL, "references/issues.md"), "utf8")).toBe(ISSUES_GUIDE);
+    expect(readFileSync(join(SKILL, "references/declaration.md"), "utf8")).toBe(DECLARATION_GUIDE);
     for (const line of EXTRACTION_CHECKS) expect(readFileSync(join(SKILL, "references/rules.md"), "utf8")).toContain(line);
   });
 
@@ -62,7 +64,7 @@ describe("built skill", () => {
     const blank = readFileSync(join(SKILL, "references/extraction-blank.json"), "utf8");
     expect(blank).toContain('"number": { "value": null, "quote": null, "page": null },');
     // Spread over five lines per fact it was 626 lines; a document's keys now fit on a screen.
-    expect(blank.split("\n").length).toBeLessThan(220);
+    expect(blank.split("\n").length).toBeLessThan(270);
   });
 
   it("ships a blank whose documents and items make a well-shaped extraction", () => {
@@ -73,7 +75,7 @@ describe("built skill", () => {
       for (const [list, item] of Object.entries((blank.items[type] ?? {}) as Record<string, unknown>)) filled[list] = [item];
       return filled;
     });
-    expect(documents.map((doc) => doc.type)).toEqual(["commercial_invoice", "packing_list", "cmr", "contract", "other"]);
+    expect(documents.map((doc) => doc.type)).toEqual(["commercial_invoice", "packing_list", "cmr", "contract", "customs_declaration", "other"]);
     const result = checkDocuments({ ...blank.file, documents });
     expect(result.extractionIssues).toEqual([]);
     expect(result.ok).toBe(true);
@@ -207,14 +209,14 @@ describe("built skill", () => {
     const issues = result.stdout.split("\n").filter((line) => line.includes("(EXT_SHAPE)"));
     // On the terminal the values are as an agent has to type them: no Markdown escapes.
     expect(issues).toEqual([
-      '- `documents[0].type` (EXT_SHAPE): Unknown type "bill_of_lading". Use commercial_invoice, packing_list, cmr, contract or other.',
+      '- `documents[0].type` (EXT_SHAPE): Unknown type "bill_of_lading". Use commercial_invoice, packing_list, cmr, contract, customs_declaration or other.',
       '- `documents[1].totalPackages` (EXT_SHAPE): Missing. Write { "value": null, "quote": null, "page": null } when the document does not print it.',
       "- `documents[2].number.page` (EXT_SHAPE): Must be a whole number (1 for the first page) or null, got a number too large to be a page.",
-      "- `documents[3].type` (EXT_SHAPE): Missing. Use commercial_invoice, packing_list, cmr, contract or other.",
+      "- `documents[3].type` (EXT_SHAPE): Missing. Use commercial_invoice, packing_list, cmr, contract, customs_declaration or other.",
     ]);
     expect(result.stdout).not.toContain("\\");
     // report.md is a Markdown file: there the underscores are escaped, so they are shown and not read as emphasis.
-    expect(readFileSync(join(dir, "out", "report.md"), "utf8")).toContain('Unknown type "bill\\_of\\_lading". Use commercial\\_invoice, packing\\_list, cmr, contract or other.');
+    expect(readFileSync(join(dir, "out", "report.md"), "utf8")).toContain('Unknown type "bill\\_of\\_lading". Use commercial\\_invoice, packing\\_list, cmr, contract, customs\\_declaration or other.');
     expect(readdirSync(join(dir, "out")).sort()).toEqual(["report.html", "report.json", "report.md"]);
   });
 

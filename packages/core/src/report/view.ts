@@ -19,6 +19,7 @@ export interface EvidenceView {
   documentType: DocumentType;
   number: string | null;
   sourceFile: string | null;
+  dataSource?: true;
   page: number | null;
   path: string;
   /** Which field this is, in the report's language ("subtotal", "line 2, quantity"); null for a sum of lines and for a path without a name. */
@@ -70,6 +71,7 @@ export interface ReportView {
   extractionIssues: { code: string; path: string; message: string }[];
   /** Every quote of the documents that have findings, in document and schema order. Not part of any rendered report. */
   citations: Citation[];
+  sourceNotes: string[];
   registry?: ReturnType<typeof registryView>;
 }
 
@@ -84,8 +86,9 @@ export function fieldLabel(type: DocumentType, path: string, language: ReportLan
   const typed = `${type}:${key}`;
   const label = Object.hasOwn(labels, typed) ? labels[typed]! : Object.hasOwn(labels, key) ? labels[key]! : null;
   if (label === null) return null;
-  const line = /^lines\[([0-9]+)\]\./.exec(path);
-  return line ? `${VOCAB[language].line} ${Number(line[1]) + 1}, ${label}` : label;
+  const row = /^(lines|items)\[([0-9]+)\]\./.exec(path);
+  const vocab = VOCAB[language];
+  return row ? `${row[1] === "items" ? vocab.item : vocab.line} ${Number(row[2]) + 1}, ${label}` : label;
 }
 
 /** Most common document language among the report languages, else English. */
@@ -123,6 +126,7 @@ export function buildReport(result: CheckResult, language: ReportLanguage = pick
         documentType: e.documentType,
         number: doc?.number.value ?? null,
         sourceFile: doc?.sourceFile ?? null,
+        ...(doc?.type === "customs_declaration" && doc.sourceKind === "rs_json" ? { dataSource: true as const } : {}),
         page: e.page,
         path: e.path,
         label: e.computed === true ? null : fieldLabel(e.documentType, e.path, language),
@@ -137,7 +141,7 @@ export function buildReport(result: CheckResult, language: ReportLanguage = pick
   const citations: Citation[] = [];
   docs.forEach((doc, documentIndex) => {
     const { sourceFile } = doc;
-    if (!sourceFile || !cited.has(documentIndex)) return;
+    if (!sourceFile || !cited.has(documentIndex) || (doc.type === "customs_declaration" && doc.sourceKind === "rs_json")) return;
     walkCited(documentSchema, doc, ({ path, field }) => {
       if (field.value !== null && field.quote !== null && field.quote.trim() !== "") citations.push({ sourceFile, documentIndex, path, quote: field.quote, page: field.page });
     });
@@ -147,11 +151,15 @@ export function buildReport(result: CheckResult, language: ReportLanguage = pick
     ui: UI[language],
     readable: result.ok,
     documents: docs.map((d) => ({ id: d.id, type: d.type, label: vocab.doc[d.type], number: d.number.value, sourceFile: d.sourceFile })),
-    rulesRun: result.ok ? RULES.length - (result.registry ? 0 : 3) : 0,
+    rulesRun: result.ok ? RULES.length - (result.registry ? 0 : 3) - (docs.some((d) => d.type === "customs_declaration") ? 0 : 6) : 0,
     errors: findings.filter((f) => f.severity === "error"),
     warnings: findings.filter((f) => f.severity === "warning"),
     extractionIssues: result.extractionIssues,
     citations,
+    sourceNotes: [...new Set(docs.flatMap((doc) =>
+      doc.type === "customs_declaration" && doc.sourceKind === "rs_json"
+        ? [`${doc.sourceFile ? doc.sourceFile + ": " : ""}${UI[language].declarationSource}`]
+        : []))],
     ...(result.registry ? { registry: registryView(result.registry, language) } : {}),
   };
 }

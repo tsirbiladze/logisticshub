@@ -18,9 +18,9 @@ export function documentParties(doc: TradeDocument): [string, Party][] {
   }
 }
 
-export function taxDigits({ value, quote, page }: CitedText): string | null {
+export function taxDigits({ value, quote, page }: CitedText, pageless = false): string | null {
   const digits = (printed: string) => printed.trim().replace(/^[A-Za-z]{2}(?=[\s\p{Pd}0-9])/u, "").replace(/[\s\p{Pd}]/gu, "");
-  if (value === null || quote === null || page === null || page < 1) return null;
+  if (value === null || quote === null || (pageless ? page !== null : page === null || page < 1)) return null;
   const code = digits(value);
   return /^[0-9]+$/.test(code) && code === digits(quote) ? code : null;
 }

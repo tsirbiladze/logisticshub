@@ -120,13 +120,13 @@ describe("extractionJsonSchema", () => {
   });
 
   it("stays compact (shared parts are $defs)", () => {
-    expect(JSON.stringify(schema).length).toBeLessThan(20_000);
+    expect(JSON.stringify(schema).length).toBeLessThan(25_000);
     expect(Object.keys((schema.$defs ?? {}) as object).length).toBeGreaterThan(5);
   });
 
-  it("offers all five document types", () => {
+  it("offers all six document types", () => {
     const text = JSON.stringify(schema);
-    for (const type of ["commercial_invoice", "packing_list", "cmr", "contract", "other"]) {
+    for (const type of ["commercial_invoice", "packing_list", "cmr", "contract", "customs_declaration", "other"]) {
       expect(text).toContain(`"${type}"`);
     }
   });

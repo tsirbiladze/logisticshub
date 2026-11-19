@@ -51,6 +51,8 @@ import {
   REPORT_LANGUAGES,
   type ReportFormat,
   type ReportLanguage,
+  declarationCommand,
+  DECLARATION_USAGE,
 } from "@logisticshub/core";
 
 declare const __VERSION__: string;
@@ -65,6 +67,7 @@ Usage:
   node check.mjs taxpayer <9-digit company code> [--json]
   node check.mjs registry <extraction.json> [-o registry.json]
   node check.mjs --schema
+  node check.mjs ${DECLARATION_USAGE}
   node check.mjs hs <code or Georgian words> [--json] [--limit <n>]
 
 Writes report.md, report.json and report.html (default: next to the extraction)
@@ -148,6 +151,14 @@ function parseArgs(argv: string[]) {
 
 async function main() {
   const args = process.argv.slice(2);
+  if (args[0] === "declaration-from-rs") {
+    if (args.slice(1).includes("--help") || args.slice(1).includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    try {
+      return void process.stdout.write(declarationCommand(args.slice(1)));
+    } catch (error) {
+      stop((error as Error).message);
+    }
+  }
   if (args[0] === "hs") {
     if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
     try {

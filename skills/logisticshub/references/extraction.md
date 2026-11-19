@@ -1,6 +1,6 @@
 # Extraction guide
 
-How to write `extraction.json` for `scripts/check.mjs`. Record what each document **prints**; the checker does every sum and comparison itself. `extraction-schema.json` is the contract, and `extraction-blank.json` holds every document type and table line with all facts null, ready to copy.
+How to write `extraction.json` for `scripts/check.mjs`. Record what each document **prints**; the checker does every sum and comparison itself. `extraction-schema.json` is the contract, and `extraction-blank.json` holds every document type and table line with all facts null, to copy.
 
 ## File
 
@@ -15,7 +15,7 @@ How to write `extraction.json` for `scripts/check.mjs`. Record what each documen
 ```
 
 - `documents`: one entry per document (not per file), the documents of one shipment.
-- `type`: `commercial_invoice`, `packing_list`, `cmr`, `contract`, or `other` for anything else.
+- `type`: `commercial_invoice`, `packing_list`, `cmr`, `contract`, `customs_declaration`, or `other` for anything else.
 - `id`: `invoice`, `packing-list`, `cmr`, `contract`; for `other` a short name of your own (`insurance-policy`). A second document of a type gets `-2` (`invoice-2`). Ids are unique.
 - `sourceFile`: the file's name as it is on disk, without folders.
 - `language`: the main language of the document's text: `en`, `ru`, `tr`, `ka` or `other`. An amount in words is read in it, and a month name in a date is checked in it or in English (with `other`, not at all).
@@ -37,7 +37,7 @@ How to write `extraction.json` for `scripts/check.mjs`. Record what each documen
 
 ## Numbers
 
-- **The decimal sign is the document's own.** One number settles it for the whole document: one that shows both signs (`9.684,00`, `13,300.00`), or one whose only sign is followed by anything but three digits (`13,2`, `4,80`, `9.0619`). Next to `9.684,00` or `13,2` the comma is the decimal sign, so `16.560 kg` is `16560` and `1.080` is `1080`; next to `13,300.00` or `9.0619` it is the point, so `1,880 kg` is `1880`.
+- **Use the document's decimal sign.** One number settles it for the whole document: one that shows both signs (`9.684,00`, `13,300.00`), or one whose only sign is followed by anything but three digits (`13,2`, `4,80`, `9.0619`). Next to `9.684,00` or `13,2` the comma is the decimal sign, so `16.560 kg` is `16560` and `1.080` is `1080`; next to `13,300.00` or `9.0619` it is the point, so `1,880 kg` is `1880`.
 - **No number in the document settles it** (only whole numbers and `1.880`): take the sign from the same issuer's other documents in the set. Failing that, three digits after a single separator are thousands (`1.880` → `1880`); tell the user which numbers you read this way.
 - Spaces and apostrophes only group thousands: `13 300,00` and `13'300.00` are `13300.00`.
 - Keep the printed decimals: `145.00` stays `145.00`, `1,880` becomes `1880`, never `1880.00`.
@@ -79,7 +79,7 @@ How to write `extraction.json` for `scripts/check.mjs`. Record what each documen
 
 ## Several documents, files and pages
 
-- **Two documents of one type** (two invoices): one entry each, `invoice` and `invoice-2`. The cross-document rules compare only the **first** entry of each type and the report says so; put first the one the packing list and the CMR cite. Where documents of different types stand does not matter.
+- **Two documents of one type** (two invoices): one entry each, `invoice` and `invoice-2`. Cross-checks generally use the **first** entry of each type; put first the one the packing list and the CMR cite. Where documents of different types stand does not matter.
 - **The same document twice** (a scan and its PDF, an original and a copy): extract it once, from the more readable file.
 - **Two documents in one file** (invoice on page 1, packing list on page 2 of `docs.pdf`): two entries with the same `sourceFile`; `page` is counted in the file, so the packing list's facts are on page 2.
 - **One document over several image files** (`cmr-1.jpg`, `cmr-2.jpg`): one entry; `sourceFile` is the first file and `page` is the image's place in the document (2 for `cmr-2.jpg`). Tell the user that "`cmr-1.jpg`, p. 2" in the report means the second image.
@@ -155,6 +155,8 @@ How to write `extraction.json` for `scripts/check.mjs`. Record what each documen
 
 `number`, `date`, `seller`, `buyer`, `incoterm`, `currency` (quoted as on an invoice), `totalAmount` (the contract value), `totalInWords`, `goodsDescription` (the goods as the contract names them, to the end of that sentence, without its heading: `1. Subject of the contract. LED lighting products: ceiling panels, tubes and drivers` → `LED lighting products: ceiling panels, tubes and drivers`).
 
+Read `declaration.md` only when the set includes a Georgian customs declaration.
+
 ## other
 
 Any other document: `number`, `date`, and `title` as printed (`Freight statement`, `Insurance policy`, `Product specification`). A document whose title names insurance (`Insurance certificate`, `Страховой полис`, `Sigorta poliçesi`, `დაზღვევის პოლისი`) satisfies the CIF/CIP insurance check.
@@ -163,6 +165,6 @@ Any other document: `number`, `date`, and `title` as printed (`Freight statement
 
 Before: every key is present; every value has its quote and page; no value was added up, converted or guessed.
 
-After: the checker verifies the extraction itself: its shape, every format, each value against its own quote, and each quote against the text of its PDF page. Leave the searching to it: looking quotes up in `pdftotext` output by hand gives false alarms on wrapped cells and columns. The report opens with `Extraction issues` when it finds any, and a value with a format, quote or percentage issue is kept out of every rule until you fix it; quotes not found on their page are listed under `Notes:`.
+After: the checker verifies the extraction itself: its shape, every format, each value against its own quote, and each quote against the text of its PDF page. The report opens with `Extraction issues` when it finds any, and a value with a format, quote or percentage issue is kept out of every rule until you fix it; quotes not found on their page are listed under `Notes:`.
 
 When the report lists an issue or the script prints `Notes:`, open `issues.md`: it says what each code and each note means and what to do. A run with neither needs no more reading.

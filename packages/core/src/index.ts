@@ -14,3 +14,4 @@ export { HS_LOOKUP_LIMIT, hsLookupOutput, lookupHsCode } from "./hs.ts";
 export * from "./report/index.ts";
 export * from "./registry.ts";
 export * from "./registry-client.ts";
+export { declarationCommand, declarationsFromRs, DECLARATION_USAGE } from "./declaration.ts";

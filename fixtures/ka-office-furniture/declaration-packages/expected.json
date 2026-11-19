@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "DEC-04",
+    "severity": "error",
+    "key": "DEC-04.packages",
+    "params": {
+      "expected": "100",
+      "found": "99",
+      "document": "packing_list"
+    }
+  }
+]

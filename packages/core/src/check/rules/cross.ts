@@ -3,9 +3,11 @@
  * is used (DOC-01 says so in the report).
  */
 import { compare, equals, sum, type Decimal } from "../../decimal.ts";
-import type { CitedDecimal, CitedText, Party, TradeDocument } from "../../schema.ts";
+import type { CitedDecimal, CitedText, Cmr, CommercialInvoice, PackingList, Party, TradeDocument } from "../../schema.ts";
 import {
   containsRef,
+  citedWrittenText,
+  quoted,
   currencyCode,
   evidence,
   foldName,
@@ -26,18 +28,18 @@ import type { Evidence, Finding, Rule } from "../types.ts";
 const encode = (entries: [TradeDocument["type"], string | null][]) => JSON.stringify(entries.map(([type, value]) => [type, value ?? ""]));
 
 /** A value read from a document; `computed` when it is a sum of lines rather than a printed figure. */
-type Observed = { doc: TradeDocument; path: string; field: CitedDecimal; value: Decimal; computed: boolean };
+export type Observed = { doc: TradeDocument; path: string; field: CitedDecimal; value: Decimal; computed: boolean };
 
-function observe(doc: TradeDocument | undefined, path: string, field: CitedDecimal | undefined): Observed | null {
+export function observe(doc: TradeDocument | undefined, path: string, field: CitedDecimal | undefined): Observed | null {
   if (!doc || !field) return null;
   const value = num(field);
   return value ? { doc, path, field, value, computed: false } : null;
 }
 
-const cite = (o: Observed) => evidence(o.doc, o.path, o.field, o.computed);
+export const cite = (o: Observed) => evidence(o.doc, o.path, o.field, o.computed);
 
 /** A total stated on the document, or the sum of its lines if not stated. */
-function statedOrSum<L>(
+export function statedOrSum<L>(
   doc: TradeDocument | undefined,
   totalPath: string,
   total: CitedDecimal | undefined,
@@ -100,6 +102,27 @@ export function packingKind(texts: (string | null)[]): string | null {
     }
   }
   return kinds.size > 0 ? [...kinds].sort().join("+") : null;
+}
+
+export function packageCounts(invoice?: CommercialInvoice, pl?: PackingList, cmr?: Cmr): [[Observed | null, string | null], [Observed | null, string | null], [Observed | null, string | null]] {
+  return [
+    [observe(invoice, "packages", invoice?.packages), packingKind([invoice?.packages.quote ?? null])],
+    [
+      statedOrSum(pl, "totalPackages", pl?.totalPackages, pl?.lines, "lines", (l) => l.packages),
+      packingKind([
+        pl?.packingMethod.value ?? null,
+        pl?.totalPackages.quote ?? null,
+        ...(pl?.lines ?? []).flatMap((l) => [l.packingMethod.value, l.packages.quote]),
+      ]),
+    ],
+    [
+      statedOrSum(cmr, "totalPackages", cmr?.totalPackages, cmr?.goods, "goods", (g) => g.packages),
+      packingKind([
+        cmr?.totalPackages.quote ?? null,
+        ...(cmr?.goods ?? []).flatMap((g) => [g.packingMethod.value, g.packages.quote]),
+      ]),
+    ],
+  ];
 }
 
 /**
@@ -274,24 +297,7 @@ export const quantities: Rule = {
     }
 
     // Package counts, each with the packing method its document names.
-    const counts: [Observed | null, string | null][] = [
-      [observe(invoice, "packages", invoice?.packages), packingKind([invoice?.packages.quote ?? null])],
-      [
-        statedOrSum(pl, "totalPackages", pl?.totalPackages, pl?.lines, "lines", (l) => l.packages),
-        packingKind([
-          pl?.packingMethod.value ?? null,
-          pl?.totalPackages.quote ?? null,
-          ...(pl?.lines ?? []).flatMap((l) => [l.packingMethod.value, l.packages.quote]),
-        ]),
-      ],
-      [
-        statedOrSum(cmr, "totalPackages", cmr?.totalPackages, cmr?.goods, "goods", (g) => g.packages),
-        packingKind([
-          cmr?.totalPackages.quote ?? null,
-          ...(cmr?.goods ?? []).flatMap((g) => [g.packingMethod.value, g.packages.quote]),
-        ]),
-      ],
-    ];
+    const counts = packageCounts(invoice, pl, cmr);
     const present = counts.filter((c): c is [Observed, string | null] => c[0] !== null);
     const kinds = [...new Set(present.flatMap(([, kind]) => (kind ? [kind] : [])))];
     // 12 pallets and 82 cartons are not a mismatch: with different packing
@@ -374,7 +380,7 @@ export const weightsAgree: Rule = {
 /** REF-01: documents refer to each other by the right numbers and dates. */
 export const references: Rule = {
   id: "REF-01",
-  run({ invoices, packingLists, cmrs, contracts }) {
+  run({ invoices, packingLists, cmrs, contracts, declarations }) {
     const findings: Finding[] = [];
     const invoice = invoices[0];
     const pl = packingLists[0];
@@ -448,6 +454,16 @@ export const references: Rule = {
         });
       }
     }
+    const declaration = declarations[0];
+    const number = invoice && citedWrittenText(invoice.number);
+    const entries = declaration?.attachedDocuments;
+    if (declaration && invoice && number && entries?.length &&
+        entries.every((entry) => citedWrittenText(entry)) && !entries.some((entry) => containsRef(entry.value!, number))) {
+      findings.push({
+        rule: "REF-01", severity: "warning", key: "REF-01.declaration-missing-invoice", params: { number },
+        evidence: [...entries.map((entry, i) => evidence(declaration, `attachedDocuments[${i}]`, entry)), evidence(invoice, "number", invoice.number)],
+      });
+    }
     return findings;
   },
 };
@@ -455,7 +471,7 @@ export const references: Rule = {
 /** DATE-01: contract ≤ invoice ≤ taking over of the goods. */
 export const dateOrder: Rule = {
   id: "DATE-01",
-  run({ invoices, cmrs, contracts }) {
+  run({ invoices, cmrs, contracts, declarations }) {
     const findings: Finding[] = [];
     const invoice = invoices[0];
     const cmr = cmrs[0];
@@ -485,6 +501,15 @@ export const dateOrder: Rule = {
           evidence: [evidence(invoice, "date", invoice.date), evidence(cmr, path, field)],
         });
       }
+    }
+    const declaration = declarations[0];
+    const registration = declaration && quoted(declaration.date) && isoDate(declaration.date);
+    if (declaration && registration && quoted(invoice.date) && invoiceDate > registration) {
+      findings.push({
+        rule: "DATE-01", severity: "error", key: "DATE-01.invoice-after-declaration",
+        params: { invoice: invoiceDate, registration },
+        evidence: [evidence(invoice, "date", invoice.date), evidence(declaration, "date", declaration.date)],
+      });
     }
     return findings;
   },

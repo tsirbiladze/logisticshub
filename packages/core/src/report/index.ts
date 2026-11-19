@@ -37,6 +37,7 @@ export function renderJson(result: CheckResult, view: ReportView): string {
         message: findings[i]?.message,
         check: findings[i]?.check,
       })),
+      ...(view.sourceNotes.length ? { sourceNotes: view.sourceNotes } : {}),
       ...(view.registry ? { registry: view.registry } : {}),
     },
     null,

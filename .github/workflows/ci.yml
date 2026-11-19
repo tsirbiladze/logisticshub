@@ -42,8 +42,8 @@ jobs:
       - run: node --version && python3 --version
       # The root package asks for Node.js 24 to develop on; on 22 pnpm warns about it and installs.
       - run: pnpm install --frozen-lockfile
-      # Typecheck + all tests: exact planted findings on the 31 variants of the 4 synthetic packs, the built check.mjs and check.py
-      # run as separate processes (byte-identical reports), CLI/MCP, PDF marking.
+      # Typecheck + all tests: exact planted findings on the 45 variants of the 4 synthetic packs, the built check.mjs and check.py
+      # run as separate processes (byte-identical reports), CLI/MCP, saved declaration conversion and PDF marking.
       - run: pnpm verify
       # The committed skill must match a fresh build. Building is a development task: current Node.js only.
       - if: matrix.node == 24

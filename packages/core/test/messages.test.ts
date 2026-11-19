@@ -25,12 +25,14 @@ import {
   REPORT_LANGUAGES,
   RULE_CHECKS,
   RULE_IDS,
+  RULE_REFERENCE,
   RULE_SUMMARIES_KA,
   RULE_TITLES,
   UI,
   VOCAB,
   type Cmr,
   type CommercialInvoice,
+  type CustomsDeclaration,
   type Contract,
   type Extraction,
   type ExtractionIssueCode,
@@ -49,8 +51,9 @@ interface Docs {
   contract: Contract;
 }
 
-function docs(): Docs {
-  const pack = kaPack();
+function docs(key?: MessageKey): Docs {
+  const declaration = key === "DOC-01.multiple-invoices-declaration" || key?.startsWith("DEC-") || key?.endsWith("declaration-missing-invoice") || key?.endsWith("invoice-after-declaration");
+  const pack = declaration ? JSON.parse(readFileSync(new URL("../../../fixtures/ka-office-furniture/declaration-clean/extraction.json", import.meta.url), "utf8")) as Extraction : kaPack();
   const [invoice, pl, cmr, contract] = pack.documents as [CommercialInvoice, PackingList, Cmr, Contract];
   return { pack, invoice, pl, cmr, contract };
 }
@@ -58,6 +61,9 @@ function docs(): Docs {
 function snapshot(id: string): RegistrySnapshot {
   return JSON.parse(readFileSync(new URL(`../../../fixtures/ka-office-furniture/${id}/registry.json`, import.meta.url), "utf8"));
 }
+
+const declarationOf = ({ pack }: Docs) => pack.documents[4] as CustomsDeclaration;
+const itemOf = (d: Docs) => declarationOf(d).items[0]!;
 
 /** One change to the clean pack per message key: the smallest one that makes its rule report it. */
 const CASES: Record<MessageKey, (docs: Docs) => void> = {
@@ -104,6 +110,7 @@ const CASES: Record<MessageKey, (docs: Docs) => void> = {
   "CMR-01.missing": ({ cmr }) => void (cmr.carrier.address = c(null)),
   "DOC-01.missing": ({ pack }) => void (pack.documents = pack.documents.filter((d) => d.type !== "cmr")),
   "DOC-01.multiple": ({ pack }) => void pack.documents.push(blankDocument("commercial_invoice", "invoice-2")),
+  "DOC-01.multiple-invoices-declaration": ({ pack }) => void pack.documents.push(blankDocument("commercial_invoice", "invoice-2")),
   "HS-01.unreadable": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("94O310")),
   "HS-01.unknown-subheading": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("999999")),
   "HS-01.unknown-subheading-heading": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("940398")),
@@ -117,6 +124,29 @@ const CASES: Record<MessageKey, (docs: Docs) => void> = {
     d.invoice.tax = c("2394.00", "EUR 2,394.00");
   },
   "TAX-03.reply": (d) => void (d.registry = snapshot("registry-status-minus-one")),
+  "REF-01.declaration-missing-invoice": (d) => { declarationOf(d).attachedDocuments = [c("ინვოისი OTHER-1")]; },
+  "DATE-01.invoice-after-declaration": (d) => { declarationOf(d).date = c("2026-09-17", "17.09.2026"); },
+  "DEC-01.tax-id": (d) => { declarationOf(d).importer.taxId = c("900000009"); },
+  "DEC-01.name": (d) => {
+    declarationOf(d).importer.taxId = c(null);
+    declarationOf(d).importer.name = c("სატესტო მარანი");
+  },
+  "DEC-02.unreadable": (d) => { itemOf(d).hsCode = c("940310"); },
+  "DEC-02.unknown-national": (d) => { itemOf(d).hsCode = c("94033099999"); },
+  "DEC-02.unknown-national-heading": (d) => { itemOf(d).hsCode = c("94039899999"); },
+  "DEC-02.unknown-national-alone": (d) => { itemOf(d).hsCode = c("99999999999"); },
+  "DEC-02.invoice-prefix": (d) => { d.invoice.lines[1]!.hsCode = c("940330"); },
+  "DEC-02.declaration-prefix": (d) => {
+    declarationOf(d).items.push({ ...structuredClone(itemOf(d)), itemNumber: c("2"), hsCode: c("94033011000") });
+  },
+  "DEC-03.gross": (d) => { itemOf(d).grossWeightKg = c("1205", "1 205"); },
+  "DEC-03.net": (d) => { itemOf(d).netWeightKg = c("1000", "1 000"); },
+  "DEC-04.packages": (d) => { declarationOf(d).totalPackages = c("99", "99 ყუთი"); },
+  "DEC-05.currency": (d) => { declarationOf(d).currency = c("USD"); },
+  "DEC-05.invoice-total": (d) => { declarationOf(d).totalInvoiceAmount = c("13301.00", "13,301.00"); },
+  "DEC-05.item-total": (d) => { itemOf(d).invoiceValue = c("13301.00", "13,301.00"); },
+  "DEC-06.origin": (d) => { itemOf(d).countryOfOrigin = c("DE"); },
+  "DEC-06.unestablished": (d) => { itemOf(d).countryOfOrigin = c("999"); },
 };
 
 /** What each case reads as. Read them aloud before changing one: every line is a sentence someone has to act on. */
@@ -301,6 +331,12 @@ const EXPECTED: Record<MessageKey, Record<ReportLanguage, string>> = {
     ru: "Инвойс: 2 документа; при сверке используется первый.",
     tr: "Fatura: 2 belge; karşılaştırmada ilki kullanılır.",
   },
+  "DOC-01.multiple-invoices-declaration": {
+    en: "2 documents of type invoice. The declaration checks use all invoices for HS prefixes, currency and totals.",
+    ka: "ინვოისი: 2 დოკუმენტი. დეკლარაციასთან შედარებისას ყველა ინვოისის HS კოდების პირველი ექვსი ციფრი, ვალუტა და ჯამი მოწმდება.",
+    ru: "Инвойс: 2 документа. При сверке с декларацией учитываются префиксы кодов ТН ВЭД, валюта и суммы всех инвойсов.",
+    tr: "Fatura: 2 belge. Beyannameyle karşılaştırmada tüm faturaların HS kodu önekleri, para birimi ve toplamları kullanılır.",
+  },
   "HS-01.unreadable": {
     en: "Line 1: the HS code could not be read.",
     ka: "სტრიქონი 1: HS კოდი ვერ იკითხება.",
@@ -355,6 +391,114 @@ const EXPECTED: Record<MessageKey, Record<ReportLanguage, string>> = {
     ru: "Ответ Службы доходов для кода 900000001: «გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე»",
     tr: "900000001 için Gelir İdaresinin yanıtı: “გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე”",
   },
+  "REF-01.declaration-missing-invoice": {
+    en: "The customs declaration's attached documents (box 44) do not list invoice AOS-INV-2026-0918-01.",
+    ka: "საბაჟო დეკლარაციის თანდართულ დოკუმენტებში (გრაფა 44) ინვოისი AOS-INV-2026-0918-01 არ არის მითითებული.",
+    ru: "В перечне приложенных документов таможенной декларации (графа 44) не указан инвойс AOS-INV-2026-0918-01.",
+    tr: "Gümrük beyannamesinin ekli belgeleri (kutu 44) AOS-INV-2026-0918-01 numaralı faturayı içermiyor.",
+  },
+  "DATE-01.invoice-after-declaration": {
+    en: "Invoice date 18 September 2026 is after the declaration's registration date 17 September 2026.",
+    ka: "ინვოისის თარიღი (18.09.2026) დეკლარაციის რეგისტრაციის თარიღზე (17.09.2026) გვიანია.",
+    ru: "Дата инвойса (18.09.2026) позже даты регистрации декларации (17.09.2026).",
+    tr: "Fatura tarihi (18.09.2026) beyannamenin tescil tarihinden (17.09.2026) sonra.",
+  },
+  "DEC-01.tax-id": {
+    en: "For the Buyer, the invoice gives tax ID 900000001, and the declaration gives 900000009.",
+    ka: "მყიდველი: ინვოისში საიდენტიფიკაციო ნომერია 900000001, დეკლარაციაში კი წერია 900000009.",
+    ru: "Для стороны «Покупатель» в инвойсе указан идентификационный номер 900000001, а в декларации — 900000009.",
+    tr: "Alıcı için faturada vergi numarası 900000001, beyannamede ise 900000009.",
+  },
+  "DEC-01.name": {
+    en: "For the Buyer, the invoice names ტესტ კომპანია, and the declaration names სატესტო მარანი.",
+    ka: "მყიდველი: ინვოისში წერია ტესტ კომპანია, დეკლარაციაში კი სატესტო მარანი.",
+    ru: "Для стороны «Покупатель» в инвойсе указано имя ტესტ კომპანია, а в декларации — სატესტო მარანი.",
+    tr: "Alıcı için faturada ტესტ კომპანია, beyannamede ise სატესტო მარანი yazıyor.",
+  },
+  "DEC-02.unreadable": {
+    en: "Item 1: the HS code could not be read as an 11-digit national code.",
+    ka: "საქონელი 1: HS კოდი 11-ნიშნა ეროვნულ კოდად ვერ იკითხება.",
+    ru: "Товар 1: не удалось прочитать 11-значный национальный код ТН ВЭД.",
+    tr: "Kalem 1: HS kodu 11 haneli ulusal kod olarak okunamadı.",
+  },
+  "DEC-02.invoice-prefix": {
+    en: "Invoice line 2: code 940330 has no matching six-digit prefix on the declaration.",
+    ka: "ინვოისის სტრიქონი 2: კოდის 940330 პირველი ექვსი ციფრი დეკლარაციის არცერთ კოდს არ ემთხვევა.",
+    ru: "Строка инвойса 2: для кода 940330 не найден совпадающий шестизначный префикс в декларации.",
+    tr: "Faturanın 2. satırı: 940330 kodunun ilk altı hanesi beyannamede bulunamadı.",
+  },
+  "DEC-02.declaration-prefix": {
+    en: "Declared item 2: code 94033011000 has no matching six-digit prefix on the invoices.",
+    ka: "დეკლარაციის საქონელი 2: კოდის 94033011000 პირველი ექვსი ციფრი ინვოისების არცერთ კოდს არ ემთხვევა.",
+    ru: "Товар декларации 2: для кода 94033011000 не найден совпадающий шестизначный префикс в инвойсах.",
+    tr: "Beyannamenin 2. kalemi: 94033011000 kodunun ilk altı hanesi faturalarda bulunamadı.",
+  },
+  "DEC-03.gross": {
+    en: "The declared items total 1,205 kg gross, and in the packing list the gross total is 1,250 kg.",
+    ka: "დეკლარირებული საქონლის საერთო ბრუტო წონაა 1\u00a0205 კგ, შეფუთვის ფურცელში კი 1\u00a0250 კგ.",
+    ru: "Общий вес брутто заявленных товаров — 1\u00a0205 кг, а в упаковочном листе — 1\u00a0250 кг.",
+    tr: "Beyan edilen kalemlerin toplam brüt ağırlığı 1.205 kg, çeki listesinde ise 1.250 kg.",
+  },
+  "DEC-03.net": {
+    en: "The declared items total 1,000 kg net, and in the packing list the net total is 1,050 kg.",
+    ka: "დეკლარირებული საქონლის საერთო ნეტო წონაა 1\u00a0000 კგ, შეფუთვის ფურცელში კი 1\u00a0050 კგ.",
+    ru: "Общий вес нетто заявленных товаров — 1\u00a0000 кг, а в упаковочном листе — 1\u00a0050 кг.",
+    tr: "Beyan edilen kalemlerin toplam net ağırlığı 1.000 kg, çeki listesinde ise 1.050 kg.",
+  },
+  "DEC-04.packages": {
+    en: "The declaration gives 99 packages, and in the packing list the count is 100.",
+    ka: "დეკლარაციაში შეფუთვების რაოდენობაა 99, შეფუთვის ფურცელში კი 100.",
+    ru: "В декларации 99 грузовых мест, а в упаковочном листе — 100.",
+    tr: "Beyannamede 99 kap, çeki listesinde ise 100 kap yazıyor.",
+  },
+  "DEC-05.currency": {
+    en: "Box 22 gives currency USD, and the invoices use EUR.",
+    ka: "გრაფა 22-ში ვალუტაა USD, ინვოისებში კი EUR.",
+    ru: "В графе 22 указана валюта USD, а в инвойсах — EUR.",
+    tr: "22. kutuda para birimi USD, faturalarda ise EUR.",
+  },
+  "DEC-05.invoice-total": {
+    en: "Box 22 gives 13,301.00 EUR, and the invoice total is 13,300.00 EUR.",
+    ka: "გრაფა 22-ში თანხაა 13\u00a0301,00 EUR, ინვოისის ჯამი კი 13\u00a0300,00 EUR.",
+    ru: "В графе 22 указана сумма 13\u00a0301,00 EUR, а итог инвойса — 13\u00a0300,00 EUR.",
+    tr: "22. kutuda tutar 13.301,00 EUR, fatura toplamı ise 13.300,00 EUR.",
+  },
+  "DEC-05.item-total": {
+    en: "Box 42 values add up to 13,301.00 EUR, and box 22 gives 13,300.00 EUR.",
+    ka: "გრაფა 42-ში თანხების ჯამია 13\u00a0301,00 EUR, გრაფა 22-ში კი 13\u00a0300,00 EUR წერია.",
+    ru: "Сумма значений графы 42 составляет 13\u00a0301,00 EUR, а в графе 22 указано 13\u00a0300,00 EUR.",
+    tr: "42. kutudaki tutarların toplamı 13.301,00 EUR, 22. kutudaki tutar ise 13.300,00 EUR.",
+  },
+  "DEC-06.origin": {
+    en: "Item 1 gives origin DE, and the invoice gives თურქეთი.",
+    ka: "საქონელი 1: დეკლარაციაში წარმოშობაა DE, ინვოისში კი თურქეთი.",
+    ru: "Товар 1: в декларации указано происхождение DE, а в инвойсе — თურქეთი.",
+    tr: "Kalem 1: beyannamede menşe DE, faturada ise თურქეთი.",
+  },
+  "DEC-06.unestablished": {
+    en: "Item 1: box 34a gives code 999 (origin not established).",
+    ka: "საქონელი 1: გრაფა 34ა-ში წერია კოდი 999 (წარმოშობა დაუდგენელია).",
+    ru: "Товар 1: в графе 34а указан код 999 (происхождение не установлено).",
+    tr: "Kalem 1: 34a kutusunda 999 kodu (menşe belirlenemedi) yazıyor.",
+  },
+  "DEC-02.unknown-national": {
+    en: "Item 1: national code 94033099999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under 940330: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    ka: "საქონელი 1: ეროვნული კოდი 94033099999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. კოდები 940330-ის ფარგლებში: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    ru: "Товар 1: национального кода 94033099999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции 940330: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    tr: "Kalem 1: 94033099999 ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. 940330 alt pozisyonundaki kodlar: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+  },
+  "DEC-02.unknown-national-heading": {
+    en: "Item 1: national code 94039899999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    ka: "საქონელი 1: ეროვნული კოდი 94039899999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. უახლოესი სასაქონლო პოზიცია: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    ru: "Товар 1: национального кода 94039899999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    tr: "Kalem 1: 94039899999 ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. En yakın pozisyon: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+  },
+  "DEC-02.unknown-national-alone": {
+    en: "Item 1: national code 99999999999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified.",
+    ka: "საქონელი 1: ეროვნული კოდი 99999999999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა.",
+    ru: "Товар 1: национального кода 99999999999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись.",
+    tr: "Kalem 1: 99999999999 ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı.",
+  },
 };
 
 const KEYS = Object.keys(MESSAGES.en) as MessageKey[];
@@ -367,11 +511,14 @@ describe("finding messages", () => {
   });
 
   it.each(KEYS)("%s: its rule reports it, and it reads as a sentence in every language", (key) => {
-    const d = docs();
+    const d = docs(key);
     CASES[key](d);
     const finding = checkExtraction(d.pack, d.registry ? { registry: d.registry } : {}).find((f) => f.key === key);
     expect(finding, `${key} is not reported`).toBeDefined();
     expect(key.startsWith(`${finding!.rule}.`)).toBe(true);
+    if (key !== "CMR-01.missing") {
+      expect(finding!.severity).toBe(RULE_REFERENCE[finding!.rule].findings.find((item) => item.key === key)?.severity);
+    }
     for (const language of REPORT_LANGUAGES) {
       const text = formatMessage(key, finding!.params, language, undefined, finding!.units);
       expect(text, `${key} ${language}`).toBe(EXPECTED[key][language]);
@@ -614,11 +761,29 @@ describe("what to check", () => {
       ru: "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым.",
       tr: "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı.",
     },
+    "DOC-01.multiple-invoices-declaration": {
+      en: "Verify that each invoice belongs to this shipment and appears only once in the set.",
+      ka: "გადაამოწმე, რომ ყველა ინვოისი ამ ტვირთს ეკუთვნის და ნაკრებში ერთხელაა ჩასმული.",
+      ru: "Убедитесь, что каждый инвойс относится к этой поставке и включён один раз.",
+      tr: "Her faturanın bu sevkiyata ait olduğunu ve sette bir kez yer aldığını doğrulayın.",
+    },
     "HS-01.unreadable": {
       en: "Read the HS code on the invoice and check the extraction against it.",
       ka: "წაიკითხე HS კოდი ინვოისში და ამოკითხულ მონაცემს შეადარე.",
       ru: "Прочитайте код ТН ВЭД в инвойсе и сверьте его с извлечённым значением.",
       tr: "Faturadaki HS kodunu okuyup çıkarılan değerle karşılaştırın.",
+    },
+    "REF-01.declaration-missing-invoice": {
+      en: "Check the invoice number against box 44 on the declaration.",
+      ka: "შეადარე ინვოისის ნომერი დეკლარაციის გრაფა 44-ს.",
+      ru: "Сверьте номер инвойса с графой 44 декларации.",
+      tr: "Fatura numarasını beyannamenin 44. kutusuyla karşılaştırın.",
+    },
+    "DATE-01.invoice-after-declaration": {
+      en: "Verify the invoice date and the date the declaration was registered.",
+      ka: "გადაამოწმე ინვოისის თარიღი და დეკლარაციის რეგისტრაციის თარიღი.",
+      ru: "Проверьте дату инвойса и дату регистрации декларации.",
+      tr: "Fatura tarihini ve beyannamenin tescil tarihini doğrulayın.",
     },
   };
 
@@ -635,7 +800,7 @@ describe("what to check", () => {
   });
 
   it.each(Object.keys(OWN) as MessageKey[])("%s: the report shows the key's own line under the finding, in Markdown, HTML and JSON", (key) => {
-    const d = docs();
+    const d = docs(key);
     CASES[key](d);
     const result = checkDocuments(d.pack);
     for (const language of REPORT_LANGUAGES) {
@@ -670,6 +835,13 @@ describe("evidence labels", () => {
   it("every piece of evidence a rule cites has a name, in every language", () => {
     // Every message case, plus the paths only a variation reaches.
     const more: ((docs: Docs) => void)[] = [
+      ({ pack }) => {
+        const a = blankDocument("customs_declaration", "declaration");
+        const b = blankDocument("customs_declaration", "declaration-2");
+        a.number = c("C-DEMO-1");
+        b.number = c("C-DEMO-2");
+        pack.documents.push(a, b);
+      },
       ({ cmr, invoice }) => {
         cmr.dateOfTakingOver = c(null);
         invoice.date = c("2026-09-25", "25.09.2026");
@@ -691,9 +863,16 @@ describe("evidence labels", () => {
         cmr.sender.name = c("Eastern Cabinet Trade");
       },
     ];
+    const exporter: [MessageKey, (docs: Docs) => void][] = [
+      ["DEC-01.tax-id", (d) => { declarationOf(d).exporter.taxId = c("TR-900009"); }],
+      ["DEC-01.name", (d) => {
+        declarationOf(d).exporter.taxId = c(null);
+        declarationOf(d).exporter.name = c("Different Exporter Ltd");
+      }],
+    ];
     const seen = new Set<string>();
-    for (const change of [...Object.values(CASES), ...more]) {
-      const d = docs();
+    for (const [key, change] of [...KEYS.map((key) => [key, CASES[key]] as const), ...exporter, ...more.map((fn) => [undefined, fn] as const)]) {
+      const d = docs(key);
       change(d);
       const result = checkDocuments(d.pack, d.registry ? { registry: d.registry } : {});
       for (const language of REPORT_LANGUAGES) {
@@ -702,7 +881,11 @@ describe("evidence labels", () => {
           for (const e of finding.evidence) {
             if (e.computed) expect(e.label).toBeNull();
             else expect(e.label, `${finding.key} ${e.documentType} ${e.path} ${language}`).toEqual(expect.any(String));
-            if (!e.computed) seen.add(`${e.documentType === "cmr" && e.path === "date" ? "cmr:" : ""}${e.path.replace(/\[[^\]]*\]/g, "")}`);
+            if (!e.computed) {
+              const key = e.path.replace(/\[[^\]]*\]/g, "");
+              const typed = `${e.documentType}:${key}`;
+              seen.add(Object.hasOwn(FIELD_LABELS.en, typed) ? typed : key);
+            }
           }
         }
       }

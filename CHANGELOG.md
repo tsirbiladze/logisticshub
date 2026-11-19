@@ -2,12 +2,11 @@
 
 ## 1.1.0 — 2026-11-19
 
-- Added HS-01 for printed HS codes on invoices involving Georgia dated from 2024-01-26. It checks against the original annex of Georgian Order No. 21 (Matsne 6086072, publication 0). Later amendments were not verified.
-- Added offline lookup by code or Georgian description in the CLI, MCP server and both skill scripts.
-- Added two synthetic sets for HS-01. The clean Georgian set now prints valid national codes.
-- Bumped the extraction schema to 3 and added PTY-02 to cross-check printed tax or registration numbers.
-- Added opt-in taxpayer lookup and registry snapshots, plus TAX-01, TAX-02 and TAX-03. The checker reads the snapshot offline and includes it in each report format. Tested with a local stub and synthetic snapshots.
-- Added five synthetic variants for tax numbers and registry replies, bringing the total to 36. Georgian and Turkish HS-01 messages now mention the unverified later amendments.
+- Added HS-01 for invoice codes involving Georgia dated from 2024-01-26, and offline lookup by code, prefix or Georgian description in the CLI, MCP server and both skill scripts. The data is the original annex to Georgian Order No. 21 (Matsne 6086072, publication 0). Later amendments were not verified.
+- Extraction schema 3 adds party identification numbers and the optional Georgian goods declaration. PTY-02 compares printed tax or registration numbers. TAX-01, TAX-02 and TAX-03 use a saved Revenue Service taxpayer snapshot for names, VAT status and the status −1 reply. The opt-in registry client was tested with a local stub and synthetic snapshots.
+- Six declaration rules compare parties, HS prefixes, shipment weights, package counts, invoice value and origin. They also check declared national codes and add up item invoice values. DATE-01 and REF-01 check the declaration registration date and the invoice reference in box 44. Declaration PDFs support quoted evidence and marked copies.
+- The CLI and both skill scripts can convert saved assessed declarations with `declaration-from-rs`, preserving the JSON numeric digits and citing the response file. The converter was tested with synthetic responses based on the published protocol. It has never been run against the live declaration service. Logging in and fetching declarations are outside the tool.
+- 45 synthetic variants across four languages with byte-identical Node and Python reports, including nine declaration variants and a clean set built from the saved-response converter.
 
 ## 1.0.0 — 2026-11-17
 

@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "DEC-01",
+    "severity": "error",
+    "key": "DEC-01.tax-id",
+    "params": {
+      "role": "buyer",
+      "invoice": "900000001",
+      "declaration": "900000009"
+    }
+  }
+]
