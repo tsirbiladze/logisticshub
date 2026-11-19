@@ -9,6 +9,8 @@ import type {
 } from "../schema.ts";
 import type { MessageKey } from "./messages.ts";
 
+import type { RegistrySnapshot } from "../registry.ts";
+
 export type Severity = "error" | "warning";
 
 export const RULE_IDS = [
@@ -29,6 +31,10 @@ export const RULE_IDS = [
   "CMR-01",
   "DOC-01",
   "HS-01",
+  "PTY-02",
+  "TAX-01",
+  "TAX-02",
+  "TAX-03",
 ] as const;
 export type RuleId = (typeof RULE_IDS)[number];
 
@@ -63,6 +69,7 @@ export interface Finding {
 }
 
 export interface CheckOptions {
+  registry?: RegistrySnapshot;
   /** Allowed difference between weights of the same goods on different documents. Default "0.5". */
   weightToleranceKg?: string;
   /** Allowed difference between volumes. Default "0.01". */
@@ -76,7 +83,7 @@ export interface RuleContext {
   cmrs: Cmr[];
   contracts: Contract[];
   others: OtherDocument[];
-  options: Required<CheckOptions>;
+  options: CheckOptions & Required<Pick<CheckOptions, "weightToleranceKg" | "volumeToleranceM3">>;
 }
 
 export interface Rule {

@@ -9,7 +9,7 @@ metadata:
 
 # Logisticshub: trade document cross-check
 
-You read the documents; `scripts/check.mjs` (in this skill's directory) applies 17 deterministic rules to your extraction and writes the report. The rules see only what you extract, so record what is **printed**, quoted **verbatim**, and nothing you worked out yourself.
+You read the documents; `scripts/check.mjs` (in this skill's directory) applies 21 deterministic rules to your extraction and writes the report. The rules see only what you extract, so record what is **printed**, quoted **verbatim**, and nothing you worked out yourself.
 
 ## 1. Collect the set
 
@@ -44,11 +44,16 @@ node <this-skill-dir>/scripts/check.mjs extraction.json --lang <en|ka|ru|tr> --o
 - Each PDF that has a finding gets a copy with the findings boxed and numbered, `<name>.marked.pdf`. A PDF without findings gets none, so a clean run writes no marked PDF. PDFs are looked up next to `extraction.json`, or in `--pdf-dir`. Images are never marked.
 - It needs no install. Reading the PDFs needs Node.js 22 or newer; on an older one the reports are still written. Where `node` is unavailable (claude.ai, the Claude API), run `python3 <this-skill-dir>/scripts/check.py` with the same arguments: the same reports, but the PDFs are not read, so there are no marked copies and no `Notes:`.
 
+Offer a registry check when the user wants to verify a Georgian company. Ask for agreement before using the live commands: they send only 9-digit company codes to Georgia’s Revenue Service. The scripts skip 11-digit personal numbers.
+
+- `node <this-skill-dir>/scripts/check.mjs registry extraction.json -o registry.json` saves a snapshot. Give either checker `--registry registry.json` to use it offline. The Python checker only reads saved snapshots.
+- On Node, `--fetch-registry` saves `registry.json` to the report directory and checks it in one run. For one code, use `check.mjs taxpayer <code> [--json]`. The report lists service failures as unchecked beside the replies.
+
 Exit codes:
 
 - `0`: checked. The report may still list extraction issues.
 - `1`: the extraction has the wrong shape (a missing key, a wrong type, another schema version), so no rule ran. The reports list each path and what to write there.
-- `2`: nothing was checked and no report was written. One line on stderr says why: a bad option, an `extraction.json` that cannot be read or is not valid JSON (with line and column), or an `--out` folder that cannot be written.
+- `2`: nothing was checked and no report was written. One line on stderr says why: a bad option, an `extraction.json` that cannot be read or is not valid JSON (with line and column), an unreadable or malformed registry snapshot, or an `--out` folder that cannot be written.
 
 Read the output in this order:
 
@@ -68,7 +73,7 @@ Answer in the user's language; when it is not one of the four, translate the rep
 - the paths of `report.html` (opens in any browser) and of each `.marked.pdf` that was written;
 - what limits the result: extraction issues left after the correction rounds, notes for the user, every fact you left null because you could not read it, and every number or date whose reading you had to choose.
 
-Present findings as discrepancies to verify against the originals, not as verdicts. With no findings and no issues, say the documents agree on the 17 rules. When the user gave fewer documents on purpose (one invoice), a `DOC-01` warning that the packing list or the CMR is missing is expected: say what was checked and that the rules which compare documents had nothing to compare.
+Present findings as discrepancies to verify against the originals, not as verdicts. With no findings and no issues, say the documents agree on the rules that ran. When the user gave fewer documents on purpose (one invoice), a `DOC-01` warning that the packing list or the CMR is missing is expected: say what was checked and that the rules which compare documents had nothing to compare.
 
 A discrepancy you noticed while reading that no rule reports (`references/rules.md`, "Not checked") goes under its own heading after the findings, "Seen while reading, not checked by a rule", with its quotes and pages. Keep it out of the checker's findings and counts.
 

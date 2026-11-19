@@ -1,10 +1,9 @@
-import { GEORGIA_COUNTRIES, hsNomenclature, normalizeHsCode } from "../../hs.ts";
+import { hsNomenclature, normalizeHsCode } from "../../hs.ts";
+import { georgianParty } from "../../parties.ts";
 import { evidence, isoDate } from "../helpers.ts";
 import type { Finding, Rule } from "../types.ts";
 
 const rule = "HS-01";
-const georgia = new Set<string>(GEORGIA_COUNTRIES);
-const isGeorgia = (value: string | null) => georgia.has(value?.trim().replaceAll("İ", "i").toLowerCase() ?? "");
 
 /** HS-01: check printed invoice codes against the saved Georgian edition. */
 export const hsCodes: Rule = {
@@ -14,7 +13,7 @@ export const hsCodes: Rule = {
     for (const invoice of invoices) {
       const date = isoDate(invoice.date);
       if (!date || !invoice.lines.some(({ hsCode }) => hsCode.value !== null)) continue;
-      if (![invoice.seller, invoice.buyer, invoice.consignee].some(({ country }) => isGeorgia(country.value) && isGeorgia(country.quote))) continue;
+      if (![invoice.seller, invoice.buyer, invoice.consignee].some(georgianParty)) continue;
 
       const { edition, byCode, bySubheading } = hsNomenclature();
       if (date < edition.inForceFrom) continue;

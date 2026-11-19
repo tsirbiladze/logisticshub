@@ -19,8 +19,9 @@ import { z } from "zod";
  *
  * 2: commercial_invoice gained tax, otherCharges and discountPercent;
  *    packing_list and its lines gained packingMethod.
+ * 3: parties gained taxId.
  */
-export const SCHEMA_VERSION = "2";
+export const SCHEMA_VERSION = "3";
 
 export const LANGUAGES = ["en", "ru", "tr", "ka", "other"] as const;
 export const languageSchema = z.enum(LANGUAGES);
@@ -93,6 +94,7 @@ export const partySchema = z.object({
   name: citedText.describe("Company or person name, with its legal form."),
   address: citedText.describe("Street, building, postal code and city, without the country. Null when only a name and a country are printed."),
   country: citedText.describe("Country as written in the document, also when it is the last word of the address."),
+  taxId: citedText.describe("Tax or company identification number as printed, without the label. Null when none is printed."),
 }).meta({ id: "party" });
 
 export const referenceSchema = z.object({

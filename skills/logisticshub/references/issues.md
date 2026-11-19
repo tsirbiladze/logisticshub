@@ -8,7 +8,7 @@ Each line gives a field path, a code and what is wrong: `documents[1].lines[1].q
 
 | Code | Means | Fix |
 |---|---|---|
-| `EXT_SHAPE` | a key is missing or has the wrong type, or `schemaVersion` is not `"2"`; no rule ran, exit code 1 | write what the message says at that path |
+| `EXT_SHAPE` | a key is missing or has the wrong type, or `schemaVersion` is not `"3"`; no rule ran, exit code 1 | write what the message says at that path |
 | `EXT_DECIMAL_FORMAT` | a number that is not canonical (`13,300.00`, `1 880`, `15%`) | `13300.00` |
 | `EXT_DATE_FORMAT` | a date that is not a real `YYYY-MM-DD` | `2026-09-18` |
 | `EXT_CURRENCY_FORMAT` | a currency that is not a three-letter code (`€`, `usd`) | `EUR` |

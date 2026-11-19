@@ -86,10 +86,10 @@ function page(title: string, number: Cited, date: Cited, L: Labels, body: string
   </body></html>`;
 }
 
-function partyBox(label: string, p: Party, registration?: string): string {
+function partyBox(label: string, p: Party, taxLabel: string): string {
   return `<div class="box"><div class="label">${esc(label)}</div>
     <div class="name">${q(p.name)}</div><div>${q(p.address)}</div><div>${q(p.country)}</div>
-    ${registration ? `<div>${esc(registration)}</div>` : ""}</div>`;
+    ${p.taxId.quote ? `<div>${esc(taxLabel)}: ${q(p.taxId)}</div>` : ""}</div>`;
 }
 
 function field(label: string, value: string): string {
@@ -131,7 +131,7 @@ export function renderInvoice(source: CommercialInvoice, spec: ShipmentSpec, opt
     [L.total, doc.total],
   ] as const;
   const body = `
-    <div class="grid">${partyBox(L.seller, doc.seller, spec.seller.registration)}${partyBox(L.buyer, doc.buyer, spec.buyer.registration)}</div>
+    <div class="grid">${partyBox(L.seller, doc.seller, L.taxId)}${partyBox(L.buyer, doc.buyer, L.taxId)}</div>
     <div class="grid3">
       ${field(L.contractRef, `${q(doc.contractRef.number)} / ${q(doc.contractRef.date)}`)}
       ${field(L.incoterm, `${q(doc.incoterm.code)} ${q(doc.incoterm.place)}, ${q(doc.incoterm.version)}`)}
@@ -159,7 +159,7 @@ export function renderPackingList(source: PackingList, spec: ShipmentSpec, optio
     )
     .join("");
   const body = `
-    <div class="grid">${partyBox(L.shipper, doc.shipper, spec.seller.registration)}${partyBox(L.consignee, doc.consignee, spec.buyer.registration)}</div>
+    <div class="grid">${partyBox(L.shipper, doc.shipper, L.taxId)}${partyBox(L.consignee, doc.consignee, L.taxId)}</div>
     <div class="grid">${field(L.invoiceRef, `${q(doc.invoiceRef.number)} / ${q(doc.invoiceRef.date)}`)}${field(L.packing, q(doc.packingMethod))}</div>
     <table><thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th>
       ${withQty ? `<th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th>` : ""}
@@ -184,8 +184,8 @@ export function renderCmr(source: Cmr, spec: ShipmentSpec, options: RenderOption
     .join("");
   const body = `
     <div class="convention">${q(doc.convention)}</div>
-    <div class="grid">${partyBox(`1. ${L.shipper}`, doc.sender, spec.seller.registration)}${partyBox(`16. ${L.carrier}`, doc.carrier, spec.carrier.registration)}</div>
-    <div class="grid">${partyBox(`2. ${L.consignee}`, doc.consignee, spec.buyer.registration)}${field(L.delivery, q(doc.placeOfDelivery))}</div>
+    <div class="grid">${partyBox(`1. ${L.shipper}`, doc.sender, L.taxId)}${partyBox(`16. ${L.carrier}`, doc.carrier, L.taxId)}</div>
+    <div class="grid">${partyBox(`2. ${L.consignee}`, doc.consignee, L.taxId)}${field(L.delivery, q(doc.placeOfDelivery))}</div>
     <div class="grid">${field(L.takingOver, `${q(doc.placeOfTakingOver)}<br>${q(doc.dateOfTakingOver)}`)}${field(L.attached, doc.attachedDocuments.map(q).join("<br>"))}</div>
     <table><thead><tr><th>6. ${esc(L.marks)}</th><th class="n">7. ${esc(L.packages)}</th><th>8. ${esc(L.packing)}</th><th>9. ${esc(L.description)}</th>
       <th class="n">11. ${esc(L.gross)}</th><th class="n">12. ${esc(L.volume)}</th></tr></thead>
@@ -201,7 +201,7 @@ export function renderContract(source: Contract, spec: ShipmentSpec, options: Re
   const L = LABELS[spec.language];
   const f = formatter(spec.style);
   const body = `
-    <div class="grid">${partyBox(L.seller, doc.seller, spec.seller.registration)}${partyBox(L.buyer, doc.buyer, spec.buyer.registration)}</div>
+    <div class="grid">${partyBox(L.seller, doc.seller, L.taxId)}${partyBox(L.buyer, doc.buyer, L.taxId)}</div>
     <p><b>1. ${esc(L.goodsDescription)}.</b> ${q(doc.goodsDescription)}</p>
     <table><thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th><th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th><th class="n">${esc(L.unitPrice)}</th></tr></thead>
       <tbody>${spec.lines.map((l) => `<tr><td>${esc(l.model)}</td><td>${esc(l.description)}</td><td class="n">${esc(f.number(l.quantity))}</td><td>${esc(l.unit)}</td><td class="n">${esc(f.number(l.unitPrice))}</td></tr>`).join("")}</tbody></table>

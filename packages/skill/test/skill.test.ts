@@ -286,7 +286,7 @@ describe("built skill", () => {
     const dir = copyFixture("en-led-lighting/clean");
     const file = join(dir, "extraction.json");
     const extraction = JSON.parse(readFileSync(file, "utf8"));
-    expect(extraction.schemaVersion).toBe("2");
+    expect(extraction.schemaVersion).toBe("3");
     // As schema version 1 had it: without the fields version 2 added.
     extraction.schemaVersion = "1";
     for (const key of ["tax", "otherCharges", "discountPercent"]) delete extraction.documents[0][key];
@@ -297,7 +297,7 @@ describe("built skill", () => {
     expect(result.status).toBe(1);
     expect(result.stderr).toBe("");
     expect(result.stdout.split("\n").filter((line) => line.startsWith("- `"))).toEqual([
-      '- `schemaVersion` (EXT_SHAPE): This extraction is written for schema version "1"; this checker reads version "2". Extract the documents again with the guide that comes with this checker.',
+      '- `schemaVersion` (EXT_SHAPE): This extraction is written for schema version "1"; this checker reads version "3". Extract the documents again with the guide that comes with this checker.',
     ]);
     expect(result.stdout).toContain("The extraction could not be read, so no rules ran.");
   });
@@ -377,7 +377,7 @@ describe("built skill", () => {
     expect(monthFirst.stdout).toContain("✓ No problems found.");
     // Two invoices: said once, with what to check, and each invoice marked at its number.
     const second = run("second-invoice");
-    expect(second.stdout).toContain("**Errors: 0 · Warnings: 1** · Checked: 5 documents, 17 rules");
+    expect(second.stdout).toContain("**Errors: 0 · Warnings: 1** · Checked: 5 documents, 18 rules");
     expect(second.stdout).toContain("- invoice BL-INV-26-0413 (invoice-2.pdf), p. 1 · number: “BL-INV-26-0413”");
     expect(second.stdout).toContain("→ See whether the first of them is the one that belongs to this shipment");
     expect(second.files).toEqual(["invoice-2.marked.pdf", "invoice.marked.pdf", "report.html", "report.json", "report.md"]);

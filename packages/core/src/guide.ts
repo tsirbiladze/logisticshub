@@ -102,10 +102,10 @@ How to write \`extraction.json\` for \`scripts/check.mjs\`. Record what each doc
 ## Every document
 
 - \`number\`: the document's own number (invoice number, contract number, CMR consignment note number). \`date\`: its issue date.
-- A party (\`seller\`, \`buyer\`, \`consignee\`, \`shipper\`, \`sender\`, \`carrier\`) has three facts. \`name\`: the company name with its legal form. \`address\`: street, building, postal code and city, without the country. \`country\`: the country as printed, also when it is the last word of the address. A box with a name and a country only has \`address\` null.
+- A party (\`seller\`, \`buyer\`, \`consignee\`, \`shipper\`, \`sender\`, \`carrier\`) has four facts. \`name\`: the company name with its legal form. \`address\`: street, building, postal code and city, without the country. \`country\`: the country as printed, also when it is the last word of the address. A box with a name and a country only has \`address\` null. \`taxId\`: copy the tax or company identification number as printed, without its label. Keep zeros, prefixes and separators. Null if absent or uncertain.
 - A box labelled for two roles (\`Buyer / Consignee\`, \`ПОКУПАТЕЛЬ / ГРУЗОПОЛУЧАТЕЛЬ\`) is the buyer; the invoice's \`consignee\` is filled only when a separate delivery party is printed.
 - \`incoterm\`: from \`FCA Kayseri, Türkiye (Incoterms 2020)\` take \`code\` \`FCA\`, \`place\` \`Kayseri, Türkiye\`, \`version\` \`Incoterms 2020\`.
-- No field, so left out: registration and tax numbers, bank details, payment terms, signatures, a contract's goods table, marks on a packing list.
+- No field, so left out: bank details, payment terms, signatures, a contract's goods table, marks on a packing list.
 
 ## commercial_invoice
 

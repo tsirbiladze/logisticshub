@@ -11,6 +11,7 @@ export interface Labels {
   carrier: string;
   number: string;
   date: string;
+  taxId: string;
   contractRef: string;
   invoiceRef: string;
   incoterm: string;
@@ -65,6 +66,7 @@ export const LABELS: Record<"ka" | "en" | "ru" | "tr", Labels> = {
     carrier: "გადამზიდველი",
     number: "ნომერი",
     date: "თარიღი",
+    taxId: "საიდენტიფიკაციო კოდი",
     contractRef: "ხელშეკრულება",
     invoiceRef: "ინვოისის მითითება",
     incoterm: "მიწოდების პირობა",
@@ -116,6 +118,7 @@ export const LABELS: Record<"ka" | "en" | "ru" | "tr", Labels> = {
     carrier: "Carrier",
     number: "No.",
     date: "Date",
+    taxId: "Registration / tax ID",
     contractRef: "Contract",
     invoiceRef: "Invoice ref.",
     incoterm: "Delivery terms",
@@ -167,6 +170,7 @@ export const LABELS: Record<"ka" | "en" | "ru" | "tr", Labels> = {
     carrier: "Перевозчик",
     number: "№",
     date: "Дата",
+    taxId: "Регистрационный / налоговый номер",
     contractRef: "Договор",
     invoiceRef: "К инвойсу",
     incoterm: "Условия поставки",
@@ -218,6 +222,7 @@ export const LABELS: Record<"ka" | "en" | "ru" | "tr", Labels> = {
     carrier: "Taşıyıcı",
     number: "No",
     date: "Tarih",
+    taxId: "Vergi No",
     contractRef: "Sözleşme",
     invoiceRef: "Fatura ref.",
     incoterm: "Teslim şekli",

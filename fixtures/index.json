@@ -1,5 +1,5 @@
 {
-  "note": "Synthetic demo data. All companies, people and numbers are fictional.",
+  "note": "Synthetic demo data. All companies, people and numbers are fictional. The Georgian company codes begin with 90000 and are never sent anywhere.",
   "packs": [
     {
       "id": "ka-office-furniture",
@@ -22,6 +22,58 @@
             "en": "Clean set"
           },
           "expected": []
+        },
+        {
+          "id": "tax-id-mismatch",
+          "title": {
+            "ka": "მიმღების საიდენტიფიკაციო ნომერი განსხვავდება",
+            "en": "Consignee’s tax ID differs"
+          },
+          "expected": [
+            "PTY-02.number"
+          ]
+        },
+        {
+          "id": "registry-name-mismatch",
+          "title": {
+            "ka": "რეესტრში სხვა სახელია",
+            "en": "Registry gives a different name"
+          },
+          "expected": [
+            "TAX-01.name"
+          ],
+          "registry": "registry.json"
+        },
+        {
+          "id": "registry-vat-mismatch",
+          "title": {
+            "ka": "გამყიდველი ჩანაწერში დღგ-ის გადამხდელი არ არის",
+            "en": "Seller is not a VAT payer in the snapshot"
+          },
+          "expected": [
+            "TAX-02.vat"
+          ],
+          "registry": "registry.json"
+        },
+        {
+          "id": "registry-status-minus-one",
+          "title": {
+            "ka": "რეესტრის პასუხი კოდით −1",
+            "en": "Registry returns status −1"
+          },
+          "expected": [
+            "TAX-03.reply"
+          ],
+          "registry": "registry.json"
+        },
+        {
+          "id": "registry-clean",
+          "title": {
+            "ka": "ნაკრები რეესტრის ჩანაწერს ემთხვევა",
+            "en": "Clean set with matching registry snapshot"
+          },
+          "expected": [],
+          "registry": "registry.json"
         },
         {
           "id": "unknown-hs-national-code",

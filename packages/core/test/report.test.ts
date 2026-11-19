@@ -35,7 +35,7 @@ describe("reports", () => {
 
   it("says when there is nothing to fix", () => {
     const md = renderMarkdown(buildReport(checkDocuments(kaPack()), "en"));
-    expect(md).toContain("**Errors: 0 · Warnings: 0** · Checked: 4 documents, 17 rules");
+    expect(md).toContain("**Errors: 0 · Warnings: 0** · Checked: 4 documents, 18 rules");
     expect(md).toContain("✓ No problems found.");
   });
 
@@ -280,9 +280,9 @@ describe("reports", () => {
   it("counts documents with the right plural in the summary", () => {
     const one = kaPack();
     one.documents = one.documents.slice(0, 1);
-    expect(renderMarkdown(buildReport(checkDocuments(one), "en"))).toContain("· Checked: 1 document, 17 rules");
-    expect(renderMarkdown(buildReport(checkDocuments(kaPack()), "ru"))).toContain("· Проверено: 4 документа, 17 правил");
-    expect(renderMarkdown(buildReport(checkDocuments(kaPack()), "ka"))).toContain("· შემოწმდა: 4 დოკუმენტი, 17 წესი");
+    expect(renderMarkdown(buildReport(checkDocuments(one), "en"))).toContain("· Checked: 1 document, 18 rules");
+    expect(renderMarkdown(buildReport(checkDocuments(kaPack()), "ru"))).toContain("· Проверено: 4 документа, 18 правил");
+    expect(renderMarkdown(buildReport(checkDocuments(kaPack()), "ka"))).toContain("· შემოწმდა: 4 დოკუმენტი, 18 წესი");
   });
 
   it("keeps JSON findings aligned with their localized messages", () => {

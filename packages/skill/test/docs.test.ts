@@ -189,11 +189,11 @@ describe("README", () => {
     const usage = read("packages/skill/src/cli.ts");
     expect(usage).toContain("0  checked, with or without findings");
     expect(usage).toContain("1  the extraction is not usable: the reports list what to fix");
-    expect(usage).toContain("2  nothing was checked: a bad option, a file that cannot be read or is not\n     JSON, or reports that cannot be written");
+    expect(usage).toContain("2  nothing was checked: a bad option, a file that cannot be read or is not\n     JSON, a malformed registry snapshot, or reports that cannot be written");
     const how = sections(README.en)[2]!.body;
     expect(how).toContain("`0` when the documents were checked, with or without findings");
     expect(how).toContain("`1` when the extraction is not usable");
-    expect(how).toContain("`2` when nothing was checked: a bad option, an `extraction.json` that cannot be read or is not JSON, or reports that cannot be written");
+    expect(how).toContain("`2` when nothing was checked: a bad option, an `extraction.json` that cannot be read or is not JSON, a registry snapshot that cannot be read or is malformed, or reports that cannot be written");
     for (const code of ["`0`", "`1`", "`2`"]) expect(sections(README.ka)[2]!.body).toContain(code);
   });
 });
@@ -279,7 +279,7 @@ describe("changelog", () => {
   it("keeps the first release intact and lists the current change", () => {
     const [, latest, first] = read("CHANGELOG.md").split(/^## /m);
     expect(latest).toContain("HS-01");
-    expect(latest).toContain("31");
+    expect(latest).toContain("36");
     expect(first?.split("\n\n")[1]).toBe("First release.");
     expect(first).toContain("16 deterministic rules");
     expect(first).toContain("29 demo sets of synthetic documents in four languages");

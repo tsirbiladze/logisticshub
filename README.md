@@ -54,28 +54,33 @@ A model reads the documents (Claude by default; `--model openai:<id>` or `openro
 { "mcpServers": { "logisticshub": { "command": "npx", "args": ["-y", "logisticshub", "mcp"] } } }
 ```
 
-Tools: `get_extraction_guide` (the guide, the JSON Schema and a blank to copy), `check_documents` (the check; with `pdfDir` it looks every quote up in the PDFs, with `outDir` it writes the reports, with both it also marks the PDFs), and `lookup_hs_code` (the HS lookup).
+Tools: `get_extraction_guide` (the guide, the JSON Schema and a blank to copy), `check_documents` (the check; with `pdfDir` it looks every quote up in the PDFs, with `outDir` it writes the reports, with both it also marks the PDFs), `lookup_hs_code` (the HS lookup), and `lookup_taxpayer` (a live company lookup). Give `registryFile` to `check_documents` to use a saved snapshot.
 </details>
 
 The skill's checker needs Node.js 22+, or Python 3.9+ via `scripts/check.py`. The CLI and the MCP server need Node.js 22+.
 
 ## What it checks
 
-17 deterministic rules. The model only reads the documents; arithmetic, reading amounts written out in words, and every comparison are done in code.
+21 deterministic rules, including three that read an optional registry snapshot. The model only reads the documents; arithmetic, reading amounts written out in words, and every comparison are done in code.
 
 | Group | Rules |
 |---|---|
 | Amounts | **AMT-01** amount in words = amount in figures (EN/KA/RU/TR, currency included) · **SUM-01** quantity × price = line total · **SUM-02** line totals → subtotal → total, with discount, freight, insurance, other charges and tax · **CUR-01** one currency |
 | Quantities and weights | **SUM-03** packing list and CMR lines add up to their totals · **QTY-01** invoice and packing list give the same quantity per item, and invoice, packing list and CMR the same number of packages · **WGT-01** gross ≥ net · **WGT-02** same weights on every document |
-| References and parties | **REF-01** the packing list cites the invoice, the invoice cites the contract, the CMR lists both · **DATE-01** contract ≤ invoice ≤ taking over of the goods · **PTY-01** same seller, buyer and consignee · **DOC-01** an invoice, a packing list and a CMR, one of each |
+| References and parties | **REF-01** the packing list cites the invoice, the invoice cites the contract, the CMR lists both · **DATE-01** contract ≤ invoice ≤ taking over of the goods · **PTY-01** same seller, buyer and consignee · **PTY-02** same printed identification numbers · **DOC-01** an invoice, a packing list and a CMR, one of each |
 | Terms and CMR | **INC-01** one Incoterms 2020 rule on invoice and contract · **INC-02** no sea-only rule on a road shipment · **INC-03** insurance under CIF/CIP · **CMR-01** CMR Convention Art. 6(1)(a)–(k) particulars |
 | Customs codes | **HS-01** printed invoice codes in the Georgian commodity nomenclature |
+| Revenue Service snapshot | **TAX-01** company name · **TAX-02** VAT payer status when tax is added · **TAX-03** reply with status −1 |
 
 HS-01 checks printed HS codes on invoices dated 2024-01-26 or later when Georgia is the recorded country of the seller, buyer or consignee. An unreadable code gives a warning. A missing six-digit subheading gives a warning and the nearest heading when available. An absent eleven-digit code under a known subheading gives an error and up to five related codes. Other lengths from six to twelve are checked at six digits.
 
 The checker and lookup use the original annex to the Georgian Minister of Finance’s Order No. 21 of 26 January 2024, in force that day and published 30 January 2024 ([Matsne document 6086072, publication 0](https://matsne.gov.ge/ka/document/download/6086072/0/1)). Later amendments were not verified. Normative texts are not protected by copyright in Georgia ([Law on Copyright and Related Rights, Art. 8(1)(a)](https://matsne.gov.ge/ka/document/view/16198)).
 
 Search by exact code, prefix or Georgian description with `logisticshub hs 940330`, `logisticshub hs "საწერი მაგიდ"`, the skill’s `hs` subcommand or the MCP tool `lookup_hs_code`.
+
+PTY-02 compares the digits of printed identification numbers across documents for the same party. With a saved Revenue Service snapshot, TAX-01 compares the company name in the same script, TAX-02 checks whether the seller was listed as a VAT payer at lookup time when the invoice adds tax, and TAX-03 quotes a reply with status −1.
+
+Use `logisticshub taxpayer <code>` for one company or `logisticshub registry extraction.json` to save a snapshot. Check it offline with `--registry <file>` or fetch and check with `--fetch-registry`. The reports display the reply, when it was requested, and any code that could not be checked.
 
 Each rule exactly, with every finding, its severity and its tolerance: [`skills/logisticshub/references/rules.md`](skills/logisticshub/references/rules.md).
 
@@ -101,7 +106,7 @@ Line 2: 1,500 × 2.90 = 4,350.00 USD, but the line total is 4,530.00 USD.
 
 Anything wrong with the extraction itself is listed before the findings, as extraction issues. After the report the script prints `Files:` and, when the PDFs showed something, `Notes:`: what could not be marked, and each quote that is not printed where the extraction says.
 
-The script's exit code is `0` when the documents were checked, with or without findings; `1` when the extraction is not usable (a missing key, a wrong type, another schema version), with reports that list what to fix; `2` when nothing was checked: a bad option, an `extraction.json` that cannot be read or is not JSON, or reports that cannot be written.
+The script's exit code is `0` when the documents were checked, with or without findings; `1` when the extraction is not usable (a missing key, a wrong type, another schema version), with reports that list what to fix; `2` when nothing was checked: a bad option, an `extraction.json` that cannot be read or is not JSON, a registry snapshot that cannot be read or is malformed, or reports that cannot be written.
 
 The skill folder, [`skills/logisticshub`](skills/logisticshub):
 
@@ -112,8 +117,8 @@ The skill folder, [`skills/logisticshub`](skills/logisticshub):
 | `references/extraction-schema.json` | the JSON Schema of `extraction.json` |
 | `references/extraction-blank.json` | every document type and table line with all facts empty, to copy |
 | `references/issues.md` | what each extraction issue and each note means, and what to do; read only when the check lists one |
-| `references/rules.md` | the 17 rules, and what is not checked |
-| `scripts/check.mjs` | the checker and HS lookup, no install |
+| `references/rules.md` | the 21 rules, and what is not checked |
+| `scripts/check.mjs` | the checker, HS lookup and registry commands, no install |
 | `scripts/check.py`, `scripts/check-data.json` | the same checker in Python, for where there is no Node.js |
 | `scripts/hs-nomenclature.json.gz` | Georgian commodity nomenclature data shared by both scripts |
 | `scripts/THIRD-PARTY-NOTICES.txt` | licenses of what `check.mjs` bundles |
@@ -121,6 +126,8 @@ The skill folder, [`skills/logisticshub`](skills/logisticshub):
 ## Privacy
 
 Logisticshub has no server. With the skill, your agent reads the documents with its own model, and the check runs where the agent runs: on your machine, or on claude.ai when you use the skill there. With the CLI, documents go to the model provider you choose, with your key. With the MCP server, the client's agent reads the documents and the check runs on the machine the server runs on.
+
+The checker sends data to the Revenue Service only when you request a live registry lookup. Only 9-digit Georgian company codes go to xdata.rs.ge. An 11-digit personal number is never sent. Checking a saved snapshot or running the checker without one is offline.
 
 ## Limits
 
@@ -139,8 +146,8 @@ Not checked:
 - **Volumes across documents**: a packing list's volumes are added up to its own total, not compared with the CMR.
 - **Weights per line across documents**, and net weight on a CMR.
 - **Origin and tariff classification**: origin is recorded only. Classification, duty and tax calculations, other countries’ nomenclatures and customs declarations are outside the check. HS-01 skips invoices without a confirmed Georgian party or usable date, and invoices dated before 2024-01-26.
-- **Addresses, countries, registration and tax numbers, bank details, signatures and stamps**. Only the parties' names are compared, and not across scripts. HS-01 reads countries to decide whether it applies.
-- **Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is only added into the invoice total.
+- **Addresses, countries, bank details, signatures and stamps**. Printed registration and tax numbers are compared across documents. Country determines which checks apply. Registry Status, RegisteredSubject, Mortgage, Sequestration, AdditionalStatus and NonResident are shown as supplied, without judgment.
+- **Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is added into the invoice total. With a registry snapshot, TAX-02 checks the seller’s VAT status at lookup time.
 - **A discount printed only as a rate**: the invoice total is then left unchecked.
 - **Units**: nothing is converted. Quantities in different units are not compared, and neither are package counts of different packing methods.
 - **Other dates**: delivery and payment terms, validity, the packing list's date.
@@ -150,11 +157,15 @@ Not checked:
 
 ## Quality
 
-- 4 synthetic packs (KA, EN, RU, TR) with 31 variants: 7 sets without a problem and 24 with a planted one. Among them are an invoice over two pages, a scanned CMR, two documents in one PDF, a second invoice, dates written month first, and a packing list that prints numbers in two conventions. The checker reports exactly the planted findings and nothing else, on every test run.
-- The planted problems cover 14 of the 17 rules. SUM-03, CUR-01 and INC-01 have no variant: they are covered by the rule tests alone.
+- 4 synthetic packs (KA, EN, RU, TR) with 36 variants: 8 sets without a problem and 28 with a planted one. Among them are an invoice over two pages, a scanned CMR, two documents in one PDF, a second invoice, dates written month first, and a packing list that prints numbers in two conventions. The checker reports exactly the planted findings and nothing else, on every test run.
+- The planted problems cover 18 of the 21 rules. SUM-03, CUR-01 and INC-01 have no variant: they are covered by the rule tests alone.
 - The Python checker produces byte-identical reports to the Node one, tested on every variant in all four languages.
 - Every message of every rule is tested in all four languages.
 - This version’s suite ran on Linux with Node.js 24.22.1 and Python 3.14.8.
+
+### Not yet seen
+
+On 2026-11-19, both live requests to the Revenue Service made with the example in its published OpenAPI 1.0.1 description returned HTTP 200 with `Status: -100` and `System error`. No successful live response was seen. This implementation follows the published description and was tested with a local HTTP stub and synthetic snapshots only.
 
 ## Development
 

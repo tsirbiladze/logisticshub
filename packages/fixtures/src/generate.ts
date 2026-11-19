@@ -148,7 +148,8 @@ async function main() {
     writeFileSync(join(dir, "extraction.json"), `${JSON.stringify(built.extraction, null, 2)}\n`);
     const expected = built.findings.map(({ rule, severity, key, params }) => ({ rule, severity, key, params }));
     writeFileSync(join(dir, "expected.json"), `${JSON.stringify(expected, null, 2)}\n`);
-    const { layout } = built.variant;
+    const { layout, registry } = built.variant;
+    if (registry) writeFileSync(join(dir, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
     const html = documentsHtml(built);
     const names = documentNames(built.documents);
     for (const { file, documents } of variantFiles(layout, names)) {
@@ -198,7 +199,7 @@ async function main() {
 function packIndex(all: BuiltVariant[]) {
   const packs = [...new Set(all.map((b) => b.pack))];
   return {
-    note: "Synthetic demo data. All companies, people and numbers are fictional.",
+    note: "Synthetic demo data. All companies, people and numbers are fictional. The Georgian company codes begin with 90000 and are never sent anywhere.",
     packs: packs.map((pack) => ({
       id: pack.spec.id,
       language: pack.spec.language,
@@ -215,6 +216,7 @@ function packIndex(all: BuiltVariant[]) {
           title: v.title,
           expected: v.expected,
           ...(v.expectedIssues ? { expectedIssues: v.expectedIssues } : {}),
+          ...(v.registry ? { registry: "registry.json" } : {}),
           ...(v.layout ? { layout: v.layout } : {}),
           ...(files.join() === DOCUMENT_NAMES.map((name) => `${name}.pdf`).join() ? {} : { files }),
         };

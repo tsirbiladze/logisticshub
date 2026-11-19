@@ -2,6 +2,9 @@ import type { Cmr, CommercialInvoice, Contract, Extraction, OtherDocument, Packi
 import { inspectExtraction, parseAndInspect, type ExtractionIssue } from "../validate.ts";
 import { beginRun, endRun } from "./helpers.ts";
 import { amountInWords, documentTotals, invoiceTotals, lineArithmetic } from "./rules/amounts.ts";
+import { companyParties } from "../parties.ts";
+import type { RegistrySnapshot } from "../registry.ts";
+import { partyTaxIds, taxpayerName, taxpayerVat, taxpayerNotRegistered } from "./rules/tax.ts";
 import { hsCodes } from "./rules/hs.ts";
 import { checklist } from "./rules/checklist.ts";
 import { cmrParticulars } from "./rules/cmr.ts";
@@ -63,9 +66,13 @@ export const RULES: readonly Rule[] = [
   cmrParticulars,
   checklist,
   hsCodes,
+  partyTaxIds,
+  taxpayerName,
+  taxpayerVat,
+  taxpayerNotRegistered,
 ];
 
-const DEFAULT_OPTIONS: Required<CheckOptions> = {
+const DEFAULT_OPTIONS: RuleContext["options"] = {
   weightToleranceKg: "0.5",
   volumeToleranceM3: "0.01",
 };
@@ -115,6 +122,7 @@ export interface CheckResult {
   extraction: Extraction | null;
   extractionIssues: ExtractionIssue[];
   findings: Finding[];
+  registry?: { snapshot: RegistrySnapshot; parties: { code: string; name: string | null }[] };
   summary: { documents: number; errors: number; warnings: number };
 }
 
@@ -122,7 +130,11 @@ export interface CheckResult {
 export function checkDocuments(input: unknown, options: CheckOptions = {}): CheckResult {
   const parsed = parseAndInspect(input);
   if (!parsed.ok) {
-    return { ok: false, extraction: null, extractionIssues: parsed.issues, findings: [], summary: { documents: 0, errors: 0, warnings: 0 } };
+    return {
+      ok: false, extraction: null, extractionIssues: parsed.issues, findings: [],
+      ...(options.registry ? { registry: { snapshot: options.registry, parties: [] } } : {}),
+      summary: { documents: 0, errors: 0, warnings: 0 },
+    };
   }
   const findings = runRules(parsed.extraction, options, parsed.unusable);
   return {
@@ -130,6 +142,10 @@ export function checkDocuments(input: unknown, options: CheckOptions = {}): Chec
     extraction: parsed.extraction,
     extractionIssues: parsed.issues,
     findings,
+    ...(options.registry ? { registry: {
+      snapshot: options.registry,
+      parties: companyParties(parsed.extraction.documents).map(({ code, party }) => ({ code, name: party.name.value })),
+    } } : {}),
     summary: {
       documents: parsed.extraction.documents.length,
       errors: findings.filter((f) => f.severity === "error").length,

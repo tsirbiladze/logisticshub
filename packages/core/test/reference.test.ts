@@ -22,7 +22,7 @@ import {
   type TradeDocument,
 } from "../src/index.ts";
 
-const source = ["amounts", "cross", "cmr", "checklist", "hs"]
+const source = ["amounts", "cross", "cmr", "checklist", "hs", "tax"]
   .map((name) => readFileSync(fileURLToPath(new URL(`../src/check/rules/${name}.ts`, import.meta.url)), "utf8"))
   .join("\n");
 

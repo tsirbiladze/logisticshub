@@ -1,3 +1,4 @@
+import { REGISTRY_SOURCE, REGISTRY_VERSION, type RegistryEntry, type RegistrySnapshot } from "@logisticshub/core";
 import { STYLES } from "../format.ts";
 import { cite, printed, type Pack, type ShipmentDocuments } from "../model.ts";
 
@@ -7,6 +8,19 @@ function printHsCodes(d: ShipmentDocuments, first = officePedestalCode) {
   d.invoice.lines[0]!.hsCode = cite(first);
   d.invoice.lines[1]!.hsCode = cite(officePedestalCode);
 }
+
+const checkedAt = "2026-11-19T10:30:00.000Z";
+const company = (code: string, FullName: string, VatPayer = "კი"): RegistryEntry => ({
+  code, checkedAt, answer: [{
+    FullName, Status: "სატესტო სტატუსი", RegisteredSubject: "სატესტო სუბიექტი",
+    StartDate: "11/19/2026 9:00:00 AM", VatPayer, Mortgage: "", Sequestration: "",
+    AdditionalStatus: "", NonResident: "არა",
+  }],
+});
+const registry = (buyer = company("900000001", "შპს „ტესტ კომპანია“"), ...others: RegistryEntry[]): RegistrySnapshot => ({
+  schemaVersion: REGISTRY_VERSION, sourceUrl: REGISTRY_SOURCE,
+  entries: [buyer, company("900000002", "Caucasus Demo Transit LLC"), ...others],
+});
 
 /** Georgian pack, based on the original LH-TEST-20260920-01 test shipment. */
 export const kaOfficeFurniture: Pack = {
@@ -20,19 +34,19 @@ export const kaOfficeFurniture: Pack = {
       name: "Anatolia Office Systems Ltd.",
       address: "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
       country: "თურქეთი",
-      registration: "სატესტო რეგისტრაცია: TR-TEST-900001",
+      taxId: "TR-900001",
     },
     buyer: {
       name: "ტესტ კომპანია",
       address: "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
       country: "საქართველო",
-      registration: "საიდენტიფიკაციო კოდი: TEST-123123123",
+      taxId: "900000001",
     },
     carrier: {
       name: "Caucasus Demo Transit LLC",
       address: "გზატკეცილის ქ. 8, ქუთაისი",
       country: "საქართველო",
-      registration: "სატესტო კოდი: TEST-998877665",
+      taxId: "900000002",
     },
     incoterm: { code: "FCA", place: "გამყიდველის საწარმო A, ქაისერი", version: "Incoterms 2020" },
     origin: "თურქეთი",
@@ -86,6 +100,53 @@ export const kaOfficeFurniture: Pack = {
   },
   variants: [
     { id: "clean", title: { ka: "სუფთა ნაკრები", en: "Clean set" }, expected: [], mutate: (d) => printHsCodes(d) },
+    {
+      id: "tax-id-mismatch",
+      title: { ka: "მიმღების საიდენტიფიკაციო ნომერი განსხვავდება", en: "Consignee’s tax ID differs" },
+      expected: ["PTY-02.number"],
+      mutate: (d) => { printHsCodes(d); d.cmr.consignee.taxId = cite("900000009"); },
+    },
+    {
+      id: "registry-name-mismatch",
+      title: { ka: "რეესტრში სხვა სახელია", en: "Registry gives a different name" },
+      expected: ["TAX-01.name"],
+      registry: registry(company("900000001", "შპს „სატესტო მარანი“")),
+      mutate: (d) => printHsCodes(d),
+    },
+    {
+      id: "registry-vat-mismatch",
+      title: { ka: "გამყიდველი ჩანაწერში დღგ-ის გადამხდელი არ არის", en: "Seller is not a VAT payer in the snapshot" },
+      expected: ["TAX-02.vat"],
+      registry: registry(undefined, company("900000007", "შპს „სატესტო ავეჯი“", "არა")),
+      mutate: (d, f) => {
+        printHsCodes(d);
+        const seller = {
+          name: cite("შპს სატესტო ავეჯი"), country: cite("საქართველო"),
+          address: cite("სატესტო მისამართი 7, თბილისი"), taxId: cite("900000007"),
+        };
+        d.invoice.seller = d.packingList.shipper = d.cmr.sender = d.contract.seller = seller;
+        d.invoice.tax = cite("2394.00", `EUR ${f.number("2394.00")}`);
+        d.invoice.total = cite("15694.00", `EUR ${f.number("15694.00")}`);
+        d.invoice.totalInWords = cite("თხუთმეტი ათას ექვსას ოთხმოცდათოთხმეტი ევრო და ნული ცენტი");
+      },
+    },
+    {
+      id: "registry-status-minus-one",
+      title: { ka: "რეესტრის პასუხი კოდით −1", en: "Registry returns status −1" },
+      expected: ["TAX-03.reply"],
+      registry: registry({
+        code: "900000001", checkedAt,
+        error: { Status: -1, Message: "გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე" },
+      }),
+      mutate: (d) => printHsCodes(d),
+    },
+    {
+      id: "registry-clean",
+      title: { ka: "ნაკრები რეესტრის ჩანაწერს ემთხვევა", en: "Clean set with matching registry snapshot" },
+      expected: [],
+      registry: registry(),
+      mutate: (d) => printHsCodes(d),
+    },
     {
       id: "unknown-hs-national-code",
       title: { ka: "ნომენკლატურაში შეტანილი არ არის ინვოისის ეროვნული კოდი", en: "Invoice national code is absent from the nomenclature" },

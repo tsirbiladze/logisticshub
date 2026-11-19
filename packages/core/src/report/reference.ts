@@ -239,6 +239,33 @@ export const RULE_REFERENCE: Record<RuleId, RuleReference> = {
       "The printed code passes the applicable lookup. The rule never chooses a classification for the goods.",
     ],
   },
+  "PTY-02": {
+    reads: "Every party’s printed `taxId`, supported by its quote. Parties across documents match using the same name comparison as PTY-01.",
+    tolerance: "Compare digits after removing spaces, dashes and an optional two-letter country prefix. For a confirmed Georgian party, only 9 or 11 digits are usable.",
+    findings: [
+      { key: "PTY-02.unreadable", severity: "warning", when: "the printed number cannot be read reliably, or a Georgian party’s number has neither 9 nor 11 digits" },
+      { key: "PTY-02.number", severity: "error", when: "two readable numbers for the same party differ" },
+    ],
+    silent: ["No number is printed, or only one readable number is available for the party."],
+  },
+  "TAX-01": {
+    reads: "A Georgian company’s printed name and the single FullName returned for its 9-digit code in a registry snapshot.",
+    tolerance: "Ignore legal forms, punctuation, case and spacing between words. Compare names in the same script.",
+    findings: [{ key: "TAX-01.name", severity: "warning", when: "the normalized names differ" }],
+    silent: ["No snapshot, no single usable name in the reply, or names in different scripts."],
+  },
+  "TAX-02": {
+    reads: "Added tax on each invoice and the snapshot’s VatPayer field for its Georgian seller’s 9-digit code.",
+    tolerance: "The reply must say `არა` in every returned row. The status is from the snapshot time.",
+    findings: [{ key: "TAX-02.vat", severity: "warning", when: "the invoice adds tax and the snapshot lists the seller as a non-VAT payer" }],
+    silent: ["No snapshot, no usable added tax, or the reply does not establish that status."],
+  },
+  "TAX-03": {
+    reads: "The reply for each Georgian company’s 9-digit code in the snapshot.",
+    tolerance: "Quote Message verbatim without interpreting it.",
+    findings: [{ key: "TAX-03.reply", severity: "warning", when: "the service returned Status -1" }],
+    silent: ["No snapshot, no reply, or any other status or transport failure. The registry section still shows when a code could not be checked."],
+  },
 };
 
 /**
@@ -261,7 +288,7 @@ export const RULE_PRINCIPLES: string[] = [
   "**Severity.** Errors are discrepancies that need fixing; warnings need a look. Every finding below has its severity.",
   "**Printed values only.** A rule compares values the extraction holds. When a value it needs is null, that comparison is skipped: nothing is assumed, and a document that prints less gets fewer checks.",
   "**Usable values only.** A value with an extraction issue (wrong format, not a reading of its own quote, a percentage where an amount belongs) reaches no rule until it is corrected. The report lists these issues before the findings.",
-  "**The first of each type.** AMT-01, SUM-01, SUM-02, SUM-03, CUR-01, WGT-01, INC-01, CMR-01 and HS-01 run on every document of their types. QTY-01, WGT-02, REF-01, DATE-01 and PTY-01 compare the first invoice, packing list, CMR and contract in `documents`; DOC-01 warns when there are more.",
+  "**The first of each type.** AMT-01, SUM-01, SUM-02, SUM-03, CUR-01, WGT-01, INC-01, CMR-01 HS-01, PTY-02 and the snapshot rules run on every document of their types. QTY-01, WGT-02, REF-01, DATE-01 and PTY-01 compare the first invoice, packing list, CMR and contract in `documents`; DOC-01 warns when there are more.",
   "**Rounding.** \"Half a unit of the last printed digit\" means a computed value may differ from the printed one by what rounding to the printed precision explains: ±0.005 against `4,350.00`, ±0.5 against `1,880`. The tolerances are fixed; no option changes them.",
   "**Output.** Each finding carries its rule, its key (below), a message in the report's language (`--lang`: en, ka, ru, tr), the quoted evidence with document and page, and a `→` line that says what to verify. Errors come first, then warnings, each in rule order.",
 ];
@@ -273,8 +300,8 @@ export const NOT_CHECKED: string[] = [
   "**Volumes across documents**: a packing list's lines are added up to its own total (SUM-03); volumes on the CMR and the packing list are not compared.",
   "**Weights per line across documents**, and net weight on a CMR.",
   "**Origin and tariff classification**: origin is recorded only. No classification, duty or tax calculation, other countries’ nomenclatures or customs declarations. HS codes are not checked when an invoice has no confirmed Georgian party, has no usable date or is dated before 2024-01-26.",
-  "**Addresses, countries, registration and tax numbers, bank details, signatures and stamps** of the parties. Only names are compared, and not across scripts. HS-01 reads countries only to decide whether it applies.",
-  "**Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is only added into the invoice total.",
+  "**Addresses, countries, bank details, signatures and stamps** of the parties. Printed registration and tax numbers are compared. Country is used to decide which checks apply. Registry Status, RegisteredSubject, Mortgage, Sequestration, AdditionalStatus and NonResident are shown as supplied.",
+  "**Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is added into the invoice total. With a snapshot, TAX-02 checks the seller’s VAT status at lookup time.",
   "**A discount printed only as a rate**: the invoice total is then left unchecked.",
   "**Units**: nothing is converted, quantities in different units are not compared, and neither are package counts of different packing methods.",
   "**Other dates**: delivery and payment terms, validity, the packing list's date.",

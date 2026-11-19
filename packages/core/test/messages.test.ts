@@ -4,6 +4,7 @@
  * typed by the key lists, so a new message key or issue code without a case
  * here fails the typecheck, and the first test fails if a table falls behind.
  */
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   blankDocument,
@@ -18,6 +19,7 @@ import {
   formatNumber,
   KEY_CHECKS,
   MESSAGES,
+  type RegistrySnapshot,
   renderMarkdown,
   renderReports,
   REPORT_LANGUAGES,
@@ -40,6 +42,7 @@ import { c, kaPack } from "./support/ka-pack.ts";
 
 interface Docs {
   pack: Extraction;
+  registry?: RegistrySnapshot;
   invoice: CommercialInvoice;
   pl: PackingList;
   cmr: Cmr;
@@ -50,6 +53,10 @@ function docs(): Docs {
   const pack = kaPack();
   const [invoice, pl, cmr, contract] = pack.documents as [CommercialInvoice, PackingList, Cmr, Contract];
   return { pack, invoice, pl, cmr, contract };
+}
+
+function snapshot(id: string): RegistrySnapshot {
+  return JSON.parse(readFileSync(new URL(`../../../fixtures/ka-office-furniture/${id}/registry.json`, import.meta.url), "utf8"));
 }
 
 /** One change to the clean pack per message key: the smallest one that makes its rule report it. */
@@ -101,6 +108,15 @@ const CASES: Record<MessageKey, (docs: Docs) => void> = {
   "HS-01.unknown-subheading": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("999999")),
   "HS-01.unknown-subheading-heading": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("940398")),
   "HS-01.unknown-national": ({ invoice }) => void (invoice.lines[0]!.hsCode = c("94033099999")),
+  "PTY-02.unreadable": ({ invoice }) => void (invoice.buyer.taxId = c("90000000?")),
+  "PTY-02.number": ({ cmr }) => void (cmr.consignee.taxId = c("900000009")),
+  "TAX-01.name": (d) => void (d.registry = snapshot("registry-name-mismatch")),
+  "TAX-02.vat": (d) => {
+    d.registry = snapshot("registry-vat-mismatch");
+    d.invoice.seller = { ...d.invoice.buyer, taxId: c("900000007") };
+    d.invoice.tax = c("2394.00", "EUR 2,394.00");
+  },
+  "TAX-03.reply": (d) => void (d.registry = snapshot("registry-status-minus-one")),
 };
 
 /** What each case reads as. Read them aloud before changing one: every line is a sentence someone has to act on. */
@@ -293,21 +309,51 @@ const EXPECTED: Record<MessageKey, Record<ReportLanguage, string>> = {
   },
   "HS-01.unknown-subheading": {
     en: "Line 1: subheading 999999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified.",
-    ka: "სტრიქონი 1: სასაქონლო სუბპოზიცია 999999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის.",
+    ka: "სტრიქონი 1: სასაქონლო სუბპოზიცია 999999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა.",
     ru: "Строка 1: субпозиции 999999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись.",
-    tr: "Satır 1: 999999 alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor.",
+    tr: "Satır 1: 999999 alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı.",
   },
   "HS-01.unknown-subheading-heading": {
     en: "Line 1: subheading 940398 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
-    ka: "სტრიქონი 1: სასაქონლო სუბპოზიცია 940398 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. უახლოესი სასაქონლო პოზიცია: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    ka: "სტრიქონი 1: სასაქონლო სუბპოზიცია 940398 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. უახლოესი სასაქონლო პოზიცია: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
     ru: "Строка 1: субпозиции 940398 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
-    tr: "Satır 1: 940398 alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. En yakın pozisyon: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
+    tr: "Satır 1: 940398 alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. En yakın pozisyon: 9403 · ავეჯი დანარჩენი და მისი ნაწილები:",
   },
   "HS-01.unknown-national": {
     en: "Line 1: national code 94033099999 is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under 940330: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
-    ka: "სტრიქონი 1: ეროვნული კოდი 94033099999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. კოდები 940330-ის ფარგლებში: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    ka: "სტრიქონი 1: ეროვნული კოდი 94033099999 საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. კოდები 940330-ის ფარგლებში: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
     ru: "Строка 1: национального кода 94033099999 нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции 940330: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
-    tr: "Satır 1: 94033099999 ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. 940330 alt pozisyonundaki kodlar: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+    tr: "Satır 1: 94033099999 ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. 940330 alt pozisyonundaki kodlar: 94033011000 · საწერი მაგიდები; 94033019000 · დანარჩენი; 94033091000 · კარადები, აღჭურვილი კარებით, საკეტებით ან გადასაწევი დაფებით; დოკუმენტების შესანახი კარადები, კარადები კართოტეკებისათვის და სხვა კარადები; 94033099000 · დანარჩენი",
+  },
+  "PTY-02.unreadable": {
+    en: "The tax identification number for “ტესტ კომპანია” could not be read.",
+    ka: "„ტესტ კომპანია“: საიდენტიფიკაციო ნომერი ვერ იკითხება.",
+    ru: "Не удалось прочитать налоговый номер стороны «ტესტ კომპანია».",
+    tr: "“ტესტ კომპანია” için vergi kimlik numarası okunamadı.",
+  },
+  "PTY-02.number": {
+    en: "The tax identification number for “ტესტ კომპანია” differs: “900000001” and “900000009”.",
+    ka: "„ტესტ კომპანია“: საიდენტიფიკაციო ნომერი განსხვავდება: „900000001“ და „900000009“.",
+    ru: "Налоговый номер стороны «ტესტ კომპანია» различается: «900000001» и «900000009».",
+    tr: "“ტესტ კომპანია” için vergi kimlik numarası farklı: “900000001” ve “900000009”.",
+  },
+  "TAX-01.name": {
+    en: "The printed name “ტესტ კომპანია” differs from “შპს „სატესტო მარანი“” in the Revenue Service snapshot dated 2026-11-19.",
+    ka: "დაბეჭდილი სახელი „ტესტ კომპანია“ განსხვავდება შემოსავლების სამსახურის 2026-11-19-ის ჩანაწერში მითითებული სახელისგან „შპს „სატესტო მარანი““.",
+    ru: "Напечатанное название «ტესტ კომპანია» отличается от названия «შპს „სატესტო მარანი“» в данных Службы доходов от 2026-11-19.",
+    tr: "Basılı “ტესტ კომპანია” adı, Gelir İdaresinin 2026-11-19 tarihli kaydındaki “შპს „სატესტო მარანი“” adından farklı.",
+  },
+  "TAX-02.vat": {
+    en: "The invoice adds tax, and the Revenue Service lists 900000007 as not a VAT payer at 2026-11-19T10:30:00.000Z. This status is from the snapshot time, not the invoice date.",
+    ka: "ინვოისში გადასახადი დარიცხულია, შემოსავლების სამსახურის ჩანაწერით კი 900000007 არ არის დღგ-ის გადამხდელი 2026-11-19T10:30:00.000Z მომენტისთვის. სტატუსი ჩანაწერის დროს ასახავს და არა ინვოისის თარიღს.",
+    ru: "В инвойсе начислен налог, а по данным Службы доходов на 2026-11-19T10:30:00.000Z код 900000007 не является плательщиком НДС. Статус указан на момент запроса, а не на дату инвойса.",
+    tr: "Faturada vergi eklenmiş, ancak Gelir İdaresi 900000007 kodunu 2026-11-19T10:30:00.000Z itibarıyla KDV mükellefi olarak göstermiyor. Bu durum fatura tarihini değil, sorgulama anını yansıtır.",
+  },
+  "TAX-03.reply": {
+    en: "Revenue Service reply for 900000001: “გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე”",
+    ka: "შემოსავლების სამსახურის პასუხი 900000001 კოდზე: „გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე“",
+    ru: "Ответ Службы доходов для кода 900000001: «გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე»",
+    tr: "900000001 için Gelir İdaresinin yanıtı: “გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე”",
   },
 };
 
@@ -323,7 +369,7 @@ describe("finding messages", () => {
   it.each(KEYS)("%s: its rule reports it, and it reads as a sentence in every language", (key) => {
     const d = docs();
     CASES[key](d);
-    const finding = checkExtraction(d.pack).find((f) => f.key === key);
+    const finding = checkExtraction(d.pack, d.registry ? { registry: d.registry } : {}).find((f) => f.key === key);
     expect(finding, `${key} is not reported`).toBeDefined();
     expect(key.startsWith(`${finding!.rule}.`)).toBe(true);
     for (const language of REPORT_LANGUAGES) {
@@ -634,6 +680,9 @@ describe("evidence labels", () => {
       ({ invoice }) => void Object.assign(invoice, { netWeightKg: c("1700"), grossWeightKg: c("1600") }),
       ({ pl }) => void Object.assign(pl, { totalQuantity: c("7"), totalVolumeM3: c("1.5"), totalNetWeightKg: c("1"), totalPackages: c("3") }),
       ({ contract }) => void (contract.totalInWords = c("ცამეტი ათას ხუთასი ევრო")),
+      ({ invoice, cmr, pl }) => {
+        for (const party of [invoice.seller, cmr.sender, cmr.carrier, pl.shipper]) party.taxId = c("unreadable");
+      },
       ({ contract, pl, cmr }) => {
         // The seller's name is in Latin letters, and names are compared within one script only.
         contract.seller.name = c("Baltic Desk Works");
@@ -646,7 +695,7 @@ describe("evidence labels", () => {
     for (const change of [...Object.values(CASES), ...more]) {
       const d = docs();
       change(d);
-      const result = checkDocuments(d.pack);
+      const result = checkDocuments(d.pack, d.registry ? { registry: d.registry } : {});
       for (const language of REPORT_LANGUAGES) {
         const view = buildReport(result, language);
         for (const finding of [...view.errors, ...view.warnings]) {

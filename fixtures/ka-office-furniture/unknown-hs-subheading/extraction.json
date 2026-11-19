@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2",
+  "schemaVersion": "3",
   "documents": [
     {
       "type": "commercial_invoice",
@@ -31,6 +31,11 @@
           "value": "თურქეთი",
           "quote": "თურქეთი",
           "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
         }
       },
       "buyer": {
@@ -48,6 +53,11 @@
           "value": "საქართველო",
           "quote": "საქართველო",
           "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
+          "page": 1
         }
       },
       "consignee": {
@@ -62,6 +72,11 @@
           "page": null
         },
         "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "taxId": {
           "value": null,
           "quote": null,
           "page": null
@@ -269,6 +284,11 @@
           "value": "თურქეთი",
           "quote": "თურქეთი",
           "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
         }
       },
       "consignee": {
@@ -285,6 +305,11 @@
         "country": {
           "value": "საქართველო",
           "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
           "page": 1
         }
       },
@@ -462,6 +487,11 @@
           "value": "თურქეთი",
           "quote": "თურქეთი",
           "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
         }
       },
       "carrier": {
@@ -478,6 +508,11 @@
         "country": {
           "value": "საქართველო",
           "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000002",
+          "quote": "900000002",
           "page": 1
         }
       },
@@ -510,6 +545,11 @@
         "country": {
           "value": "საქართველო",
           "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
           "page": 1
         }
       },
@@ -652,6 +692,11 @@
           "value": "თურქეთი",
           "quote": "თურქეთი",
           "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
         }
       },
       "buyer": {
@@ -668,6 +713,11 @@
         "country": {
           "value": "საქართველო",
           "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
           "page": 1
         }
       },

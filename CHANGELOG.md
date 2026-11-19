@@ -4,7 +4,10 @@
 
 - Added HS-01 for printed HS codes on invoices involving Georgia dated from 2024-01-26. It checks against the original annex of Georgian Order No. 21 (Matsne 6086072, publication 0). Later amendments were not verified.
 - Added offline lookup by code or Georgian description in the CLI, MCP server and both skill scripts.
-- Added two synthetic sets for HS-01, bringing the total to 31. The clean Georgian set now prints valid national codes.
+- Added two synthetic sets for HS-01. The clean Georgian set now prints valid national codes.
+- Bumped the extraction schema to 3 and added PTY-02 to cross-check printed tax or registration numbers.
+- Added opt-in taxpayer lookup and registry snapshots, plus TAX-01, TAX-02 and TAX-03. The checker reads the snapshot offline and includes it in each report format. Tested with a local stub and synthetic snapshots.
+- Added five synthetic variants for tax numbers and registry replies, bringing the total to 36. Georgian and Turkish HS-01 messages now mention the unverified later amendments.
 
 ## 1.0.0 — 2026-11-17
 

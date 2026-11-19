@@ -27,7 +27,7 @@ export function buildVariant(pack: Pack, variant: Variant): BuiltVariant {
     schemaVersion: SCHEMA_VERSION,
     documents: [documents.invoice, documents.packingList, documents.cmr, documents.contract, ...(documents.secondInvoice ? [documents.secondInvoice] : [])],
   };
-  const findings = checkExtraction(extraction);
+  const findings = checkExtraction(extraction, variant.registry ? { registry: variant.registry } : {});
   return {
     pack,
     variant,

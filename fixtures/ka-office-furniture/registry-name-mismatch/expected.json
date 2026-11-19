@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "TAX-01",
+    "severity": "warning",
+    "key": "TAX-01.name",
+    "params": {
+      "printed": "ტესტ კომპანია",
+      "registered": "შპს „სატესტო მარანი“",
+      "snapshotDate": "2026-11-19"
+    }
+  }
+]

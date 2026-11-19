@@ -12,3 +12,5 @@ export * from "./words/index.ts";
 export * from "./check/index.ts";
 export { HS_LOOKUP_LIMIT, hsLookupOutput, lookupHsCode } from "./hs.ts";
 export * from "./report/index.ts";
+export * from "./registry.ts";
+export * from "./registry-client.ts";

@@ -1,4 +1,5 @@
 import { countDocuments, formatMessage, formatNumber } from "../check/messages.ts";
+import { registryRows } from "./registry.ts";
 import { evidenceHeading, type FindingView, type ReportView } from "./view.ts";
 
 /**
@@ -75,6 +76,15 @@ export function renderMarkdown(view: ReportView, escape: Escape = markdownText):
     if (view.errors.length === 0 && view.warnings.length === 0 && view.extractionIssues.length === 0) out.push(`✓ ${ui.noProblems}`, "");
     if (view.errors.length > 0) out.push(`## ${ui.errorsHeading}`, "", ...view.errors.map((f) => `${findingBlock(f, view, escape)}\n`));
     if (view.warnings.length > 0) out.push(`## ${ui.warningsHeading}`, "", ...view.warnings.map((f) => `${findingBlock(f, view, escape)}\n`));
+  }
+  const registry = view.registry;
+  if (registry) {
+    out.push(`## ${registry.title}`, "", `${registry.source.label}: ${escape(registry.source.value)}`, "");
+    for (const entry of registry.entries) {
+      out.push(`### ${entry.code}`, "");
+      for (const [label, value] of registryRows(registry, entry)) out.push(value ? `- ${label}: ${escape(value)}` : `- ${label}`);
+      out.push("");
+    }
   }
   out.push(`---`, `${ui.generatedBy}`);
   return `${out.join("\n").trim()}\n`;

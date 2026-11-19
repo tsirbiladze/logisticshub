@@ -13,11 +13,13 @@ const SELLER = {
   name: c("Anatolia Office Systems Ltd."),
   address: c("საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი, თურქეთი"),
   country: c("თურქეთი"),
+  taxId: c(null),
 };
 const BUYER = {
   name: c("ტესტ კომპანია"),
   address: c("საწყობი B, ლოგისტიკის ქ. 12, თბილისი, საქართველო"),
   country: c("საქართველო"),
+  taxId: c("900000001"),
 };
 const WORDS = "ცამეტი ათას სამასი ევრო და ნული ცენტი";
 const INVOICE_NO = "AOS-INV-2026-0918-01";
@@ -120,6 +122,7 @@ export function kaPack(): Extraction {
       name: c("Caucasus Demo Transit LLC"),
       address: c("გზატკეცილის ქ. 8, ქუთაისი, საქართველო"),
       country: c("საქართველო"),
+      taxId: c("900000002"),
     },
     placeOfTakingOver: c("საწარმო A, ქაისერი, თურქეთი"),
     dateOfTakingOver: c("2026-09-19", "19.09.2026, 09:00"),

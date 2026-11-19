@@ -31,6 +31,12 @@ import { basename, dirname, extname, join, resolve } from "node:path";
 import { annotateDocuments, checkNotes, checkQuotes, type QuoteCheck } from "@logisticshub/annotate";
 import {
   buildReport,
+  fetchRegistry,
+  readRegistry,
+  RegistryInputError,
+  registryCommand,
+  registryJson,
+  shapeIssues,
   checkDocuments,
   decodeText,
   extractionJsonSchema,
@@ -55,7 +61,9 @@ const USAGE = `Logisticshub ${VERSION}: cross-check trade documents
 
 Usage:
   node check.mjs <extraction.json> [--lang en|ka|ru|tr] [--out <dir>] [--format md,json,html]
-                 [--pdf-dir <dir>] [--no-annotate]
+                 [--pdf-dir <dir>] [--no-annotate] [--registry <file> | --fetch-registry]
+  node check.mjs taxpayer <9-digit company code> [--json]
+  node check.mjs registry <extraction.json> [-o registry.json]
   node check.mjs --schema
   node check.mjs hs <code or Georgian words> [--json] [--limit <n>]
 
@@ -64,12 +72,14 @@ and prints the report. PDFs named in sourceFile (looked up in --pdf-dir,
 default: the extraction's folder) get a copy with the findings marked,
 <name>.marked.pdf, and every quote is looked up on its page: what is not found
 is listed under "Notes:". --no-annotate leaves the PDFs unread.
+--registry reads a saved snapshot offline. --fetch-registry sends up to 20
+Georgian company codes to xdata.rs.ge, saves registry.json in --out, then checks.
 
 Exit codes:
   0  checked, with or without findings
   1  the extraction is not usable: the reports list what to fix
   2  nothing was checked: a bad option, a file that cannot be read or is not
-     JSON, or reports that cannot be written`;
+     JSON, a malformed registry snapshot, or reports that cannot be written`;
 
 /** A wrong command line: the message and how to call the script. */
 function fail(message: string): never {
@@ -89,6 +99,8 @@ function parseArgs(argv: string[]) {
     lang?: ReportLanguage;
     out?: string;
     pdfDir?: string;
+    registryFile?: string;
+    fetchRegistry?: boolean;
     annotate: boolean;
     formats: ReportFormat[];
     schema: boolean;
@@ -112,6 +124,10 @@ function parseArgs(argv: string[]) {
       options.out = next();
     } else if (arg === "--pdf-dir") {
       options.pdfDir = next();
+    } else if (arg === "--registry") {
+      options.registryFile = next();
+    } else if (arg === "--fetch-registry") {
+      options.fetchRegistry = true;
     } else if (arg === "--no-annotate") {
       options.annotate = false;
     } else if (arg === "--format") {
@@ -140,7 +156,12 @@ async function main() {
       stop((error as Error).message);
     }
   }
+  if (args[0] === "taxpayer" || args[0] === "registry") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    return void process.stdout.write(await registryCommand(args[0], args.slice(1), (line) => process.stderr.write(`${line}\n`)));
+  }
   const options = parseArgs(args);
+  if (options.registryFile !== undefined && options.fetchRegistry) stop("Use either --registry or --fetch-registry.");
   if (options.schema) {
     process.stdout.write(`${JSON.stringify(extractionJsonSchema(), null, 2)}\n`);
     return;
@@ -158,15 +179,10 @@ async function main() {
   if (!json.ok) stop(`Cannot read ${file}: ${json.problem}. Fix the file and run the check again.`);
   const input = json.value;
 
-  const result = checkDocuments(input);
-  const language = options.lang ?? pickLanguage(result.extraction);
-  const view = buildReport(result, language);
-  const reports: Record<ReportFormat, () => string> = {
-    md: () => renderMarkdown(view),
-    json: () => renderJson(result, view),
-    html: () => renderHtml(view),
-  };
   const outDir = resolve(options.out ?? dirname(file));
+  if (options.fetchRegistry && file === join(outDir, "registry.json")) {
+    stop("The registry snapshot and extraction must use different paths.");
+  }
   const written: string[] = [];
   /** Writes into the output folder, or ends the run with one line when that cannot be done. */
   const advice = "Give --out a folder that can be written to.";
@@ -183,6 +199,19 @@ async function main() {
       stop(`Cannot write ${path}: ${ioProblem(error)}. ${advice}`);
     }
     written.push(path);
+  };
+  let registry = options.registryFile === undefined ? undefined : readRegistry(resolve(options.registryFile));
+  if (options.fetchRegistry && shapeIssues(input).length === 0) {
+    const snapshot = await fetchRegistry(input, (line) => process.stderr.write(`${line}\n`));
+    write("registry.json", registryJson(snapshot));
+    registry = readRegistry(join(outDir, "registry.json"));
+  }
+  const result = checkDocuments(input, registry ? { registry } : {});
+  const view = buildReport(result, options.lang ?? pickLanguage(result.extraction));
+  const reports: Record<ReportFormat, () => string> = {
+    md: () => renderMarkdown(view),
+    json: () => renderJson(result, view),
+    html: () => renderHtml(view),
   };
   for (const format of options.formats) write(`report.${format}`, reports[format]());
 
@@ -212,6 +241,7 @@ async function main() {
 try {
   await main();
 } catch (error) {
+  if (error instanceof RegistryInputError) stop(error.message);
   // Not expected: every known failure ends in stop() or fail() above.
   stop(`Unexpected error, nothing was checked: ${ioProblem(error)}`);
 }

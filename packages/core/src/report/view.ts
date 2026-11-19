@@ -2,6 +2,7 @@
  * Language-specific view of a check result, shared by the Markdown, HTML and
  * JSON reports.
  */
+import { registryView } from "./registry.ts";
 import type { CheckResult } from "../check/index.ts";
 import { formatMessage, REPORT_LANGUAGES, VOCAB, type MessageKey, type ReportLanguage } from "../check/messages.ts";
 import { RULES } from "../check/index.ts";
@@ -69,6 +70,7 @@ export interface ReportView {
   extractionIssues: { code: string; path: string; message: string }[];
   /** Every quote of the documents that have findings, in document and schema order. Not part of any rendered report. */
   citations: Citation[];
+  registry?: ReturnType<typeof registryView>;
 }
 
 /**
@@ -145,11 +147,12 @@ export function buildReport(result: CheckResult, language: ReportLanguage = pick
     ui: UI[language],
     readable: result.ok,
     documents: docs.map((d) => ({ id: d.id, type: d.type, label: vocab.doc[d.type], number: d.number.value, sourceFile: d.sourceFile })),
-    rulesRun: result.ok ? RULES.length : 0,
+    rulesRun: result.ok ? RULES.length - (result.registry ? 0 : 3) : 0,
     errors: findings.filter((f) => f.severity === "error"),
     warnings: findings.filter((f) => f.severity === "warning"),
     extractionIssues: result.extractionIssues,
     citations,
+    ...(result.registry ? { registry: registryView(result.registry, language) } : {}),
   };
 }
 

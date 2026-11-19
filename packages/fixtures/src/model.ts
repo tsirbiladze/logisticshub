@@ -19,6 +19,7 @@ import {
   type MessageKey,
   type PackingList,
   type Party,
+  type RegistrySnapshot,
 } from "@logisticshub/core";
 import { formatter, type Formatter, type NumberStyle } from "./format.ts";
 
@@ -28,7 +29,7 @@ export interface PartySpec {
   name: string;
   address: string;
   country: string;
-  registration: string;
+  taxId: string;
 }
 
 export interface LineSpec {
@@ -131,6 +132,7 @@ export interface Variant {
   style?: Partial<NumberStyle>;
   mutate?: (docs: ShipmentDocuments, f: Formatter) => void;
   layout?: Layout;
+  registry?: RegistrySnapshot;
 }
 
 export interface Pack {
@@ -144,7 +146,7 @@ export function cite(value: string | null, quote: string | null = value) {
 }
 
 function party(spec: PartySpec): Party {
-  return { name: cite(spec.name), address: cite(spec.address), country: cite(spec.country) };
+  return { name: cite(spec.name), address: cite(spec.address), country: cite(spec.country), taxId: cite(spec.taxId) };
 }
 
 export function lineTotal(line: LineSpec): string {

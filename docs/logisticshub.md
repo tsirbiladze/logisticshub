@@ -10,7 +10,7 @@ source: https://github.com/tsirbiladze/logisticshub/blob/main/skills/logisticshu
 
 `logisticshub` compares the documents of one shipment (commercial invoice, packing list, CMR and sales contract) with each other, and checks each one on its own. It reports every discrepancy its rules find, with the verbatim quote and the page it came from.
 
-It never corrects a document and never guesses. Your agent only reads: from each PDF or page image it writes down every fact exactly as printed, with its quote and page. Everything after that is code. The checker first makes sure that each number and date is what its own quote says, and that each quote is printed on the page it cites. Then come exact decimal arithmetic, a parser that turns an amount written in words (English, Georgian, Russian, Turkish) into a number, and 17 fixed rules. Run it twice on the same extraction and you get the same report.
+It never corrects a document and never guesses. Your agent only reads: from each PDF or page image it writes down every fact exactly as printed, with its quote and page. Everything after that is code. The checker first makes sure that each number and date is what its own quote says, and that each quote is printed on the page it cites. Then come exact decimal arithmetic, a parser that turns an amount written in words (English, Georgian, Russian, Turkish) into a number, and 21 fixed rules, three of which read an optional registry snapshot. Run it twice on the same extraction and you get the same report.
 
 The output is a report in Markdown, HTML and JSON, in English, Georgian, Russian or Turkish. Each finding names the document, the page and the field, quotes the printed text, and ends with a line that says what to verify. Each PDF that has a finding also comes back as a copy with the findings boxed and numbered.
 
@@ -39,6 +39,10 @@ The checker and lookup use the original annex to the Georgian Minister of Financ
 
 Search by exact code, prefix or Georgian description with `logisticshub hs 940330`, `logisticshub hs "საწერი მაგიდ"`, the skill’s `hs` subcommand or the MCP tool `lookup_hs_code`.
 
+PTY-02 compares the digits of printed identification numbers across documents for the same party. With a saved Revenue Service snapshot, TAX-01 compares the company name in the same script, TAX-02 checks whether the seller was listed as a VAT payer at lookup time when the invoice adds tax, and TAX-03 quotes a reply with status −1.
+
+The checker sends data to the Revenue Service only when you request a live registry lookup. Only 9-digit Georgian company codes go to xdata.rs.ge. An 11-digit personal number is never sent. Checking a saved snapshot or running the checker without one is offline.
+
 Each rule is stated exactly, with every finding, its severity and its tolerance, in the [rules reference](https://github.com/tsirbiladze/logisticshub/blob/main/skills/logisticshub/references/rules.md).
 
 ## It's working if
@@ -66,8 +70,8 @@ Not checked:
 - **Volumes across documents**: a packing list's volumes are added up to its own total, not compared with the CMR.
 - **Weights per line across documents**, and net weight on a CMR.
 - **Origin and tariff classification**: origin is recorded only. Classification, duty and tax calculations, other countries’ nomenclatures and customs declarations are outside the check. HS-01 skips invoices without a confirmed Georgian party or usable date, and invoices dated before 2024-01-26.
-- **Addresses, countries, registration and tax numbers, bank details, signatures and stamps**. Only the parties' names are compared, and not across scripts. HS-01 reads countries to decide whether it applies.
-- **Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is only added into the invoice total.
+- **Addresses, countries, bank details, signatures and stamps**. Printed registration and tax numbers are compared across documents. Country determines which checks apply. Registry Status, RegisteredSubject, Mortgage, Sequestration, AdditionalStatus and NonResident are shown as supplied, without judgment.
+- **Tax**: the rate, whether tax is due, and tax included in the prices. A printed tax amount is added into the invoice total. With a registry snapshot, TAX-02 checks the seller’s VAT status at lookup time.
 - **A discount printed only as a rate**: the invoice total is then left unchecked.
 - **Units**: nothing is converted. Quantities in different units are not compared, and neither are package counts of different packing methods.
 - **Other dates**: delivery and payment terms, validity, the packing list's date.

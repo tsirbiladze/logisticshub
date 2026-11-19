@@ -3,7 +3,7 @@
  * extraction guide from this server, and sends the extraction for checking.
  */
 import { isAbsolute } from "node:path";
-import { EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, HS_LOOKUP_LIMIT, ISSUES_GUIDE, lookupHsCode, parseJson, REPORT_LANGUAGES, RULE_IDS, type ReportLanguage } from "@logisticshub/core";
+import { lookupTaxpayer, RegistryInputError, taxpayerText, EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, HS_LOOKUP_LIMIT, ISSUES_GUIDE, lookupHsCode, parseJson, REPORT_LANGUAGES, RULE_IDS, type ReportLanguage } from "@logisticshub/core";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { OutputError, runCheck } from "./run.ts";
@@ -19,7 +19,7 @@ export const SERVER_INSTRUCTIONS = `Logisticshub cross-checks the documents of o
 
 Use lookup_hs_code to explain a Georgian code or see related entries for HS-01. It uses the original text of Order No. 21 of 2024-01-26 (publication 0). Later amendments were not verified.
 
-Not for paying or booking an invoice. Nothing is sent anywhere: the check runs on the machine this server runs on.`;
+Not for paying or booking an invoice. Offer lookup_taxpayer when the user wants to verify a Georgian company. Ask for their agreement first: it sends one 9-digit company code to the Revenue Service. check_documents takes an optional registryFile, an absolute path to a saved snapshot, and checks it offline.`;
 
 /** How the guide's words map to this server: the guide is the skill's, and names the skill's files and script. */
 const GUIDE_PREFACE = `This guide comes with the Logisticshub skill, so it names the skill's files. With this server:
@@ -98,6 +98,7 @@ const checkOutput = {
       }),
     )
     .describe("The discrepancies between the documents, errors and warnings."),
+  registry: z.record(z.string(), z.unknown()).optional().describe("Registry section when a snapshot is supplied."),
   files: z.array(z.string()).describe("Absolute paths of the files written; empty without outDir."),
   notes: z
     .array(z.string())
@@ -141,6 +142,7 @@ export function createServer(version: string): McpServer {
           .string()
           .optional()
           .describe("Absolute path of a folder to write report.md, report.json and report.html (and marked PDFs) into. Without it the report is only returned."),
+        registryFile: z.string().optional().describe("Absolute path to a saved registry.json snapshot. The check reads it offline."),
         pdfDir: z
           .string()
           .optional()
@@ -151,10 +153,10 @@ export function createServer(version: string): McpServer {
       outputSchema: checkOutput,
       annotations: { readOnlyHint: false, idempotentHint: true },
     },
-    async ({ extraction, language, outDir, pdfDir }) => {
+    async ({ extraction, language, outDir, pdfDir, registryFile }) => {
       const refuse = (text: string) => ({ content: [{ type: "text" as const, text }], isError: true });
       if (Object.hasOwn(extraction, NOT_JSON)) return refuse(`${NOT_AN_OBJECT} The string you passed is ${String(extraction[NOT_JSON])}. Nothing was checked.`);
-      for (const [name, path] of [["outDir", outDir], ["pdfDir", pdfDir]] as const) {
+      for (const [name, path] of [["outDir", outDir], ["pdfDir", pdfDir], ["registryFile", registryFile]] as const) {
         if (path !== undefined && !isAbsolute(path)) return refuse(`${name} must be an absolute path; got "${path}".`);
       }
 
@@ -167,9 +169,11 @@ export function createServer(version: string): McpServer {
           ...(language ? { language: language as ReportLanguage } : {}),
           annotate: Boolean(pdfDir),
           ...(pdfDir ? { pdfDir } : {}),
+          ...(registryFile === undefined ? {} : { registryFile }),
         });
       } catch (error) {
         if (error instanceof OutputError) return refuse(`${error.message} Nothing was checked. Give outDir a folder that can be written to, or leave it out to get the report inline.`);
+        if (error instanceof RegistryInputError) return refuse(`${error.message} Nothing was checked.`);
         throw error;
       }
       const files = run.written.length > 0 ? `\n\nFiles:\n${run.written.map((p) => `- ${p}`).join("\n")}` : "";
@@ -195,6 +199,7 @@ export function createServer(version: string): McpServer {
             units,
             evidence: evidence.map((e) => ({ document: e.documentId, sourceFile: e.sourceFile, page: e.page, path: e.path, label: e.label, quote: e.quote, value: e.value })),
           })),
+          ...(run.view.registry ? { registry: run.view.registry } : {}),
           files: run.written,
           notes: run.notes,
         },
@@ -238,6 +243,25 @@ export function createServer(version: string): McpServer {
     async ({ query, limit }) => {
       const result = lookupHsCode(query, limit);
       return { content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result };
+    },
+  );
+
+  server.registerTool(
+    "lookup_taxpayer",
+    {
+      title: "Look up a Georgian company",
+      description: "With the user's agreement, send one 9-digit company code to the Revenue Service and return its public reply. Personal numbers are never sent.",
+      inputSchema: { code: z.string().describe("A 9-digit Georgian company code.") },
+      annotations: { readOnlyHint: true, openWorldHint: true },
+    },
+    async ({ code }) => {
+      try {
+        const entry = await lookupTaxpayer(code);
+        return { content: [{ type: "text", text: taxpayerText(entry) }], structuredContent: entry };
+      } catch (error) {
+        if (!(error instanceof RegistryInputError)) throw error;
+        return { content: [{ type: "text", text: error.message }], isError: true };
+      }
     },
   );
 

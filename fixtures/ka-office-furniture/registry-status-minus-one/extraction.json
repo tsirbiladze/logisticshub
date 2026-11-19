@@ -1,0 +1,763 @@
+{
+  "schemaVersion": "3",
+  "documents": [
+    {
+      "type": "commercial_invoice",
+      "id": "invoice",
+      "sourceFile": "invoice.pdf",
+      "language": "ka",
+      "number": {
+        "value": "AOS-INV-2026-0918-01",
+        "quote": "AOS-INV-2026-0918-01",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-09-18",
+        "quote": "18.09.2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "Anatolia Office Systems Ltd.",
+          "quote": "Anatolia Office Systems Ltd.",
+          "page": 1
+        },
+        "address": {
+          "value": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "quote": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "page": 1
+        },
+        "country": {
+          "value": "თურქეთი",
+          "quote": "თურქეთი",
+          "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "ტესტ კომპანია",
+          "quote": "ტესტ კომპანია",
+          "page": 1
+        },
+        "address": {
+          "value": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "quote": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "page": 1
+        },
+        "country": {
+          "value": "საქართველო",
+          "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "address": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "taxId": {
+          "value": null,
+          "quote": null,
+          "page": null
+        }
+      },
+      "contractRef": {
+        "number": {
+          "value": "AOS-SC-2026-0915-01",
+          "quote": "AOS-SC-2026-0915-01",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-09-15",
+          "quote": "15.09.2026",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "FCA",
+          "quote": "FCA",
+          "page": 1
+        },
+        "place": {
+          "value": "გამყიდველის საწარმო A, ქაისერი",
+          "quote": "გამყიდველის საწარმო A, ქაისერი",
+          "page": 1
+        },
+        "version": {
+          "value": "Incoterms 2020",
+          "quote": "Incoterms 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "EUR",
+        "quote": "EUR",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "საოფისე ლითონის ტუმბო, 3 უჯრით",
+            "quote": "საოფისე ლითონის ტუმბო, 3 უჯრით",
+            "page": 1
+          },
+          "model": {
+            "value": "AOS-MP3",
+            "quote": "AOS-MP3",
+            "page": 1
+          },
+          "hsCode": {
+            "value": "9403 10 580 00",
+            "quote": "9403 10 580 00",
+            "page": 1
+          },
+          "quantity": {
+            "value": "60",
+            "quote": "60",
+            "page": 1
+          },
+          "unit": {
+            "value": "ცალი",
+            "quote": "ცალი",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "145.00",
+            "quote": "145.00",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "8700.00",
+            "quote": "8,700.00",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "საოფისე ლითონის ტუმბო, 2 უჯრით",
+            "quote": "საოფისე ლითონის ტუმბო, 2 უჯრით",
+            "page": 1
+          },
+          "model": {
+            "value": "AOS-MP2",
+            "quote": "AOS-MP2",
+            "page": 1
+          },
+          "hsCode": {
+            "value": "9403 10 580 00",
+            "quote": "9403 10 580 00",
+            "page": 1
+          },
+          "quantity": {
+            "value": "40",
+            "quote": "40",
+            "page": 1
+          },
+          "unit": {
+            "value": "ცალი",
+            "quote": "ცალი",
+            "page": 1
+          },
+          "unitPrice": {
+            "value": "115.00",
+            "quote": "115.00",
+            "page": 1
+          },
+          "lineTotal": {
+            "value": "4600.00",
+            "quote": "4,600.00",
+            "page": 1
+          }
+        }
+      ],
+      "subtotal": {
+        "value": "13300.00",
+        "quote": "EUR 13,300.00",
+        "page": 1
+      },
+      "discount": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "discountPercent": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "freight": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "insurance": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "otherCharges": [],
+      "tax": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "total": {
+        "value": "13300.00",
+        "quote": "EUR 13,300.00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "ცამეტი ათას სამასი ევრო და ნული ცენტი",
+        "quote": "ცამეტი ათას სამასი ევრო და ნული ცენტი",
+        "page": 1
+      },
+      "packages": {
+        "value": "100",
+        "quote": "100 ყუთი",
+        "page": 1
+      },
+      "netWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "grossWeightKg": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "countryOfOrigin": {
+        "value": "თურქეთი",
+        "quote": "თურქეთი",
+        "page": 1
+      }
+    },
+    {
+      "type": "packing_list",
+      "id": "packing-list",
+      "sourceFile": "packing-list.pdf",
+      "language": "ka",
+      "number": {
+        "value": "AOS-PL-2026-0919-01",
+        "quote": "AOS-PL-2026-0919-01",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-09-19",
+        "quote": "19.09.2026",
+        "page": 1
+      },
+      "shipper": {
+        "name": {
+          "value": "Anatolia Office Systems Ltd.",
+          "quote": "Anatolia Office Systems Ltd.",
+          "page": 1
+        },
+        "address": {
+          "value": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "quote": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "page": 1
+        },
+        "country": {
+          "value": "თურქეთი",
+          "quote": "თურქეთი",
+          "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
+        }
+      },
+      "consignee": {
+        "name": {
+          "value": "ტესტ კომპანია",
+          "quote": "ტესტ კომპანია",
+          "page": 1
+        },
+        "address": {
+          "value": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "quote": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "page": 1
+        },
+        "country": {
+          "value": "საქართველო",
+          "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
+          "page": 1
+        }
+      },
+      "invoiceRef": {
+        "number": {
+          "value": "AOS-INV-2026-0918-01",
+          "quote": "AOS-INV-2026-0918-01",
+          "page": 1
+        },
+        "date": {
+          "value": "2026-09-18",
+          "quote": "18.09.2026",
+          "page": 1
+        }
+      },
+      "packingMethod": {
+        "value": "მუყაოს ყუთი",
+        "quote": "მუყაოს ყუთი",
+        "page": 1
+      },
+      "lines": [
+        {
+          "description": {
+            "value": "საოფისე ლითონის ტუმბო, 3 უჯრით",
+            "quote": "საოფისე ლითონის ტუმბო, 3 უჯრით",
+            "page": 1
+          },
+          "model": {
+            "value": "AOS-MP3",
+            "quote": "AOS-MP3",
+            "page": 1
+          },
+          "quantity": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "unit": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "packages": {
+            "value": "60",
+            "quote": "60",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "1080",
+            "quote": "1,080",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "1200",
+            "quote": "1,200",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "9.0619",
+            "quote": "9.0619",
+            "page": 1
+          }
+        },
+        {
+          "description": {
+            "value": "საოფისე ლითონის ტუმბო, 2 უჯრით",
+            "quote": "საოფისე ლითონის ტუმბო, 2 უჯრით",
+            "page": 1
+          },
+          "model": {
+            "value": "AOS-MP2",
+            "quote": "AOS-MP2",
+            "page": 1
+          },
+          "quantity": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "unit": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "packages": {
+            "value": "40",
+            "quote": "40",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": null,
+            "quote": null,
+            "page": null
+          },
+          "netWeightKg": {
+            "value": "600",
+            "quote": "600",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "680",
+            "quote": "680",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "5.0669",
+            "quote": "5.0669",
+            "page": 1
+          }
+        }
+      ],
+      "totalQuantity": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "totalPackages": {
+        "value": "100",
+        "quote": "100",
+        "page": 1
+      },
+      "totalNetWeightKg": {
+        "value": "1680",
+        "quote": "1,680",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "1880",
+        "quote": "1,880",
+        "page": 1
+      },
+      "totalVolumeM3": {
+        "value": "14.1288",
+        "quote": "14.1288",
+        "page": 1
+      }
+    },
+    {
+      "type": "cmr",
+      "id": "cmr",
+      "sourceFile": "cmr.pdf",
+      "language": "ka",
+      "number": {
+        "value": "CDT-CMR-2026-0919-01",
+        "quote": "CDT-CMR-2026-0919-01",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-09-19",
+        "quote": "19.09.2026",
+        "page": 1
+      },
+      "placeOfIssue": {
+        "value": "ქაისერი",
+        "quote": "ქაისერი",
+        "page": 1
+      },
+      "sender": {
+        "name": {
+          "value": "Anatolia Office Systems Ltd.",
+          "quote": "Anatolia Office Systems Ltd.",
+          "page": 1
+        },
+        "address": {
+          "value": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "quote": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "page": 1
+        },
+        "country": {
+          "value": "თურქეთი",
+          "quote": "თურქეთი",
+          "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
+        }
+      },
+      "carrier": {
+        "name": {
+          "value": "Caucasus Demo Transit LLC",
+          "quote": "Caucasus Demo Transit LLC",
+          "page": 1
+        },
+        "address": {
+          "value": "გზატკეცილის ქ. 8, ქუთაისი",
+          "quote": "გზატკეცილის ქ. 8, ქუთაისი",
+          "page": 1
+        },
+        "country": {
+          "value": "საქართველო",
+          "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000002",
+          "quote": "900000002",
+          "page": 1
+        }
+      },
+      "placeOfTakingOver": {
+        "value": "საწარმო A, ქაისერი, თურქეთი",
+        "quote": "საწარმო A, ქაისერი, თურქეთი",
+        "page": 1
+      },
+      "dateOfTakingOver": {
+        "value": "2026-09-19",
+        "quote": "19.09.2026",
+        "page": 1
+      },
+      "placeOfDelivery": {
+        "value": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი, საქართველო",
+        "quote": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი, საქართველო",
+        "page": 1
+      },
+      "consignee": {
+        "name": {
+          "value": "ტესტ კომპანია",
+          "quote": "ტესტ კომპანია",
+          "page": 1
+        },
+        "address": {
+          "value": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "quote": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "page": 1
+        },
+        "country": {
+          "value": "საქართველო",
+          "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
+          "page": 1
+        }
+      },
+      "goods": [
+        {
+          "marksAndNumbers": {
+            "value": "LH-TEST-20260920-01 / AOS-MP3 / 001-060",
+            "quote": "LH-TEST-20260920-01 / AOS-MP3 / 001-060",
+            "page": 1
+          },
+          "packages": {
+            "value": "60",
+            "quote": "60",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "მუყაოს ყუთი",
+            "quote": "მუყაოს ყუთი",
+            "page": 1
+          },
+          "description": {
+            "value": "საოფისე ლითონის ტუმბო, 3 უჯრით",
+            "quote": "საოფისე ლითონის ტუმბო, 3 უჯრით",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "1200",
+            "quote": "1,200",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "9.0619",
+            "quote": "9.0619",
+            "page": 1
+          }
+        },
+        {
+          "marksAndNumbers": {
+            "value": "LH-TEST-20260920-01 / AOS-MP2 / 061-100",
+            "quote": "LH-TEST-20260920-01 / AOS-MP2 / 061-100",
+            "page": 1
+          },
+          "packages": {
+            "value": "40",
+            "quote": "40",
+            "page": 1
+          },
+          "packingMethod": {
+            "value": "მუყაოს ყუთი",
+            "quote": "მუყაოს ყუთი",
+            "page": 1
+          },
+          "description": {
+            "value": "საოფისე ლითონის ტუმბო, 2 უჯრით",
+            "quote": "საოფისე ლითონის ტუმბო, 2 უჯრით",
+            "page": 1
+          },
+          "grossWeightKg": {
+            "value": "680",
+            "quote": "680",
+            "page": 1
+          },
+          "volumeM3": {
+            "value": "5.0669",
+            "quote": "5.0669",
+            "page": 1
+          }
+        }
+      ],
+      "dangerousGoods": {
+        "value": null,
+        "quote": null,
+        "page": null
+      },
+      "totalPackages": {
+        "value": "100",
+        "quote": "100",
+        "page": 1
+      },
+      "totalGrossWeightKg": {
+        "value": "1880",
+        "quote": "1,880",
+        "page": 1
+      },
+      "carriageCharges": {
+        "value": "ფრახტი EUR 1,800.00, იხდის მიმღები",
+        "quote": "ფრახტი EUR 1,800.00, იხდის მიმღები",
+        "page": 1
+      },
+      "customsInstructions": {
+        "value": "საბაჟო გაფორმება: საქართველოში იმპორტი",
+        "quote": "საბაჟო გაფორმება: საქართველოში იმპორტი",
+        "page": 1
+      },
+      "convention": {
+        "value": "ეს გადაზიდვა, მიუხედავად ნებისმიერი საწინააღმდეგო პირობისა, ექვემდებარება საქონლის საერთაშორისო საავტომობილო გადაზიდვის ხელშეკრულების შესახებ კონვენციას (CMR).",
+        "quote": "ეს გადაზიდვა, მიუხედავად ნებისმიერი საწინააღმდეგო პირობისა, ექვემდებარება საქონლის საერთაშორისო საავტომობილო გადაზიდვის ხელშეკრულების შესახებ კონვენციას (CMR).",
+        "page": 1
+      },
+      "attachedDocuments": [
+        {
+          "value": "ინვოისი AOS-INV-2026-0918-01",
+          "quote": "ინვოისი AOS-INV-2026-0918-01",
+          "page": 1
+        },
+        {
+          "value": "შეფუთვის ფურცელი AOS-PL-2026-0919-01",
+          "quote": "შეფუთვის ფურცელი AOS-PL-2026-0919-01",
+          "page": 1
+        }
+      ]
+    },
+    {
+      "type": "contract",
+      "id": "contract",
+      "sourceFile": "contract.pdf",
+      "language": "ka",
+      "number": {
+        "value": "AOS-SC-2026-0915-01",
+        "quote": "AOS-SC-2026-0915-01",
+        "page": 1
+      },
+      "date": {
+        "value": "2026-09-15",
+        "quote": "15.09.2026",
+        "page": 1
+      },
+      "seller": {
+        "name": {
+          "value": "Anatolia Office Systems Ltd.",
+          "quote": "Anatolia Office Systems Ltd.",
+          "page": 1
+        },
+        "address": {
+          "value": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "quote": "საწარმო A, 12. Cadde No:34, Organize Sanayi Bölgesi, ქაისერი",
+          "page": 1
+        },
+        "country": {
+          "value": "თურქეთი",
+          "quote": "თურქეთი",
+          "page": 1
+        },
+        "taxId": {
+          "value": "TR-900001",
+          "quote": "TR-900001",
+          "page": 1
+        }
+      },
+      "buyer": {
+        "name": {
+          "value": "ტესტ კომპანია",
+          "quote": "ტესტ კომპანია",
+          "page": 1
+        },
+        "address": {
+          "value": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "quote": "საწყობი B, ლოგისტიკის ქ. 12, თბილისი",
+          "page": 1
+        },
+        "country": {
+          "value": "საქართველო",
+          "quote": "საქართველო",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000001",
+          "quote": "900000001",
+          "page": 1
+        }
+      },
+      "incoterm": {
+        "code": {
+          "value": "FCA",
+          "quote": "FCA",
+          "page": 1
+        },
+        "place": {
+          "value": "გამყიდველის საწარმო A, ქაისერი",
+          "quote": "გამყიდველის საწარმო A, ქაისერი",
+          "page": 1
+        },
+        "version": {
+          "value": "Incoterms 2020",
+          "quote": "Incoterms 2020",
+          "page": 1
+        }
+      },
+      "currency": {
+        "value": "EUR",
+        "quote": "EUR",
+        "page": 1
+      },
+      "totalAmount": {
+        "value": "13300.00",
+        "quote": "EUR 13,300.00",
+        "page": 1
+      },
+      "totalInWords": {
+        "value": "ცამეტი ათას სამასი ევრო და ნული ცენტი",
+        "quote": "ცამეტი ათას სამასი ევრო და ნული ცენტი",
+        "page": 1
+      },
+      "goodsDescription": {
+        "value": "ახალი საოფისე ლითონის ავეჯი საკუთარი წარმოებიდან",
+        "quote": "ახალი საოფისე ლითონის ავეჯი საკუთარი წარმოებიდან",
+        "page": 1
+      }
+    }
+  ]
+}

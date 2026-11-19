@@ -1,7 +1,7 @@
 {
   "how": "Parts to copy into extraction.json; this file is not an extraction. \"file\" is the frame. Put one copy of a document from \"documents\" into the frame's \"documents\" array for each document you read, and one copy of an item from \"items\" into that document's list for each line the document prints. Fill in what is printed and leave the rest null.",
   "file": {
-    "schemaVersion": "2",
+    "schemaVersion": "3",
     "documents": []
   },
   "documents": {
@@ -15,17 +15,20 @@
       "seller": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "buyer": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "consignee": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "contractRef": {
         "number": { "value": null, "quote": null, "page": null },
@@ -62,12 +65,14 @@
       "shipper": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "consignee": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "invoiceRef": {
         "number": { "value": null, "quote": null, "page": null },
@@ -92,12 +97,14 @@
       "sender": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "carrier": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "placeOfTakingOver": { "value": null, "quote": null, "page": null },
       "dateOfTakingOver": { "value": null, "quote": null, "page": null },
@@ -105,7 +112,8 @@
       "consignee": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "goods": [],
       "dangerousGoods": { "value": null, "quote": null, "page": null },
@@ -126,12 +134,14 @@
       "seller": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "buyer": {
         "name": { "value": null, "quote": null, "page": null },
         "address": { "value": null, "quote": null, "page": null },
-        "country": { "value": null, "quote": null, "page": null }
+        "country": { "value": null, "quote": null, "page": null },
+        "taxId": { "value": null, "quote": null, "page": null }
       },
       "incoterm": {
         "code": { "value": null, "quote": null, "page": null },

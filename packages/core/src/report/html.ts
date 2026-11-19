@@ -4,6 +4,7 @@
  * light technical grid).
  */
 import { formatNumber } from "../check/messages.ts";
+import { registryRows } from "./registry.ts";
 import { evidenceSource, type FindingView, type ReportView } from "./view.ts";
 
 const esc = (text: string) =>
@@ -100,6 +101,16 @@ export function renderHtml(view: ReportView): string {
     if (view.errors.length === 0 && view.warnings.length === 0 && view.extractionIssues.length === 0) body.push(`<p class="ok">✓ ${esc(ui.noProblems)}</p>`);
     if (view.errors.length > 0) body.push(`<h2>${esc(ui.errorsHeading)}</h2>`, ...view.errors.map((f) => finding(f, view)));
     if (view.warnings.length > 0) body.push(`<h2>${esc(ui.warningsHeading)}</h2>`, ...view.warnings.map((f) => finding(f, view)));
+  }
+  const registry = view.registry;
+  if (registry) {
+    body.push(`<h2>${esc(registry.title)}</h2><p>${esc(registry.source.label)}: ${esc(registry.source.value)}</p>`);
+    for (const entry of registry.entries) {
+      const rows = registryRows(registry, entry).map(([label, value]) => value
+        ? `<li>${esc(label)}: <span style="white-space: pre-wrap">${esc(value)}</span></li>`
+        : `<li>${esc(label)}</li>`).join("");
+      body.push(`<h3>${entry.code}</h3><ul>${rows}</ul>`);
+    }
   }
   return `<!doctype html>
 <html lang="${view.language}">

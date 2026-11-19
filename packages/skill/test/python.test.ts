@@ -16,6 +16,7 @@ import {
   PACKING_KINDS,
   parseAmountInWords,
   parseJson,
+  readRegistry,
   REPORT_LANGUAGES,
   renderHtml,
   renderJson,
@@ -45,9 +46,11 @@ function node(...args: string[]) {
 }
 
 const index = JSON.parse(readFileSync(join(ROOT, "fixtures/index.json"), "utf8")) as {
-  packs: { id: string; variants: { id: string }[] }[];
+  packs: { id: string; variants: { id: string; registry?: string }[] }[];
 };
-const fixtures = index.packs.flatMap((p) => p.variants.map((v) => `${p.id}/${v.id}`));
+const fixtureVariants = index.packs.flatMap((p) => p.variants.map((v) => [`${p.id}/${v.id}`, v] as const));
+const fixtures = fixtureVariants.map(([path]) => path);
+const registryFiles = new Map<string, string>(fixtureVariants.filter(([, v]) => v.registry).map(([path, v]) => [path, join(ROOT, "fixtures", path, v.registry!)]));
 
 /** Inputs beyond the fixtures: unreadable shapes and per-field format issues. */
 function brokenInputs(): [string, unknown][] {
@@ -481,16 +484,32 @@ describe.skipIf(!python)("Python port", () => {
     const dir = mkdtempSync(join(tmpdir(), "lh-py-"));
     const file = join(dir, "extraction.json");
     writeFileSync(file, JSON.stringify(input));
-    const result = checkDocuments(input);
+    const registryFile = registryFiles.get(name);
+    const registryArgs = registryFile ? ["--registry", registryFile] : [];
+    const result = checkDocuments(input, registryFile ? { registry: readRegistry(registryFile) } : {});
+    const newVariant = registryFile || name.endsWith("/tax-id-mismatch");
+    if (newVariant) {
+      const expected = JSON.parse(readFileSync(join(ROOT, "fixtures", name, "expected.json"), "utf8"));
+      expect(result.findings.map(({ rule, severity, key, params }) => ({ rule, severity, key, params }))).toEqual(expected);
+    }
     for (const language of REPORT_LANGUAGES) {
       const out = join(dir, language);
-      const run = py(file, "--lang", language, "--out", out);
+      const run = py(file, "--lang", language, "--out", out, ...registryArgs);
       expect(run.stderr, `${name} ${language}`).toBe("");
       expect(run.status, `${name} ${language} exit`).toBe(result.ok ? 0 : 1);
       const view = buildReport(result, language);
       expect(readFileSync(join(out, "report.md"), "utf8"), `${name} ${language} md`).toBe(renderMarkdown(view));
       expect(readFileSync(join(out, "report.json"), "utf8"), `${name} ${language} json`).toBe(renderJson(result, view));
       expect(readFileSync(join(out, "report.html"), "utf8"), `${name} ${language} html`).toBe(renderHtml(view));
+      if (newVariant) {
+        const nodeOut = join(dir, `node-${language}`);
+        const built = node(file, "--lang", language, "--out", nodeOut, "--no-annotate", ...registryArgs);
+        expect(built.status).toBe(0);
+        for (const format of ["md", "json", "html"]) {
+          const filename = `report.${format}`;
+          expect(readFileSync(join(nodeOut, filename))).toEqual(readFileSync(join(out, filename)));
+        }
+      }
     }
   });
 
@@ -537,6 +556,15 @@ describe.skipIf(!python)("Python port", () => {
       expect(b.status).toBe(a.status);
       return b;
     };
+
+    it("a malformed registry snapshot", () => {
+      const dir = scratch();
+      const path = join(dir, "registry.json");
+      writeFileSync(path, '{"schemaVersion":"1","entries":[]}');
+      const run = same(clean, "--registry", path, "--out", dir);
+      expect(run).toMatchObject({ status: 2, stdout: "" });
+      expect(run.stderr).toContain("Invalid registry snapshot");
+    });
 
     it("an output folder that cannot be made or written to", () => {
       const dir = scratch();

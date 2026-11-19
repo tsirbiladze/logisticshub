@@ -3,7 +3,7 @@
   "properties": {
     "schemaVersion": {
       "type": "string",
-      "const": "2"
+      "const": "3"
     },
     "documents": {
       "type": "array",
@@ -288,12 +288,17 @@
         "country": {
           "description": "Country as written in the document, also when it is the last word of the address.",
           "$ref": "#/$defs/citedText"
+        },
+        "taxId": {
+          "description": "Tax or company identification number as printed, without the label. Null when none is printed.",
+          "$ref": "#/$defs/citedText"
         }
       },
       "required": [
         "name",
         "address",
-        "country"
+        "country",
+        "taxId"
       ],
       "additionalProperties": false
     },

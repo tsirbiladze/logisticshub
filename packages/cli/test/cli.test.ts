@@ -11,7 +11,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { MockLanguageModelV4 } from "ai/test";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AGENT_ONLY_SECTIONS, answerObject, correctionRequest, issueRows, MODEL_GUIDE, MODEL_INSTRUCTIONS } from "../src/extract.ts";
 import { createServer, ISSUES_PREFACE, SERVER_INSTRUCTIONS } from "../src/mcp.ts";
 import { ModelConfigError, parseModelId, resolveModel } from "../src/models.ts";
@@ -390,7 +390,7 @@ describe("logisticshub check, from its help alone", () => {
     const help = cli("--help").stdout;
     const readme = readFileSync(join(ROOT, "packages/cli/README.md"), "utf8");
     const options = [...new Set([...help.matchAll(/(?<![\w-])--?[a-z][a-z-]*/g)].map((m) => m[0]))];
-    expect(options.sort()).toEqual(["--format", "--help", "--json", "--lang", "--limit", "--model", "--no-annotate", "--out", "--pdf-dir", "--version", "-h", "-v"]);
+    expect(options.sort()).toEqual(["--fetch-registry", "--format", "--help", "--json", "--lang", "--limit", "--model", "--no-annotate", "--out", "--pdf-dir", "--registry", "--version", "-h", "-o", "-v"]);
     for (const option of options) expect(readme, option).toContain(`\`${option}`);
     for (const fact of [
       ".pdf`, `.png`, `.jpg`, `.jpeg` and `.webp`",
@@ -499,7 +499,7 @@ describe("logisticshub check extraction.json", () => {
 
   it("exits with 1 and writes the reports when the extraction is not usable", () => {
     const dir = out();
-    writeFileSync(join(dir, "extraction.json"), fixture("en-led-lighting/clean/extraction.json").replace('"schemaVersion": "2"', '"schemaVersion": "1"'));
+    writeFileSync(join(dir, "extraction.json"), fixture("en-led-lighting/clean/extraction.json").replace('"schemaVersion": "3"', '"schemaVersion": "1"'));
     const run = cli("check", join(dir, "extraction.json"), "--out", join(dir, "out"));
     expect(run.status).toBe(1);
     expect(run.stdout).toContain('written for schema version "1"');
@@ -783,6 +783,53 @@ describe("models", () => {
   });
 });
 
+describe("registry commands", () => {
+  it("uses a saved snapshot, fetches a new one and prints a single reply on both Node entry points", () => {
+    // Intercept every request in the child, including unexpected ones.
+    const fake = `globalThis.fetch = async (url, request) => {
+      if (url !== "https://xdata.rs.ge/TaxPayer/RSPublicInfo" || request.body !== '{"IdentCode":"910000001"}') {
+        process.stderr.write("Unexpected request");
+        throw new Error("Unexpected request");
+      }
+      return Response.json({ Status: -100, Message: "System error" });
+    };`;
+    const dir = out();
+    const stored = join(FIXTURES, "ka-office-furniture/registry-name-mismatch");
+    const input = join(stored, "extraction.json");
+    const modified = JSON.parse(readFileSync(input, "utf8"));
+    for (const doc of modified.documents) {
+      const party = doc.buyer ?? doc.consignee;
+      if (party) party.taxId = { value: "910000001", quote: "910000001", page: 1 };
+    }
+    modified.documents[2].carrier.taxId = { value: "91000000001", quote: "91000000001", page: 1 };
+    const onlineInput = join(dir, "extraction.json");
+    writeFileSync(onlineInput, JSON.stringify(modified));
+
+    for (const script of [MAIN, SKILL_SCRIPT]) {
+      const run = (...args: string[]) => spawnSync(process.execPath, ["--import", "data:text/javascript," + encodeURIComponent(fake), script, ...args], { encoding: "utf8" });
+      const check = (...args: string[]) => run(...(script === MAIN ? ["check"] : []), ...args, "--no-annotate", "--lang", "en", "--out", dir);
+      const result = check(input, "--registry", join(stored, "registry.json"));
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(result.stdout).toContain("TAX-01");
+      const fresh = check(onlineInput, "--fetch-registry");
+      expect(fresh.status).toBe(0);
+      expect(fresh.stderr).toBe("Skipped an 11-digit personal number.\n");
+      expect(fresh.stdout).toContain("Could not be checked");
+      expect(fresh.stdout).toContain("System error");
+      expect(JSON.parse(readFileSync(join(dir, "report.json"), "utf8")).findings).toEqual([]);
+      const dest = join(dir, "standalone-registry.json");
+      expect(run("registry", onlineInput, "-o", dest).status).toBe(0);
+      expect(JSON.parse(readFileSync(dest, "utf8")).entries).toMatchObject([{ code: "910000001", error: { Status: -100, Message: "System error" } }]);
+      const single = run("taxpayer", "910000001");
+      expect(single).toMatchObject({ status: 0, stderr: "" });
+      expect(single.stdout).toContain("Could not be checked.\n-100: System error");
+      expect(JSON.parse(run("taxpayer", "910000001", "--json").stdout).error).toEqual({ Status: -100, Message: "System error" });
+      expect(run("taxpayer", "91000000001")).toMatchObject({ status: 2, stderr: "Skipped lookup: an 11-digit personal number is never sent.\n" });
+    }
+  });
+});
+
 describe("MCP server", () => {
   async function connect() {
     const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
@@ -809,7 +856,7 @@ describe("MCP server", () => {
   it("serves the guide and checks an extraction in memory", async () => {
     const client = await connect();
     const tools = await client.listTools();
-    expect(tools.tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide", "lookup_hs_code"]);
+    expect(tools.tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide", "lookup_hs_code", "lookup_taxpayer"]);
 
     const guide = await client.callTool({ name: "get_extraction_guide", arguments: {} });
     expect(JSON.stringify(guide.content)).toContain("Extraction guide");
@@ -826,6 +873,32 @@ describe("MCP server", () => {
     // Nothing to correct, so nothing more to read: the report is the whole text.
     expect(parts(result)).toHaveLength(1);
     await client.close();
+  });
+
+  it("returns a live reply and checks a saved snapshot offline", async () => {
+    const client = await connect();
+    const fetch = vi.fn(async () => Response.json({ Status: -100, Message: "System error" }));
+    vi.stubGlobal("fetch", fetch);
+    try {
+      const live = await client.callTool({ name: "lookup_taxpayer", arguments: { code: "910000001" } });
+      expect(live.structuredContent).toMatchObject({ code: "910000001", error: { Status: -100, Message: "System error" } });
+      expect(text(live)).toContain("Could not be checked");
+      const personal = await client.callTool({ name: "lookup_taxpayer", arguments: { code: "91000000001" } });
+      expect(personal.isError).toBe(true);
+      expect(text(personal)).toContain("personal number");
+      const dir = join(FIXTURES, "ka-office-furniture/registry-status-minus-one");
+      const extraction = JSON.parse(readFileSync(join(dir, "extraction.json"), "utf8"));
+      const saved = await client.callTool({ name: "check_documents", arguments: { extraction, registryFile: join(dir, "registry.json") } });
+      expect(saved.structuredContent).toHaveProperty("registry");
+      expect(structured(saved).findings.map(({ key }) => key)).toEqual(["TAX-03.reply"]);
+      const invalid = await client.callTool({ name: "check_documents", arguments: { extraction, registryFile: join(dir, "extraction.json") } });
+      expect(invalid.isError).toBe(true);
+      expect(text(invalid)).toContain("Invalid registry snapshot");
+      expect(fetch).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+      await client.close();
+    }
   });
 
   it("tells the client what it is for and in which order to call its tools", async () => {
@@ -879,7 +952,7 @@ describe("MCP server", () => {
     expect(parts(mixed)[1]).toContain("One issue is not yours to fix");
 
     // An extraction that is not usable.
-    const old = JSON.parse(fixture("en-led-lighting/clean/extraction.json").replace('"schemaVersion": "2"', '"schemaVersion": "1"'));
+    const old = JSON.parse(fixture("en-led-lighting/clean/extraction.json").replace('"schemaVersion": "3"', '"schemaVersion": "1"'));
     const unusable = await client.callTool({ name: "check_documents", arguments: { extraction: old } });
     expect(unusable.isError).toBe(true);
     expect(parts(unusable)[1]).toBe(ISSUES_PART);
@@ -947,14 +1020,14 @@ describe("MCP server", () => {
     const client = await connect();
     const tool = (await client.listTools()).tools.find((t) => t.name === "check_documents")!;
     const schema = tool.outputSchema as { properties: Record<string, unknown>; required: string[] };
-    expect(Object.keys(schema.properties).sort()).toEqual(["extractionIssues", "files", "findings", "language", "notes", "ok", "summary"]);
-    expect([...schema.required].sort()).toEqual(Object.keys(schema.properties).sort());
+    expect(Object.keys(schema.properties).sort()).toEqual(["extractionIssues", "files", "findings", "language", "notes", "ok", "registry", "summary"]);
+    expect([...schema.required].sort()).toEqual(Object.keys(schema.properties).filter((key) => key !== "registry").sort());
 
     // The client checks every structured result against the schema it was given, and throws when one breaks it.
     const planted = await client.callTool({ name: "check_documents", arguments: { extraction: JSON.parse(fixture("en-led-lighting/line-arithmetic/extraction.json")) } });
     expect(planted.isError).toBe(false);
     const result = structured(planted);
-    expect(Object.keys(result).sort()).toEqual(Object.keys(schema.properties).sort());
+    expect(Object.keys(result).sort()).toEqual([...schema.required].sort());
     expect(result).toMatchObject({ ok: true, language: "en", summary: { documents: 4, errors: 2, warnings: 0 }, extractionIssues: [], files: [], notes: [] });
     expect(result.findings[0]).toEqual({
       rule: "SUM-01",
@@ -984,7 +1057,7 @@ describe("MCP server", () => {
       ["totalGrossWeightKg", "total gross weight", "2 946"],
     ]);
 
-    const old = JSON.parse(fixture("en-led-lighting/clean/extraction.json").replace('"schemaVersion": "2"', '"schemaVersion": "1"'));
+    const old = JSON.parse(fixture("en-led-lighting/clean/extraction.json").replace('"schemaVersion": "3"', '"schemaVersion": "1"'));
     const unusable = await client.callTool({ name: "check_documents", arguments: { extraction: old } });
     expect(unusable.isError).toBe(true);
     expect(structured(unusable)).toMatchObject({ ok: false, findings: [], summary: { documents: 0 } });
@@ -1076,7 +1149,7 @@ describe("MCP server", () => {
     try {
       expect(client.getServerVersion()).toMatchObject({ name: "logisticshub" });
       expect(client.getInstructions()).toBe(SERVER_INSTRUCTIONS);
-      expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide", "lookup_hs_code"]);
+      expect((await client.listTools()).tools.map((t) => t.name).sort()).toEqual(["check_documents", "get_extraction_guide", "lookup_hs_code", "lookup_taxpayer"]);
       for (const [query, matches] of [["9403 30", [{ code: "940330", level: "subheading" }]], ["999999", []]] as const) {
         const result = await client.callTool({ name: "lookup_hs_code", arguments: { query, limit: 1 } });
         expect(result.isError).toBeFalsy();

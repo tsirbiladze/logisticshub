@@ -39,6 +39,10 @@ with open(os.path.join(HERE, "check-data.json"), encoding="utf-8") as _f:
 VERSION = DATA["version"]
 SCHEMA_VERSION = DATA["schemaVersion"]
 REPORT_VERSION = DATA["reportVersion"]
+REGISTRY_FIELDS = DATA["registryFields"]
+REGISTRY_LABELS = DATA["registryLabels"]
+REGISTRY_SOURCE = DATA["registrySource"]
+REGISTRY_VERSION = DATA["registryVersion"]
 REPORT_LANGUAGES = DATA["languages"]
 RULE_IDS = DATA["ruleIds"]
 RULE_TITLES = DATA["ruleTitles"]
@@ -569,7 +573,7 @@ def _cited(kind):
 
 
 TEXT, DECIMAL, DATE, CURRENCY, WORDS = (_cited(k) for k in ("text", "decimal", "date", "currency", "words"))
-PARTY = ("obj", [("name", TEXT), ("address", TEXT), ("country", TEXT)])
+PARTY = ("obj", [("name", TEXT), ("address", TEXT), ("country", TEXT), ("taxId", TEXT)])
 REFERENCE = ("obj", [("number", TEXT), ("date", DATE)])
 INCOTERM = ("obj", [("code", TEXT), ("place", TEXT), ("version", TEXT)])
 
@@ -2687,14 +2691,135 @@ def is_georgia(value):
     return js_trim(value or "").replace("İ", "i").lower() in GEORGIA_COUNTRIES
 
 
+def georgian_party(party):
+    return all(is_georgia(party["country"][key]) for key in ("value", "quote"))
+
+
+def document_parties(doc):
+    roles = {
+        "commercial_invoice": ("seller", "buyer", "consignee"),
+        "packing_list": ("shipper", "consignee"),
+        "cmr": ("sender", "carrier", "consignee"),
+        "contract": ("seller", "buyer"),
+    }
+    return ((role, doc[role]) for role in roles.get(doc["type"], ()))
+
+
+def tax_digits(field):
+    value, quote, page = (field[key] for key in ("value", "quote", "page"))
+    if value is None or quote is None or page is None or page < 1:
+        return None
+
+    def digits(printed):
+        printed = js_trim(printed)
+        if re.match(r"[A-Za-z]{2}", printed) and len(printed) > 2:
+            next_char = printed[2]
+            if next_char in JS_WS or cat(next_char) == "Pd" or next_char in "0123456789":
+                printed = printed[2:]
+        return "".join(ch for ch in printed if ch not in JS_WS and cat(ch) != "Pd")
+
+    code = digits(value)
+    return code if re.fullmatch(r"[0-9]+", code) and code == digits(quote) else None
+
+
+def company_parties(documents):
+    for doc in documents:
+        for role, party in document_parties(doc):
+            if georgian_party(party):
+                code = tax_digits(party["taxId"])
+                if code and len(code) == 9:
+                    yield doc, role, party, code
+
+
+def rule_party_tax_ids(ctx):
+    findings, seen, reported = [], [], {}
+    for doc in ctx["extraction"]["documents"]:
+        for role, party in document_parties(doc):
+            if party["taxId"]["value"] is None:
+                continue
+            citation = evidence(doc, role + ".taxId", party["taxId"])
+            code = tax_digits(party["taxId"])
+            name = text_of(party["name"])
+            if not code or (georgian_party(party) and len(code) not in (9, 11)):
+                findings.append(finding("PTY-02", "warning", "PTY-02.unreadable", {"name": name or ""}, [citation]))
+                continue
+            if not name:
+                continue
+            for earlier_name, earlier_code, first in seen:
+                if earlier_code == code or first["documentIndex"] == citation["documentIndex"] or same_party(earlier_name, name) is not True:
+                    continue
+                pair = tuple(sorted((earlier_code, code)))
+                names = reported.setdefault(pair, [])
+                if any(same_party(reported_name, name) is True for reported_name in names):
+                    continue
+                names.append(name)
+                findings.append(finding("PTY-02", "error", "PTY-02.number",
+                                        {"name": name, "a": first["quote"], "b": citation["quote"]}, [first, citation]))
+            seen.append((name, code, citation))
+    return findings
+
+
+def registry_parties(ctx):
+    snapshot = ctx["options"].get("registry")
+    if snapshot is None:
+        return
+    entries = {entry["code"]: entry for entry in snapshot["entries"]}
+    for doc, role, party, code in company_parties(ctx["extraction"]["documents"]):
+        if code in entries:
+            yield doc, role, party, code, entries[code]
+
+
+def rule_taxpayer_name(ctx):
+    findings, seen = [], set()
+    for doc, role, party, code, entry in registry_parties(ctx):
+        answer = entry.get("answer", [])
+        registered = answer[0]["FullName"] if len(answer) == 1 else None
+        printed = text_of(party["name"])
+        if not registered or not printed:
+            continue
+        a, b = " ".join(name_tokens(printed)), " ".join(name_tokens(registered))
+        if script_of(a) == "other" or script_of(a) != script_of(b):
+            continue
+        key = (code, a)
+        if not a or not b or a == b or key in seen:
+            continue
+        seen.add(key)
+        findings.append(finding("TAX-01", "warning", "TAX-01.name",
+                                {"printed": printed, "registered": registered, "snapshotDate": entry["checkedAt"][:10]},
+                                [evidence(doc, role + ".name", party["name"]), evidence(doc, role + ".taxId", party["taxId"])]))
+    return findings
+
+
+def rule_taxpayer_vat(ctx):
+    findings = []
+    for doc, role, party, code, entry in registry_parties(ctx):
+        answer = entry.get("answer", [])
+        if doc["type"] != "commercial_invoice" or role != "seller" or num(doc["tax"]) is None or not answer or not all(row["VatPayer"] == "არა" for row in answer):
+            continue
+        findings.append(finding("TAX-02", "warning", "TAX-02.vat", {"code": code, "checkedAt": entry["checkedAt"]},
+                                [evidence(doc, "seller.taxId", party["taxId"]), evidence(doc, "tax", doc["tax"])]))
+    return findings
+
+
+def rule_taxpayer_reply(ctx):
+    findings, seen = [], set()
+    for doc, role, party, code, entry in registry_parties(ctx):
+        error = entry.get("error", {})
+        if error.get("Status") != -1 or code in seen:
+            continue
+        seen.add(code)
+        findings.append(finding("TAX-03", "warning", "TAX-03.reply", {"code": code, "reply": error["Message"]},
+                                [evidence(doc, role + ".taxId", party["taxId"])]))
+    return findings
+
+
 def rule_hs_codes(ctx):
     findings = []
     for invoice in ctx["invoices"]:
         date = iso_date(invoice["date"])
-        countries = (invoice[role]["country"] for role in ("seller", "buyer", "consignee"))
         if not date or not any(item["hsCode"]["value"] is not None for item in invoice["lines"]):
             continue
-        if not any(is_georgia(country["value"]) and is_georgia(country["quote"]) for country in countries):
+        if not any(georgian_party(party) for _, party in document_parties(invoice)):
             continue
         data, by_code, by_subheading = hs_nomenclature()
         if date < data["edition"]["inForceFrom"]:
@@ -2756,6 +2881,10 @@ RULES = [
     rule_cmr_particulars,
     rule_checklist,
     rule_hs_codes,
+    rule_party_tax_ids,
+    rule_taxpayer_name,
+    rule_taxpayer_vat,
+    rule_taxpayer_reply,
 ]
 DEFAULT_OPTIONS = {"weightToleranceKg": "0.5", "volumeToleranceM3": "0.01"}
 
@@ -2791,11 +2920,13 @@ def check_extraction(extraction, options=None, unusable=None):
 
 def check_documents(data, options=None):
     parsed = parse_extraction(data)
+    snapshot = (options or {}).get("registry")
     if not parsed["ok"]:
         return {"ok": False, "extraction": None, "extractionIssues": parsed["issues"], "findings": [],
+                **({"registry": {"snapshot": snapshot, "parties": []}} if snapshot is not None else {}),
                 "summary": {"documents": 0, "errors": 0, "warnings": 0}}
     findings = check_extraction(parsed["extraction"], options, parsed["unusable"])
-    return {
+    result = {
         "ok": True,
         "extraction": parsed["extraction"],
         "extractionIssues": parsed["issues"],
@@ -2806,6 +2937,13 @@ def check_documents(data, options=None):
             "warnings": len([f for f in findings if f["severity"] == "warning"]),
         },
     }
+    if snapshot is not None:
+        result["registry"] = {
+            "snapshot": snapshot,
+            "parties": [{"code": code, "name": party["name"]["value"]}
+                        for _, _, party, code in company_parties(parsed["extraction"]["documents"])],
+        }
+    return result
 
 
 # ==== report ====
@@ -3034,6 +3172,46 @@ def field_label(type_, path, language):
     return "%s %d, %s" % (VOCAB[language]["line"], int(line.group(1)) + 1, label) if line else label
 
 
+def registry_view(registry, language):
+    title, source, party, time, unavailable, status, message, *field_labels = REGISTRY_LABELS[language]
+    snapshot = registry["snapshot"]
+    parties = {}
+    for item in registry["parties"]:
+        names = parties.setdefault(item["code"], {})
+        if item["name"]:
+            names[item["name"]] = None
+    replies = {entry["code"]: entry for entry in snapshot["entries"]}
+    entries = []
+    for code in dict.fromkeys([*parties, *replies]):
+        reply = replies.get(code, {})
+        entry = {"code": code, "parties": list(parties.get(code, {})), "checkedAt": reply.get("checkedAt")}
+        if "answer" in reply:
+            entry["answer"] = reply["answer"]
+        elif "error" in reply:
+            entry["error"] = reply["error"]
+        entry["checked"] = bool(reply.get("answer")) or reply.get("error", {}).get("Status") == -1
+        entries.append(entry)
+    labels = {"party": party, "time": time, "unavailable": unavailable, "replyStatus": status, "replyMessage": message}
+    labels.update(zip(REGISTRY_FIELDS, field_labels))
+    return {"title": title, "source": {"label": source, "value": snapshot["sourceUrl"]}, "labels": labels, "entries": entries}
+
+
+def registry_rows(registry, entry):
+    labels = registry["labels"]
+    rows = [(labels["party"], " · ".join(entry["parties"]) or "—"), (labels["time"], entry["checkedAt"] or "—")]
+    if not entry["checked"]:
+        rows.append((labels["unavailable"], ""))
+    if "error" in entry:
+        error = entry["error"]
+        if "Status" in error:
+            rows += [(labels["replyStatus"], js_number(error["Status"])), (labels["replyMessage"], error["Message"])]
+        else:
+            rows.append((labels["replyMessage"], error["transport"]))
+    for answer in entry.get("answer", []):
+        rows.extend((labels[field], answer[field]) for field in REGISTRY_FIELDS)
+    return rows
+
+
 def build_report(result, language=None):
     if language is None:
         language = pick_language(result["extraction"])
@@ -3075,10 +3253,11 @@ def build_report(result, language=None):
         "ui": UI[language],
         "readable": result["ok"],
         "documents": [{"id": d["id"], "type": d["type"], "label": vocab["doc"][d["type"]], "number": d["number"]["value"], "sourceFile": d["sourceFile"]} for d in docs],
-        "rulesRun": len(RULES) if result["ok"] else 0,
+        "rulesRun": len(RULES) - (0 if "registry" in result else 3) if result["ok"] else 0,
         "errors": [f for f in findings if f["severity"] == "error"],
         "warnings": [f for f in findings if f["severity"] == "warning"],
         "extractionIssues": result["extractionIssues"],
+        **({"registry": registry_view(result["registry"], language)} if "registry" in result else {}),
     }
 
 
@@ -3162,6 +3341,13 @@ def render_markdown(view, escape=markdown_text):
             out += ["## " + ui["errorsHeading"], ""] + [_finding_block(f, view, escape) + "\n" for f in errors]
         if warnings:
             out += ["## " + ui["warningsHeading"], ""] + [_finding_block(f, view, escape) + "\n" for f in warnings]
+    registry = view.get("registry")
+    if registry is not None:
+        out += ["## " + registry["title"], "", "%s: %s" % (registry["source"]["label"], escape(registry["source"]["value"])), ""]
+        for entry in registry["entries"]:
+            out += ["### " + entry["code"], ""]
+            out += ["- %s: %s" % (label, escape(value)) if value else "- " + label for label, value in registry_rows(registry, entry)]
+            out.append("")
     out += ["---", ui["generatedBy"]]
     return js_trim("\n".join(out)) + "\n"
 
@@ -3229,6 +3415,13 @@ def render_html(view):
             body += ["<h2>%s</h2>" % esc(ui["errorsHeading"])] + [_html_finding(f, view) for f in errors]
         if warnings:
             body += ["<h2>%s</h2>" % esc(ui["warningsHeading"])] + [_html_finding(f, view) for f in warnings]
+    registry = view.get("registry")
+    if registry is not None:
+        body.append("<h2>%s</h2><p>%s: %s</p>" % (esc(registry["title"]), esc(registry["source"]["label"]), esc(registry["source"]["value"])))
+        for entry in registry["entries"]:
+            rows = "".join('<li>%s: <span style="white-space: pre-wrap">%s</span></li>' % (esc(label), esc(value))
+                           if value else "<li>%s</li>" % esc(label) for label, value in registry_rows(registry, entry))
+            body.append("<h3>%s</h3><ul>%s</ul>" % (entry["code"], rows))
     return (
         "<!doctype html>\n"
         '<html lang="' + view["language"] + '">\n'
@@ -3262,6 +3455,7 @@ def render_json(result, view):
         "documents": view["documents"],
         "extractionIssues": result["extractionIssues"],
         "findings": out_findings,
+        **({"registry": view["registry"]} if "registry" in view else {}),
     }
     return js_stringify(report) + "\n"
 
@@ -3275,19 +3469,21 @@ USAGE = """Logisticshub %s: cross-check trade documents (Python port)
 
 Usage:
   python3 check.py <extraction.json> [--lang en|ka|ru|tr] [--out <dir>] [--format md,json,html]
+                  [--registry <file>]
   python3 check.py --schema
   python3 check.py hs <code or Georgian words> [--json] [--limit <n>]
 
 Writes report.md, report.json and report.html (default: next to the extraction)
 and prints the report. Same reports as check.mjs. The PDFs are not
 read: no marked copies and no check that each quote is printed on its page
-(--pdf-dir and --no-annotate are accepted and ignored).
+(--pdf-dir and --no-annotate are accepted and ignored). --registry reads a saved
+snapshot. The Python checker never connects to the Revenue Service.
 
 Exit codes:
   0  checked, with or without findings
   1  the extraction is not usable: the reports list what to fix
   2  nothing was checked: a bad option, a file that cannot be read or is not
-     JSON, or reports that cannot be written""" % VERSION
+     JSON, a malformed registry snapshot, or reports that cannot be written""" % VERSION
 
 
 class UsageExit(Exception):
@@ -3313,7 +3509,7 @@ def stop(message):
 
 def parse_args(argv):
     options = {"file": None, "lang": None, "out": None, "pdfDir": None, "annotate": True, "formats": FORMATS,
-               "schema": False, "parseWords": None, "dumpTables": False}
+               "schema": False, "parseWords": None, "dumpTables": False, "registry": None}
     i = 0
     while i < len(argv):
         arg = argv[i]
@@ -3339,6 +3535,9 @@ def parse_args(argv):
             options["lang"] = lang
         elif arg == "--out":
             options["out"] = next_value()
+            i += 1
+        elif arg == "--registry":
+            options["registry"] = next_value()
             i += 1
         elif arg == "--pdf-dir":
             options["pdfDir"] = next_value()
@@ -3443,6 +3642,52 @@ def hs_lookup(argv):
     return 0
 
 
+def read_registry(path):
+    def invalid():
+        raise ValueError("Invalid registry snapshot. Expected registry schema version %s, its source URL and valid entries." % REGISTRY_VERSION)
+
+    ok, data = parse_json(read_text(path))
+    if not ok:
+        raise ValueError(data)
+    if (not isinstance(data, dict) or set(data) != {"schemaVersion", "sourceUrl", "entries"}
+            or data["schemaVersion"] != REGISTRY_VERSION or data["sourceUrl"] != REGISTRY_SOURCE
+            or not isinstance(data["entries"], list)):
+        invalid()
+    entries = []
+    for entry in data["entries"]:
+        if not isinstance(entry, dict):
+            invalid()
+        code, checked_at = entry.get("code"), entry.get("checkedAt")
+        if (not isinstance(code, str) or not re.fullmatch(r"[0-9]{9}", code)
+                or not isinstance(checked_at, str)
+                or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\.[0-9]+)?Z", checked_at)
+                or checked_at.startswith("0000-") or not is_iso_date(checked_at[:10])):
+            invalid()
+        normalized = {"code": code, "checkedAt": checked_at}
+        if set(entry) == {"code", "checkedAt", "answer"}:
+            answer = entry["answer"]
+            if (not isinstance(answer, list) or any(not isinstance(row, dict)
+                    or any(not isinstance(row.get(key), str) for key in REGISTRY_FIELDS) for row in answer)):
+                invalid()
+            normalized["answer"] = [{key: row[key] for key in REGISTRY_FIELDS} for row in answer]
+        elif set(entry) == {"code", "checkedAt", "error"}:
+            error = entry["error"]
+            if not isinstance(error, dict):
+                invalid()
+            if set(error) == {"Status", "Message"} and error["Status"] in (-1, -100, -101) and isinstance(error["Message"], str):
+                normalized["error"] = {"Status": error["Status"], "Message": error["Message"]}
+            elif set(error) == {"transport"} and isinstance(error["transport"], str) and error["transport"]:
+                normalized["error"] = {"transport": error["transport"]}
+            else:
+                invalid()
+        else:
+            invalid()
+        entries.append(normalized)
+    if len({entry["code"] for entry in entries}) != len(entries):
+        raise ValueError("Invalid registry snapshot: duplicate company codes.")
+    return dict(data, entries=entries)
+
+
 def main(argv):
     if argv[:1] == ["hs"]:
         return hs_lookup(argv[1:])
@@ -3477,7 +3722,15 @@ def main(argv):
     if not ok:
         stop("Cannot read %s: %s. Fix the file and run the check again." % (file, data))
 
-    result = check_documents(data)
+    registry_path = options["registry"]
+    registry = None
+    if registry_path is not None:
+        registry_path = os.path.abspath(registry_path)
+        try:
+            registry = read_registry(registry_path)
+        except (OSError, ValueError) as error:
+            stop("Cannot read registry snapshot %s: %s" % (registry_path, io_problem(error)))
+    result = check_documents(data, {"registry": registry})
     language = options["lang"] or pick_language(result["extraction"])
     view = build_report(result, language)
     reports = {

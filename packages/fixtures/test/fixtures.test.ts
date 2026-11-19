@@ -4,7 +4,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { checkDocuments } from "@logisticshub/core";
+import { checkDocuments, parseRegistry, renderReports } from "@logisticshub/core";
 import { describe, expect, it } from "vitest";
 import { buildAll } from "../src/build.ts";
 import { documentNames, variantFiles } from "../src/model.ts";
@@ -17,7 +17,7 @@ interface IndexFile {
   packs: {
     id: string;
     documents: string[];
-    variants: { id: string; expected: string[]; expectedIssues?: string[]; layout?: { invoiceBreakBefore?: number; scanned?: string[]; combined?: string[] }; files?: string[] }[];
+    variants: { id: string; expected: string[]; registry?: string; expectedIssues?: string[]; layout?: { invoiceBreakBefore?: number; scanned?: string[]; combined?: string[] }; files?: string[] }[];
   }[];
 }
 
@@ -28,7 +28,7 @@ describe("stored fixtures", () => {
   it("cover four languages with a clean set each", () => {
     expect(index.packs.map((p) => p.id)).toEqual(["ka-office-furniture", "en-led-lighting", "ru-textile", "tr-ceramics"]);
     for (const pack of index.packs) expect(pack.variants[0]?.id).toBe("clean");
-    expect(variants.length).toBe(31);
+    expect(variants.length).toBe(36);
   });
 
   it("print valid Georgian national HS codes in the clean office furniture set", () => {
@@ -153,7 +153,9 @@ describe("stored fixtures", () => {
   it.each(variants.map(({ pack, variant }) => [`${pack.id}/${variant.id}`, pack, variant] as const))(
     "%s: exactly the planted findings",
     (path, pack, variant) => {
-      const result = checkDocuments(read(`${path}/extraction.json`));
+      const registry = variant.registry ? parseRegistry(read(`${path}/${variant.registry}`)) : undefined;
+      const result = checkDocuments(read(`${path}/extraction.json`), registry ? { registry } : {});
+      if (registry) expect(JSON.parse(renderReports(result, "en").json).registry.entries.every(({ checked }: { checked: boolean }) => checked)).toBe(true);
       expect(result.ok).toBe(true);
       expect(result.extractionIssues.map((issue) => `${issue.code} ${issue.path}`)).toEqual(variant.expectedIssues ?? []);
       const actual = result.findings.map(({ rule, severity, key, params }) => ({ rule, severity, key, params }));
@@ -188,6 +190,7 @@ describe("stored fixtures", () => {
       const listed = index.packs.find((p) => p.id === built.pack.spec.id)!.variants.find((v) => v.id === built.variant.id)!;
       expect(listed.files ?? ["invoice.pdf", "packing-list.pdf", "cmr.pdf", "contract.pdf"], built.variant.id).toEqual(variantFiles(built.variant.layout, documentNames(built.documents)).map(({ file }) => file));
       expect(listed.expectedIssues ?? [], built.variant.id).toEqual(built.actualIssues);
+      expect(listed.registry && read(`${built.pack.spec.id}/${built.variant.id}/${listed.registry}`)).toEqual(built.variant.registry);
       const stored = read(`${built.pack.spec.id}/${built.variant.id}/extraction.json`);
       expect(stored, `${built.pack.spec.id}/${built.variant.id}`).toEqual(JSON.parse(JSON.stringify(built.extraction)));
     }
