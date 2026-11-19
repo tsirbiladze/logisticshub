@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "DEC-03",
+    "severity": "error",
+    "key": "DEC-03.gross",
+    "params": {
+      "expected": "1250",
+      "found": "1205",
+      "document": "packing_list"
+    }
+  }
+]

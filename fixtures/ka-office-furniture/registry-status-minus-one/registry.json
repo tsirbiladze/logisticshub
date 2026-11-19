@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1",
+  "sourceUrl": "https://xdata.rs.ge/TaxPayer/RSPublicInfo",
+  "entries": [
+    {
+      "code": "900000001",
+      "checkedAt": "2026-11-19T10:30:00.000Z",
+      "error": {
+        "Status": -1,
+        "Message": "გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე"
+      }
+    },
+    {
+      "code": "900000002",
+      "checkedAt": "2026-11-19T10:30:00.000Z",
+      "answer": [
+        {
+          "FullName": "Caucasus Demo Transit LLC",
+          "Status": "სატესტო სტატუსი",
+          "RegisteredSubject": "სატესტო სუბიექტი",
+          "StartDate": "11/19/2026 9:00:00 AM",
+          "VatPayer": "კი",
+          "Mortgage": "",
+          "Sequestration": "",
+          "AdditionalStatus": "",
+          "NonResident": "არა"
+        }
+      ]
+    }
+  ]
+}

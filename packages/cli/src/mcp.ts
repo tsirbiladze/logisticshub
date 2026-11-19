@@ -3,27 +3,29 @@
  * extraction guide from this server, and sends the extraction for checking.
  */
 import { isAbsolute } from "node:path";
-import { EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, ISSUES_GUIDE, parseJson, REPORT_LANGUAGES, RULE_IDS, type ReportLanguage } from "@logisticshub/core";
+import { lookupTaxpayer, RegistryInputError, taxpayerText, DECLARATION_GUIDE, EXTRACTION_GUIDE, extractionBlank, extractionJsonSchema, HS_LOOKUP_LIMIT, ISSUES_GUIDE, lookupHsCode, parseJson, REPORT_LANGUAGES, RULE_IDS, type ReportLanguage } from "@logisticshub/core";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { OutputError, runCheck } from "./run.ts";
 
 /** Sent to the client when it connects: what the server is for and the order of the calls. */
-export const SERVER_INSTRUCTIONS = `Logisticshub cross-checks the documents of one shipment (commercial invoice, packing list, CMR, sales contract) against each other with ${RULE_IDS.length} deterministic rules. One document is a set too: an invoice on its own gets its line totals, its sums and its amount in words checked. It reads no document itself: you read them, and it checks what you extracted.
+export const SERVER_INSTRUCTIONS = `Logisticshub cross-checks the documents of one shipment (commercial invoice, packing list, CMR, sales contract and optional Georgian customs declaration) against each other with ${RULE_IDS.length} deterministic rules. One document is a set too: an invoice on its own gets its line totals, its sums and its amount in words checked. It reads no document itself: you read them, and it checks what you extracted.
 
-1. Call get_extraction_guide once and read it in full.
+1. Call get_extraction_guide and read it in full. Set includeDeclaration to true if the set includes a Georgian customs declaration.
 2. Read every page of every document of the shipment yourself and build the extraction object the guide describes: each fact with its value, its verbatim quote and its page.
 3. Call check_documents with that object. Give pdfDir (the absolute path of the folder with the PDFs) to have every quote looked up on its page, and outDir (an absolute path) to have the reports written. With both, each PDF that has a finding also gets a copy with the findings marked.
 4. If the result lists extraction issues or notes, its last text part says what each code and each note means and what to do, and which one is not yours to fix. Then correct the extraction against the documents and call check_documents again, at most twice. What is still listed after that goes to the user.
 5. Give the user every finding with its quotes and pages, as a discrepancy to verify against the originals, not as a verdict.
 
-Not for paying or booking an invoice. Nothing is sent anywhere: the check runs on the machine this server runs on.`;
+Use lookup_hs_code to explain a Georgian code or see related entries for HS-01. It uses the original text of Order No. 21 of 2024-01-26 (publication 0). Later amendments were not verified.
+
+Not for paying or booking an invoice. Offer lookup_taxpayer when the user wants to verify a Georgian company. Ask for their agreement first: it sends one 9-digit company code to the Revenue Service. check_documents takes an optional registryFile, an absolute path to a saved snapshot, and checks it offline.`;
 
 /** How the guide's words map to this server: the guide is the skill's, and names the skill's files and script. */
 const GUIDE_PREFACE = `This guide comes with the Logisticshub skill, so it names the skill's files. With this server:
 
 - \`scripts/check.mjs\` is the tool check_documents: pass the extraction as its \`extraction\` argument. Write no file unless the user wants one.
-- \`extraction-schema.json\` and \`extraction-blank.json\` are the two texts that follow the guide.
+- \`extraction-schema.json\` and \`extraction-blank.json\` follow the guide. Set \`includeDeclaration\` to true to include \`declaration.md\` when needed.
 - The \`Notes:\` the guide speaks of come back in the result of check_documents (\`notes\`), when you give it \`pdfDir\`. Without \`pdfDir\` no PDF is read and no quote is looked up.
 - \`issues.md\` comes back with the result of check_documents, as its last text part, whenever that result lists an extraction issue or a note. A result with neither needs no more reading.
 - When the extraction is not usable, the result is an error with \`ok\` false, and \`extractionIssues\` say what to write at which path.`;
@@ -96,6 +98,7 @@ const checkOutput = {
       }),
     )
     .describe("The discrepancies between the documents, errors and warnings."),
+  registry: z.record(z.string(), z.unknown()).optional().describe("Registry section when a snapshot is supplied."),
   files: z.array(z.string()).describe("Absolute paths of the files written; empty without outDir."),
   notes: z
     .array(z.string())
@@ -112,13 +115,15 @@ export function createServer(version: string): McpServer {
     {
       title: "Extraction guide",
       description:
-        "Returns how to extract trade documents (commercial invoice, packing list, CMR, contract) into the object that check_documents expects: the guide, the JSON Schema, and a blank of every document type to copy. Call it before check_documents.",
+        "Returns how to extract trade documents (commercial invoice, packing list, CMR, contract, Georgian customs declaration) into the object that check_documents expects: the guide, the JSON Schema, and a blank of every document type to copy. Call it before check_documents.",
+      inputSchema: { includeDeclaration: z.boolean().optional().describe("Include declaration.md for a Georgian customs declaration.") },
       annotations: { readOnlyHint: true },
     },
-    async () => ({
+    async ({ includeDeclaration }) => ({
       content: [
         { type: "text", text: GUIDE_PREFACE },
         { type: "text", text: EXTRACTION_GUIDE },
+        ...(includeDeclaration ? [{ type: "text" as const, text: DECLARATION_GUIDE }] : []),
         { type: "text", text: `extraction-schema.json (JSON Schema):\n${JSON.stringify(extractionJsonSchema())}` },
         { type: "text", text: `extraction-blank.json:\n${JSON.stringify(extractionBlank())}` },
       ],
@@ -129,7 +134,7 @@ export function createServer(version: string): McpServer {
     "check_documents",
     {
       title: "Check trade documents",
-      description: `Cross-checks the extracted documents of one shipment with ${RULE_IDS.length} deterministic rules (amount in words against figures, totals, quantities, packages, weights, references, dates, parties, Incoterms, CMR particulars) and returns the report with quoted evidence. With pdfDir it looks every quote up on its page; with outDir it writes the reports; with both it also marks the findings on copies of the PDFs.`,
+      description: `Cross-checks the extracted documents of one shipment with ${RULE_IDS.length} deterministic rules (amount in words against figures, totals, quantities, packages, weights, references, dates, parties, Incoterms, CMR particulars, Georgian HS codes, customs declaration) and returns the report with quoted evidence. With pdfDir it looks every quote up on its page; with outDir it writes the reports; with both it also marks the findings on copies of the PDFs.`,
       inputSchema: {
         extraction: z
           .preprocess(fromJsonString, z.record(z.string(), z.unknown(), { error: NOT_AN_OBJECT }))
@@ -139,6 +144,7 @@ export function createServer(version: string): McpServer {
           .string()
           .optional()
           .describe("Absolute path of a folder to write report.md, report.json and report.html (and marked PDFs) into. Without it the report is only returned."),
+        registryFile: z.string().optional().describe("Absolute path to a saved registry.json snapshot. The check reads it offline."),
         pdfDir: z
           .string()
           .optional()
@@ -149,10 +155,10 @@ export function createServer(version: string): McpServer {
       outputSchema: checkOutput,
       annotations: { readOnlyHint: false, idempotentHint: true },
     },
-    async ({ extraction, language, outDir, pdfDir }) => {
+    async ({ extraction, language, outDir, pdfDir, registryFile }) => {
       const refuse = (text: string) => ({ content: [{ type: "text" as const, text }], isError: true });
       if (Object.hasOwn(extraction, NOT_JSON)) return refuse(`${NOT_AN_OBJECT} The string you passed is ${String(extraction[NOT_JSON])}. Nothing was checked.`);
-      for (const [name, path] of [["outDir", outDir], ["pdfDir", pdfDir]] as const) {
+      for (const [name, path] of [["outDir", outDir], ["pdfDir", pdfDir], ["registryFile", registryFile]] as const) {
         if (path !== undefined && !isAbsolute(path)) return refuse(`${name} must be an absolute path; got "${path}".`);
       }
 
@@ -165,9 +171,11 @@ export function createServer(version: string): McpServer {
           ...(language ? { language: language as ReportLanguage } : {}),
           annotate: Boolean(pdfDir),
           ...(pdfDir ? { pdfDir } : {}),
+          ...(registryFile === undefined ? {} : { registryFile }),
         });
       } catch (error) {
         if (error instanceof OutputError) return refuse(`${error.message} Nothing was checked. Give outDir a folder that can be written to, or leave it out to get the report inline.`);
+        if (error instanceof RegistryInputError) return refuse(`${error.message} Nothing was checked.`);
         throw error;
       }
       const files = run.written.length > 0 ? `\n\nFiles:\n${run.written.map((p) => `- ${p}`).join("\n")}` : "";
@@ -193,11 +201,69 @@ export function createServer(version: string): McpServer {
             units,
             evidence: evidence.map((e) => ({ document: e.documentId, sourceFile: e.sourceFile, page: e.page, path: e.path, label: e.label, quote: e.quote, value: e.value })),
           })),
+          ...(run.view.registry ? { registry: run.view.registry } : {}),
           files: run.written,
           notes: run.notes,
         },
         isError: !run.result.ok,
       };
+    },
+  );
+
+  const entry = z.object({
+    code: z.string(),
+    level: z.enum(["heading", "subheading", "national code"]),
+    description: z.string(),
+    depth: z.number().int().nonnegative(),
+    supplementaryUnit: z.string().nullable(),
+  });
+  server.registerTool(
+    "lookup_hs_code",
+    {
+      title: "Look up Georgian HS codes",
+      description: "Search the original annex to Georgian Order No. 21 of 2024-01-26 (publication 0) by code or Georgian description. Later amendments were not verified. Returns official descriptions, related headings and units. Use to explain codes or investigate HS-01 findings.",
+      inputSchema: {
+        query: z.string().trim().min(1).describe("Digits (exact code or prefix, with or without spaces and dots) or a substring of the Georgian description."),
+        limit: z.number().int().positive().optional().describe(`Maximum number of matches, default ${HS_LOOKUP_LIMIT}.`),
+      },
+      outputSchema: {
+        edition: z.object({
+          orderNumber: z.number(),
+          orderDate: z.string(),
+          publishedDate: z.string(),
+          inForceFrom: z.string(),
+          title: z.string(),
+          documentId: z.number(),
+          publication: z.number(),
+          laterAmendmentsVerified: z.literal(false),
+        }),
+        sourceUrl: z.url(),
+        matches: z.array(entry.extend({ ancestors: z.array(entry) })),
+      },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async ({ query, limit }) => {
+      const result = lookupHsCode(query, limit);
+      return { content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result };
+    },
+  );
+
+  server.registerTool(
+    "lookup_taxpayer",
+    {
+      title: "Look up a Georgian company",
+      description: "With the user's agreement, send one 9-digit company code to the Revenue Service and return its public reply. Personal numbers are never sent.",
+      inputSchema: { code: z.string().describe("A 9-digit Georgian company code.") },
+      annotations: { readOnlyHint: true, openWorldHint: true },
+    },
+    async ({ code }) => {
+      try {
+        const entry = await lookupTaxpayer(code);
+        return { content: [{ type: "text", text: taxpayerText(entry) }], structuredContent: entry };
+      } catch (error) {
+        if (!(error instanceof RegistryInputError)) throw error;
+        return { content: [{ type: "text", text: error.message }], isError: true };
+      }
     },
   );
 

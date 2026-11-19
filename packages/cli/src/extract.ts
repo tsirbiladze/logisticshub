@@ -20,6 +20,7 @@ import { checkQuotes } from "@logisticshub/annotate";
 import {
   classificationJsonSchema,
   documentJsonSchema,
+  DECLARATION_GUIDE,
   EXTRACTION_GUIDE,
   ISSUES_GUIDE,
   parseExtraction,
@@ -95,7 +96,7 @@ export const MODEL_INSTRUCTIONS = `You extract one trade document into JSON for 
 The guide below was written for an agent that works with a user, runs commands and writes a whole \`extraction.json\`. You are called by a program, once per file, and your whole answer is the JSON of one document. Follow the guide with these differences:
 
 - **One file, one document.** You see one file and return the one document the request names. The program gives it its \`id\` and \`sourceFile\` and puts the documents of the set together, so of the section "File" only \`type\`, \`language\` and the last point are yours. When the file holds more than the document the request names, extract that document and leave the rest. \`page\` counts the pages of the file you were given, from 1. Where the guide looks at the issuer's other documents, you have none: go on to the next rule it gives.
-- **No commands and no other files.** You cannot run \`pdftotext\`, \`pdftoppm\`, \`scripts/check.mjs\` or \`scripts/check.py\`, and you cannot open \`extraction-schema.json\`, \`extraction-blank.json\` or \`issues.md\`. Read the file as you were given it; the schema of your answer already holds every key.
+- **No commands and no other files.** You cannot run \`pdftotext\`, \`pdftoppm\`, \`scripts/check.mjs\` or \`scripts/check.py\`, and you cannot open \`extraction-schema.json\`, \`extraction-blank.json\`, \`issues.md\` or \`declaration.md\`. The declaration guide is included here when applicable. Read the file as you were given it; the schema of your answer already holds every key.
 - **No user to tell.** Nothing but the JSON reaches anyone: there is no report and no list to keep. Where the guide says to tell the user, apply the reading it gives and say nothing. Where the guide gives no reading, or a character cannot be read for certain, the fact is \`{ "value": null, "quote": null, "page": null }\`. A null is safe; a guess makes a false finding.
 - **One correction.** The program checks your answer: the format of every value, each value against its own quote, and every quote against the text of its page. It may come back once with the problems it found, and with what \`issues.md\` says about each code among them. Correct those against the document and change nothing else. Change a value or a quote only to what the document prints, never just to make a problem go away: where the guide's point "A document that prints both conventions" applies, your value stays and so does the problem.`;
 
@@ -108,6 +109,7 @@ const ID: Record<DocumentType, string> = {
   packing_list: "packing-list",
   cmr: "cmr",
   contract: "contract",
+  customs_declaration: "declaration",
   other: "other",
 };
 
@@ -156,7 +158,7 @@ async function classify(file: InputFile, model: LanguageModel): Promise<Document
     filePart(file),
     {
       type: "text",
-      text: `Classify this file: commercial_invoice, packing_list, cmr (road consignment note), contract, or other. One entry, sourceFile exactly as given: ${file.name}.`,
+      text: `Classify this file: commercial_invoice, packing_list, cmr (road consignment note), contract, customs_declaration (Georgian goods declaration or draft), or other. One entry, sourceFile exactly as given: ${file.name}.`,
     },
   ];
   const { output } = await generateText({
@@ -201,14 +203,16 @@ export function answerObject(text: string): Record<string, unknown> {
 }
 
 /** One document from the model: the answer as text, read as JSON. Its shape is checked by validate(). */
-async function documentFrom(model: LanguageModel, messages: ModelMessage[]): Promise<TradeDocument> {
-  const { text, finishReason } = await generateText({ model, system: SYSTEM, messages });
+async function documentFrom(model: LanguageModel, type: DocumentType, messages: ModelMessage[]): Promise<TradeDocument> {
+  const { text, finishReason } = await generateText({ model, system: type === "customs_declaration" ? `${SYSTEM}\n${DECLARATION_GUIDE}` : SYSTEM, messages });
   if (finishReason === "length") throw new Error("the answer was cut off at the model's output limit");
-  return answerObject(text) as unknown as TradeDocument;
+  const document = answerObject(text);
+  if (document.type === "customs_declaration") document.sourceKind = null;
+  return document as unknown as TradeDocument;
 }
 
 function extractOne(file: InputFile, type: DocumentType, model: LanguageModel): Promise<TradeDocument> {
-  return documentFrom(model, extractMessages(file, type));
+  return documentFrom(model, type, extractMessages(file, type));
 }
 
 function repairOne(
@@ -219,7 +223,7 @@ function repairOne(
   model: LanguageModel,
 ): Promise<TradeDocument> {
   // The schema of the classified type is in the first request: the document's own type may be what is broken.
-  return documentFrom(model, [
+  return documentFrom(model, type, [
     ...extractMessages(file, type),
     { role: "assistant", content: JSON.stringify(doc) },
     { role: "user", content: correctionRequest(issues) },

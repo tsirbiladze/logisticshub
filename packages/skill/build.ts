@@ -3,6 +3,7 @@
  *   SKILL.md, scripts/check.mjs (single file, no dependencies) and
  *   scripts/THIRD-PARTY-NOTICES.txt (licenses of what check.mjs bundles),
  *   scripts/check.py + check-data.json (Python port),
+ *   scripts/hs-nomenclature.json.gz (shared by Node and Python),
  *   references/extraction.md, extraction-schema.json, extraction-blank.json,
  *   references/issues.md, rules.md
  * The output is committed so `npx skills add` works without a build.
@@ -16,6 +17,7 @@ import {
   CURRENCY_CODES,
   CURRENCY_SIGNS,
   DATE_PARAMS,
+  DECLARATION_GUIDE,
   EXTRACTION_CHECKS,
   EXTRACTION_GUIDE,
   FIELD_LABELS,
@@ -42,6 +44,10 @@ import {
   RULE_PRINCIPLES,
   RULE_REFERENCE,
   RULE_TITLES,
+  REGISTRY_FIELDS,
+  REGISTRY_LABELS,
+  REGISTRY_SOURCE,
+  REGISTRY_VERSION,
   SCHEMA_VERSION,
   SEA_ONLY,
   SELLER_INSURES,
@@ -49,6 +55,9 @@ import {
   UNIT_ALIASES,
   VOCAB,
 } from "@logisticshub/core";
+import { RS_FIELDS } from "../core/src/declaration.ts";
+import { COUNTRIES } from "../core/src/check/rules/declaration.ts";
+import { GEORGIA_COUNTRIES, HS_LOOKUP_LIMIT } from "../core/src/hs.ts";
 import { thirdPartyNotices } from "../cli/notices.ts";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -77,6 +86,7 @@ const { metafile } = await build({
 });
 
 writeFileSync(`${OUT}scripts/THIRD-PARTY-NOTICES.txt`, thirdPartyNotices(metafile, `Logisticshub ${version} (scripts/check.mjs)`));
+copyFileSync(here("../core/src/hs-nomenclature.json.gz"), `${OUT}scripts/hs-nomenclature.json.gz`);
 copyFileSync(here("SKILL.md"), `${OUT}SKILL.md`);
 
 // Python port (claude.ai / Claude API, no Node): logic in check.py, every text
@@ -90,11 +100,19 @@ const lexicons = Object.fromEntries(
 );
 const data = {
   version,
+  georgiaCountries: GEORGIA_COUNTRIES,
+  countries: COUNTRIES,
+  rsFields: RS_FIELDS,
+  hsLookupLimit: HS_LOOKUP_LIMIT,
   schemaVersion: SCHEMA_VERSION,
   reportVersion: REPORT_VERSION,
   languages: REPORT_LANGUAGES,
   ruleIds: RULE_IDS,
   ruleTitles: RULE_TITLES,
+  registryFields: REGISTRY_FIELDS,
+  registryLabels: REGISTRY_LABELS,
+  registrySource: REGISTRY_SOURCE,
+  registryVersion: REGISTRY_VERSION,
   ruleChecks: RULE_CHECKS,
   keyChecks: KEY_CHECKS,
   fieldLabels: FIELD_LABELS,
@@ -122,6 +140,7 @@ const data = {
 writeFileSync(`${OUT}scripts/check-data.json`, `${JSON.stringify(data, null, 2)}\n`);
 writeFileSync(`${OUT}references/extraction.md`, EXTRACTION_GUIDE);
 writeFileSync(`${OUT}references/issues.md`, ISSUES_GUIDE);
+writeFileSync(`${OUT}references/declaration.md`, DECLARATION_GUIDE);
 writeFileSync(`${OUT}references/extraction-schema.json`, `${JSON.stringify(extractionJsonSchema(), null, 2)}\n`);
 writeFileSync(`${OUT}references/extraction-blank.json`, `${blankJson(extractionBlank())}\n`);
 

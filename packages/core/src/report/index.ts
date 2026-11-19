@@ -10,6 +10,8 @@ export { renderHtml, REPORT_CSS } from "./html.ts";
 export { markdownText, plainText, renderMarkdown, renderText } from "./markdown.ts";
 export { buildReport, evidenceHeading, evidenceSource, fieldLabel, pickLanguage, type Citation, type EvidenceView, type FindingView, type ReportView } from "./view.ts";
 
+export { REGISTRY_LABELS } from "./registry.ts";
+
 export const REPORT_VERSION = "1";
 
 /**
@@ -35,6 +37,8 @@ export function renderJson(result: CheckResult, view: ReportView): string {
         message: findings[i]?.message,
         check: findings[i]?.check,
       })),
+      ...(view.sourceNotes.length ? { sourceNotes: view.sourceNotes } : {}),
+      ...(view.registry ? { registry: view.registry } : {}),
     },
     null,
     2,

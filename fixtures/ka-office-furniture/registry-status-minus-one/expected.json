@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "TAX-03",
+    "severity": "warning",
+    "key": "TAX-03.reply",
+    "params": {
+      "code": "900000001",
+      "reply": "გადამხდელი არ არის რეგისტრირებული ESERVICES.RS.GE-ზე"
+    }
+  }
+]

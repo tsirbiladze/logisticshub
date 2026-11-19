@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "DEC-02",
+    "severity": "warning",
+    "key": "DEC-02.invoice-prefix",
+    "params": {
+      "code": "940330",
+      "line": "2"
+    }
+  }
+]

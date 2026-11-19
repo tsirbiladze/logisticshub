@@ -1,0 +1,31 @@
+{
+  "DATA": [
+    {
+      "CustomsCode": "99099",
+      "CustomsName": "სატესტო გაფორმების ზონა",
+      "Regime": "იმ",
+      "RegistrationNumber": "C-DEMO-2041",
+      "RegistrationDate": "20.09.2026",
+      "AssessmentNumber": "A-DEMO-2052",
+      "AssessmentDate": "21.09.2026",
+      "ExporterCode": "TR-900001",
+      "ImporterCode": "900000001",
+      "SenderCountryCode": "792",
+      "DestinationCountryCode": "268",
+      "ItemNumber": 1,
+      "HSCode": "94031058000",
+      "CustomsProcedure": "4000",
+      "OriginCountryCode": "792",
+      "BruttoWeight": 1250,
+      "NettoWeight": 1050,
+      "ValueInGEL": 40582.96,
+      "GoodsDescription": "საოფისე ავეჯი, ლითონის ტუმბოები",
+      "SupplementaryQuantity": 100,
+      "SupplementaryUnit": "ცალი"
+    }
+  ],
+  "STATUS": {
+    "ID": 0,
+    "TEXT": "ოპერაცია წარმატებით დასრულდა"
+  }
+}

@@ -19,8 +19,9 @@ import { z } from "zod";
  *
  * 2: commercial_invoice gained tax, otherCharges and discountPercent;
  *    packing_list and its lines gained packingMethod.
+ * 3: parties gained taxId and the customs_declaration type was added.
  */
-export const SCHEMA_VERSION = "2";
+export const SCHEMA_VERSION = "3";
 
 export const LANGUAGES = ["en", "ru", "tr", "ka", "other"] as const;
 export const languageSchema = z.enum(LANGUAGES);
@@ -31,6 +32,7 @@ export const DOCUMENT_TYPES = [
   "packing_list",
   "cmr",
   "contract",
+  "customs_declaration",
   "other",
 ] as const;
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
@@ -93,6 +95,7 @@ export const partySchema = z.object({
   name: citedText.describe("Company or person name, with its legal form."),
   address: citedText.describe("Street, building, postal code and city, without the country. Null when only a name and a country are printed."),
   country: citedText.describe("Country as written in the document, also when it is the last word of the address."),
+  taxId: citedText.describe("Tax or company identification number as printed, without the label. Null when none is printed."),
 }).meta({ id: "party" });
 
 export const referenceSchema = z.object({
@@ -237,6 +240,46 @@ export const contractSchema = z.object({
   goodsDescription: citedText.describe("The goods as the contract names them, to the end of that sentence and without its heading, on one line."),
 }).meta({ id: "contract" });
 
+export const declarationItemSchema = z.object({
+  itemNumber: citedText.describe("Goods item number (box 32)."),
+  description: citedText.describe("Goods description (box 31)."),
+  packages: citedDecimal.describe("Number of packages for the item (box 31), when printed."),
+  packingMethod: citedText.describe("Packing method for the item (box 31), when printed."),
+  hsCode: citedText.describe("Tariff code as printed (box 33), keeping leading zeros."),
+  countryOfOrigin: citedText.describe("Country of origin or its code as printed (box 34a)."),
+  grossWeightKg: citedDecimal.describe("Gross weight in kilograms (box 35)."),
+  procedure: citedText.describe("Procedure as printed (box 37)."),
+  netWeightKg: citedDecimal.describe("Net weight in kilograms (box 38)."),
+  supplementaryQuantity: citedDecimal.describe("Quantity in the supplementary unit (box 41)."),
+  supplementaryUnit: citedText.describe("Supplementary unit as printed (box 41)."),
+  invoiceValue: citedDecimal.describe("Item value in box 22's invoice currency (box 42)."),
+  customsValueGel: citedDecimal.describe("Customs value in GEL (box 46)."),
+  rsValueInGel: citedDecimal.describe("Only for an RS response: ValueInGEL as supplied, with no box assigned. Null for a PDF."),
+}).meta({ id: "declarationItem" });
+
+export const customsDeclarationSchema = z.object({
+  type: z.literal("customs_declaration"),
+  ...baseFields,
+  sourceKind: z.enum(["rs_json"]).nullable().describe("Null for a PDF or image. rs_json only for documents created by declaration-from-rs, whose facts have null pages."),
+  number: citedText.describe("Registration number (box A), when printed."),
+  date: citedDate.describe("Registration date (box A), when printed."),
+  customsOfficeCode: citedText.describe("Customs office code (box A)."),
+  customsOfficeName: citedText.describe("Customs office name (box A)."),
+  regime: citedText.describe("Regime exactly as printed (box 1), e.g. 'იმ 4'."),
+  assessmentNumber: citedText.describe("Assessment number (box B), when printed."),
+  assessmentDate: citedDate.describe("Assessment date (box B), when printed."),
+  exporter: partySchema.describe("Exporter (box 2)."),
+  importer: partySchema.describe("Importer (box 8)."),
+  countryOfDispatch: citedText.describe("Country of dispatch (box 15), as printed."),
+  countryOfDestination: citedText.describe("Country of destination (box 17), as printed."),
+  currency: citedCurrency.describe("Invoice currency (box 22)."),
+  totalInvoiceAmount: citedDecimal.describe("Total invoice amount (box 22)."),
+  exchangeRate: citedDecimal.describe("Exchange rate (box 23)."),
+  totalPackages: citedDecimal.describe("Total packages (box 6), retaining the packing word in the quote if printed."),
+  attachedDocuments: z.array(citedText).describe("Documents listed in box 44, one text entry per document, including its code and number where printed."),
+  items: z.array(declarationItemSchema).describe("One entry per declared goods item identified by box 32, in document order."),
+}).meta({ id: "customsDeclaration" });
+
 export const otherDocumentSchema = z.object({
   type: z.literal("other"),
   ...baseFields,
@@ -248,6 +291,7 @@ export const documentSchema = z.discriminatedUnion("type", [
   packingListSchema,
   cmrSchema,
   contractSchema,
+  customsDeclarationSchema,
   otherDocumentSchema,
 ]);
 
@@ -264,6 +308,8 @@ export type CommercialInvoice = z.infer<typeof commercialInvoiceSchema>;
 export type PackingList = z.infer<typeof packingListSchema>;
 export type Cmr = z.infer<typeof cmrSchema>;
 export type Contract = z.infer<typeof contractSchema>;
+export type CustomsDeclaration = z.infer<typeof customsDeclarationSchema>;
+export type DeclarationItem = z.infer<typeof declarationItemSchema>;
 export type OtherDocument = z.infer<typeof otherDocumentSchema>;
 export type TradeDocument = z.infer<typeof documentSchema>;
 export type Extraction = z.infer<typeof extractionSchema>;

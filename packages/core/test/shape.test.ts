@@ -16,7 +16,7 @@ function cited(value: string | null) {
   return { value, quote: value, page: value === null ? null : 1 };
 }
 
-const TYPES = "commercial_invoice, packing_list, cmr, contract or other";
+const TYPES = "commercial_invoice, packing_list, cmr, contract, customs_declaration or other";
 const BLANK = '{ "value": null, "quote": null, "page": null }';
 
 describe("shapeIssues", () => {
@@ -42,7 +42,7 @@ describe("shapeIssues", () => {
     ["a list that is not one", (d) => void (d.lines = "none"), "documents[0].lines", "Must be an array, got a string."],
     ["a line that is not an object", (d) => void (d.lines[0] = null), "documents[0].lines[0]", "Must be an object with the keys description, model, hsCode, quantity, unit, unitPrice, lineTotal, got null."],
     ["a missing key inside a line", (d) => void delete d.lines[0].unit, "documents[0].lines[0].unit", `Missing. Write ${BLANK} when the document does not print it.`],
-    ["a missing party", (d) => void delete d.seller, "documents[0].seller", "Missing. Write an object with the keys name, address, country."],
+    ["a missing party", (d) => void delete d.seller, "documents[0].seller", "Missing. Write an object with the keys name, address, country, taxId."],
     ["a missing id", (d) => void delete d.id, "documents[0].id", "Missing. A string is required."],
     ["an id that is a number", (d) => void (d.id = 1), "documents[0].id", "Must be a string, got a number: write it in quotes."],
     ["a missing sourceFile", (d) => void delete d.sourceFile, "documents[0].sourceFile", "Missing. Write null when there is none."],
@@ -78,7 +78,7 @@ describe("shapeIssues", () => {
   });
 
   it("accepts every document type with every fact null", () => {
-    const documents: TradeDocument[] = (["commercial_invoice", "packing_list", "cmr", "contract", "other"] as const).map((type) => blankDocument(type, type));
+    const documents: TradeDocument[] = (["commercial_invoice", "packing_list", "cmr", "contract", "customs_declaration", "other"] as const).map((type) => blankDocument(type, type));
     expect(shapeIssues({ schemaVersion: SCHEMA_VERSION, documents })).toEqual([]);
     expect(parseExtraction({ schemaVersion: SCHEMA_VERSION, documents }).ok).toBe(true);
   });

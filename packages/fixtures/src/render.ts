@@ -2,7 +2,7 @@
  * HTML for the synthetic documents. Every cited field prints exactly its
  * quote, so the PDF text and the extraction always agree.
  */
-import { dec, sum, toFixed, type Cmr, type CommercialInvoice, type Contract, type PackingList, type Party } from "@logisticshub/core";
+import { dec, sum, toFixed, type Cmr, type CommercialInvoice, type Contract, type CustomsDeclaration, type PackingList, type Party } from "@logisticshub/core";
 import { formatter } from "./format.ts";
 import { LABELS, type Labels } from "./labels.ts";
 import type { ShipmentSpec } from "./model.ts";
@@ -86,10 +86,10 @@ function page(title: string, number: Cited, date: Cited, L: Labels, body: string
   </body></html>`;
 }
 
-function partyBox(label: string, p: Party, registration?: string): string {
+function partyBox(label: string, p: Party, taxLabel: string): string {
   return `<div class="box"><div class="label">${esc(label)}</div>
     <div class="name">${q(p.name)}</div><div>${q(p.address)}</div><div>${q(p.country)}</div>
-    ${registration ? `<div>${esc(registration)}</div>` : ""}</div>`;
+    ${p.taxId.quote ? `<div>${esc(taxLabel)}: ${q(p.taxId)}</div>` : ""}</div>`;
 }
 
 function field(label: string, value: string): string {
@@ -99,11 +99,12 @@ function field(label: string, value: string): string {
 export function renderInvoice(source: CommercialInvoice, spec: ShipmentSpec, options: RenderOptions = {}): string {
   const doc = track(source);
   const L = LABELS[spec.language];
+  const withHs = doc.lines.some((line) => line.hsCode.quote);
   const rows = doc.lines.map(
-    (l) => `<tr><td>${q(l.model)}</td><td>${q(l.description)}</td><td class="n">${q(l.quantity)}</td><td>${q(l.unit)}</td>
+    (l) => `<tr><td>${q(l.model)}</td><td>${q(l.description)}</td>${withHs ? `<td class="n">${q(l.hsCode)}</td>` : ""}<td class="n">${q(l.quantity)}</td><td>${q(l.unit)}</td>
       <td class="n">${q(l.unitPrice)}</td><td class="n">${q(l.lineTotal)}</td></tr>`,
   );
-  const header = `<thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th><th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th>
+  const header = `<thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th>${withHs ? '<th class="n">HS</th>' : ""}<th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th>
       <th class="n">${esc(L.unitPrice)}</th><th class="n">${esc(L.amount)}</th></tr></thead>`;
   const table = (body: string) => `<table>${header}<tbody>${body}</tbody></table>`;
   // A table over two pages: the running sum closes page 1 and opens page 2, under the repeated header.
@@ -111,7 +112,7 @@ export function renderInvoice(source: CommercialInvoice, spec: ShipmentSpec, opt
   const carried = (label: string) => {
     const f = formatter(spec.style);
     const amount = toFixed(sum(source.lines.slice(0, cut).map((l) => dec(l.lineTotal.value ?? "0"))), 2);
-    return `<tr class="carry"><td colspan="5">${esc(label)}</td><td class="n">${esc(`${spec.currency} ${f.number(amount)}`)}</td></tr>`;
+    return `<tr class="carry"><td colspan="${withHs ? 6 : 5}">${esc(label)}</td><td class="n">${esc(`${spec.currency} ${f.number(amount)}`)}</td></tr>`;
   };
   const lines =
     cut === undefined
@@ -130,7 +131,7 @@ export function renderInvoice(source: CommercialInvoice, spec: ShipmentSpec, opt
     [L.total, doc.total],
   ] as const;
   const body = `
-    <div class="grid">${partyBox(L.seller, doc.seller, spec.seller.registration)}${partyBox(L.buyer, doc.buyer, spec.buyer.registration)}</div>
+    <div class="grid">${partyBox(L.seller, doc.seller, L.taxId)}${partyBox(L.buyer, doc.buyer, L.taxId)}</div>
     <div class="grid3">
       ${field(L.contractRef, `${q(doc.contractRef.number)} / ${q(doc.contractRef.date)}`)}
       ${field(L.incoterm, `${q(doc.incoterm.code)} ${q(doc.incoterm.place)}, ${q(doc.incoterm.version)}`)}
@@ -158,7 +159,7 @@ export function renderPackingList(source: PackingList, spec: ShipmentSpec, optio
     )
     .join("");
   const body = `
-    <div class="grid">${partyBox(L.shipper, doc.shipper, spec.seller.registration)}${partyBox(L.consignee, doc.consignee, spec.buyer.registration)}</div>
+    <div class="grid">${partyBox(L.shipper, doc.shipper, L.taxId)}${partyBox(L.consignee, doc.consignee, L.taxId)}</div>
     <div class="grid">${field(L.invoiceRef, `${q(doc.invoiceRef.number)} / ${q(doc.invoiceRef.date)}`)}${field(L.packing, q(doc.packingMethod))}</div>
     <table><thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th>
       ${withQty ? `<th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th>` : ""}
@@ -183,8 +184,8 @@ export function renderCmr(source: Cmr, spec: ShipmentSpec, options: RenderOption
     .join("");
   const body = `
     <div class="convention">${q(doc.convention)}</div>
-    <div class="grid">${partyBox(`1. ${L.shipper}`, doc.sender, spec.seller.registration)}${partyBox(`16. ${L.carrier}`, doc.carrier, spec.carrier.registration)}</div>
-    <div class="grid">${partyBox(`2. ${L.consignee}`, doc.consignee, spec.buyer.registration)}${field(L.delivery, q(doc.placeOfDelivery))}</div>
+    <div class="grid">${partyBox(`1. ${L.shipper}`, doc.sender, L.taxId)}${partyBox(`16. ${L.carrier}`, doc.carrier, L.taxId)}</div>
+    <div class="grid">${partyBox(`2. ${L.consignee}`, doc.consignee, L.taxId)}${field(L.delivery, q(doc.placeOfDelivery))}</div>
     <div class="grid">${field(L.takingOver, `${q(doc.placeOfTakingOver)}<br>${q(doc.dateOfTakingOver)}`)}${field(L.attached, doc.attachedDocuments.map(q).join("<br>"))}</div>
     <table><thead><tr><th>6. ${esc(L.marks)}</th><th class="n">7. ${esc(L.packages)}</th><th>8. ${esc(L.packing)}</th><th>9. ${esc(L.description)}</th>
       <th class="n">11. ${esc(L.gross)}</th><th class="n">12. ${esc(L.volume)}</th></tr></thead>
@@ -200,7 +201,7 @@ export function renderContract(source: Contract, spec: ShipmentSpec, options: Re
   const L = LABELS[spec.language];
   const f = formatter(spec.style);
   const body = `
-    <div class="grid">${partyBox(L.seller, doc.seller, spec.seller.registration)}${partyBox(L.buyer, doc.buyer, spec.buyer.registration)}</div>
+    <div class="grid">${partyBox(L.seller, doc.seller, L.taxId)}${partyBox(L.buyer, doc.buyer, L.taxId)}</div>
     <p><b>1. ${esc(L.goodsDescription)}.</b> ${q(doc.goodsDescription)}</p>
     <table><thead><tr><th>${esc(L.model)}</th><th>${esc(L.description)}</th><th class="n">${esc(L.quantity)}</th><th>${esc(L.unit)}</th><th class="n">${esc(L.unitPrice)}</th></tr></thead>
       <tbody>${spec.lines.map((l) => `<tr><td>${esc(l.model)}</td><td>${esc(l.description)}</td><td class="n">${esc(f.number(l.quantity))}</td><td>${esc(l.unit)}</td><td class="n">${esc(f.number(l.unitPrice))}</td></tr>`).join("")}</tbody></table>
@@ -209,4 +210,37 @@ export function renderContract(source: Contract, spec: ShipmentSpec, options: Re
     <p><b>3. ${esc(L.incoterm)}:</b> ${q(doc.incoterm.code)} ${q(doc.incoterm.place)}, ${q(doc.incoterm.version)}. ${esc(L.currency)}: ${q(doc.currency)}.</p>
     <div class="sign"><div>${esc(L.seller)} · ${esc(L.signature)}</div><div>${esc(L.buyer)} · ${esc(L.signature)}</div></div>`;
   return page(L.contract, doc.number, doc.date, L, body, spec.language, options);
+}
+
+export function renderDeclaration(source: CustomsDeclaration): string {
+  const doc = track(source);
+  const L = LABELS.ka;
+  const body = `
+    <div class="grid">
+      ${field("A · საბაჟო ორგანო", `${q(doc.customsOfficeCode)} · ${q(doc.customsOfficeName)}`)}
+      ${field("B · შეფასება", `${q(doc.assessmentNumber)} · ${q(doc.assessmentDate)}`)}
+      ${field("1 · რეჟიმი", q(doc.regime))}
+      ${field("6 · შეფუთვების ჯამი", q(doc.totalPackages))}
+      ${partyBox("2 · ექსპორტიორი", doc.exporter, L.taxId)}
+      ${partyBox("8 · იმპორტიორი", doc.importer, L.taxId)}
+      ${field("15 · გამომგზავნი ქვეყანა", q(doc.countryOfDispatch))}
+      ${field("17 · დანიშნულების ქვეყანა", q(doc.countryOfDestination))}
+      ${field("22 · ვალუტა და ფაქტურული ღირებულება", `${q(doc.currency)} ${q(doc.totalInvoiceAmount)}`)}
+      ${field("23 · გაცვლითი კურსი", q(doc.exchangeRate))}
+    </div>
+    ${doc.items.map((item) => `<div class="grid">
+      ${field("32 · საქონლის ნომერი", q(item.itemNumber))}
+      ${field("31 · აღწერა და შეფუთვა", `${q(item.description)}<br>${q(item.packages)} ${q(item.packingMethod)}`)}
+      ${field("33 · სასაქონლო კოდი", q(item.hsCode))}
+      ${field("34ა · წარმოშობა", q(item.countryOfOrigin))}
+      ${field("35 · ბრუტო წონა (კგ)", q(item.grossWeightKg))}
+      ${field("37 · პროცედურა", q(item.procedure))}
+      ${field("38 · ნეტო წონა (კგ)", q(item.netWeightKg))}
+      ${field("41 · დამატებითი ერთეული", `${q(item.supplementaryQuantity)} ${q(item.supplementaryUnit)}`)}
+      ${field("42 · ფაქტურული ღირებულება", q(item.invoiceValue))}
+      ${field("46 · საბაჟო ღირებულება (ლარი)", q(item.customsValueGel))}
+    </div>`).join("")}
+    ${field("44 · თანდართული დოკუმენტები", doc.attachedDocuments.map(q).join("<br>"))}
+  `;
+  return page("საქონლის საბაჟო დეკლარაცია", doc.number, doc.date, { ...L, number: "A · რეგისტრაციის ნომერი", date: "რეგისტრაციის თარიღი" }, body, "ka");
 }

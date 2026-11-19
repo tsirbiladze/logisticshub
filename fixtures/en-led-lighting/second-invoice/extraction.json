@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2",
+  "schemaVersion": "3",
   "documents": [
     {
       "type": "commercial_invoice",
@@ -31,6 +31,11 @@
           "value": "Estonia",
           "quote": "Estonia",
           "page": 1
+        },
+        "taxId": {
+          "value": "EE-100200",
+          "quote": "EE-100200",
+          "page": 1
         }
       },
       "buyer": {
@@ -48,6 +53,11 @@
           "value": "Georgia",
           "quote": "Georgia",
           "page": 1
+        },
+        "taxId": {
+          "value": "900000003",
+          "quote": "900000003",
+          "page": 1
         }
       },
       "consignee": {
@@ -62,6 +72,11 @@
           "page": null
         },
         "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "taxId": {
           "value": null,
           "quote": null,
           "page": null
@@ -306,6 +321,11 @@
           "value": "Estonia",
           "quote": "Estonia",
           "page": 1
+        },
+        "taxId": {
+          "value": "EE-100200",
+          "quote": "EE-100200",
+          "page": 1
         }
       },
       "consignee": {
@@ -322,6 +342,11 @@
         "country": {
           "value": "Georgia",
           "quote": "Georgia",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000003",
+          "quote": "900000003",
           "page": 1
         }
       },
@@ -546,6 +571,11 @@
           "value": "Estonia",
           "quote": "Estonia",
           "page": 1
+        },
+        "taxId": {
+          "value": "EE-100200",
+          "quote": "EE-100200",
+          "page": 1
         }
       },
       "carrier": {
@@ -562,6 +592,11 @@
         "country": {
           "value": "Georgia",
           "quote": "Georgia",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000004",
+          "quote": "900000004",
           "page": 1
         }
       },
@@ -594,6 +629,11 @@
         "country": {
           "value": "Georgia",
           "quote": "Georgia",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000003",
+          "quote": "900000003",
           "page": 1
         }
       },
@@ -768,6 +808,11 @@
           "value": "Estonia",
           "quote": "Estonia",
           "page": 1
+        },
+        "taxId": {
+          "value": "EE-100200",
+          "quote": "EE-100200",
+          "page": 1
         }
       },
       "buyer": {
@@ -784,6 +829,11 @@
         "country": {
           "value": "Georgia",
           "quote": "Georgia",
+          "page": 1
+        },
+        "taxId": {
+          "value": "900000003",
+          "quote": "900000003",
           "page": 1
         }
       },
@@ -855,6 +905,11 @@
           "value": "Estonia",
           "quote": "Estonia",
           "page": 1
+        },
+        "taxId": {
+          "value": "EE-100200",
+          "quote": "EE-100200",
+          "page": 1
         }
       },
       "buyer": {
@@ -872,6 +927,11 @@
           "value": "Georgia",
           "quote": "Georgia",
           "page": 1
+        },
+        "taxId": {
+          "value": "900000003",
+          "quote": "900000003",
+          "page": 1
         }
       },
       "consignee": {
@@ -886,6 +946,11 @@
           "page": null
         },
         "country": {
+          "value": null,
+          "quote": null,
+          "page": null
+        },
+        "taxId": {
           "value": null,
           "quote": null,
           "page": null

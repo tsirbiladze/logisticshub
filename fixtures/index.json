@@ -1,5 +1,5 @@
 {
-  "note": "Synthetic demo data. All companies, people and numbers are fictional.",
+  "note": "Synthetic demo data. All companies, people and numbers are fictional. The Georgian company codes begin with 90000 and are never sent anywhere.",
   "packs": [
     {
       "id": "ka-office-furniture",
@@ -22,6 +22,78 @@
             "en": "Clean set"
           },
           "expected": []
+        },
+        {
+          "id": "tax-id-mismatch",
+          "title": {
+            "ka": "მიმღების საიდენტიფიკაციო ნომერი განსხვავდება",
+            "en": "Consignee’s tax ID differs"
+          },
+          "expected": [
+            "PTY-02.number"
+          ]
+        },
+        {
+          "id": "registry-name-mismatch",
+          "title": {
+            "ka": "რეესტრში სხვა სახელია",
+            "en": "Registry gives a different name"
+          },
+          "expected": [
+            "TAX-01.name"
+          ],
+          "registry": "registry.json"
+        },
+        {
+          "id": "registry-vat-mismatch",
+          "title": {
+            "ka": "გამყიდველი ჩანაწერში დღგ-ის გადამხდელი არ არის",
+            "en": "Seller is not a VAT payer in the snapshot"
+          },
+          "expected": [
+            "TAX-02.vat"
+          ],
+          "registry": "registry.json"
+        },
+        {
+          "id": "registry-status-minus-one",
+          "title": {
+            "ka": "რეესტრის პასუხი კოდით −1",
+            "en": "Registry returns status −1"
+          },
+          "expected": [
+            "TAX-03.reply"
+          ],
+          "registry": "registry.json"
+        },
+        {
+          "id": "registry-clean",
+          "title": {
+            "ka": "ნაკრები რეესტრის ჩანაწერს ემთხვევა",
+            "en": "Clean set with matching registry snapshot"
+          },
+          "expected": [],
+          "registry": "registry.json"
+        },
+        {
+          "id": "unknown-hs-national-code",
+          "title": {
+            "ka": "ნომენკლატურაში შეტანილი არ არის ინვოისის ეროვნული კოდი",
+            "en": "Invoice national code is absent from the nomenclature"
+          },
+          "expected": [
+            "HS-01.unknown-national"
+          ]
+        },
+        {
+          "id": "unknown-hs-subheading",
+          "title": {
+            "ka": "ნომენკლატურაში შეტანილი არ არის ინვოისის სასაქონლო სუბპოზიცია",
+            "en": "Invoice subheading is absent from the nomenclature"
+          },
+          "expected": [
+            "HS-01.unknown-subheading-heading"
+          ]
         },
         {
           "id": "words-mismatch",
@@ -89,6 +161,149 @@
             "CMR-01.missing",
             "CMR-01.missing"
           ]
+        },
+        {
+          "id": "declaration-clean",
+          "title": {
+            "ka": "სუფთა ნაკრები დეკლარაციით",
+            "en": "Clean set with a declaration"
+          },
+          "expected": [],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-gross-mismatch",
+          "title": {
+            "ka": "დეკლარაციის ბრუტო წონა განსხვავდება",
+            "en": "Declared gross weight differs"
+          },
+          "expected": [
+            "DEC-03.gross"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-national-code",
+          "title": {
+            "ka": "დეკლარაციის ეროვნული კოდი არ არსებობს",
+            "en": "Unknown declared national code"
+          },
+          "expected": [
+            "DEC-02.unknown-national"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-invoice-prefix",
+          "title": {
+            "ka": "ინვოისის კოდი დეკლარაციაში არ ჩანს",
+            "en": "Invoice code missing from the declaration"
+          },
+          "expected": [
+            "DEC-02.invoice-prefix"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-invoice-total",
+          "title": {
+            "ka": "დეკლარაციაში ინვოისის თანხა განსხვავდება",
+            "en": "Box 22 differs from the invoice total"
+          },
+          "expected": [
+            "DEC-05.invoice-total"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-importer-tax-id",
+          "title": {
+            "ka": "იმპორტიორის საიდენტიფიკაციო ნომერი განსხვავდება",
+            "en": "Declared importer tax ID differs"
+          },
+          "expected": [
+            "DEC-01.tax-id"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-packages",
+          "title": {
+            "ka": "შეფუთვების რაოდენობა განსხვავდება",
+            "en": "Declared package count differs"
+          },
+          "expected": [
+            "DEC-04.packages"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-origin",
+          "title": {
+            "ka": "დეკლარირებული წარმოშობა განსხვავდება",
+            "en": "Declared origin differs"
+          },
+          "expected": [
+            "DEC-06.origin"
+          ],
+          "files": [
+            "invoice.pdf",
+            "packing-list.pdf",
+            "cmr.pdf",
+            "contract.pdf",
+            "declaration.pdf"
+          ]
+        },
+        {
+          "id": "declaration-rs-clean",
+          "title": {
+            "ka": "სუფთა ნაკრები შემოსავლების სამსახურის პასუხით",
+            "en": "Clean set with a saved Revenue Service response"
+          },
+          "expected": [],
+          "rsResponse": "rs-response.json"
         }
       ]
     },

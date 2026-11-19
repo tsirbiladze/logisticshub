@@ -17,6 +17,8 @@ import { abs, compare, equals, isCanonicalDecimal, parseDecimal, ZERO, type Deci
 import { walkCited, type CitedVisit } from "./introspect.ts";
 import {
   dateReadingsWith,
+  jsonDecimal,
+  rsDate,
   monthNameDate,
   otherCurrency,
   printedDates,
@@ -200,6 +202,8 @@ export function inspectExtraction(extraction: Extraction): Inspection {
   });
 
   extraction.documents.forEach((doc, index) => {
+    const declaration = doc.type === "customs_declaration";
+    const rs = declaration && doc.sourceKind === "rs_json";
     const convention = conventionOf(doc);
     const visit = ({ kind, path, field }: CitedVisit) => {
       const { value, quote, page } = field;
@@ -213,22 +217,38 @@ export function inspectExtraction(extraction: Extraction): Inspection {
       if (kind === "decimal") {
         problem = !isCanonicalDecimal(value)
           ? { code: "EXT_DECIMAL_FORMAT", message: `"${value}" is not a canonical decimal like 13300.00.` }
-          : cited === null
+          : cited === null || rs
             ? null
             : decimalIssue(value, cited, path, convention);
       } else if (kind === "date") {
         problem = !isIsoDate(value)
           ? { code: "EXT_DATE_FORMAT", message: `"${value}" is not a valid YYYY-MM-DD date.` }
-          : cited === null
+          : cited === null || rs
             ? null
             : dateIssue(value, cited, convention);
       } else if (kind === "currency") {
         problem = !isIsoCurrency(value)
           ? { code: "EXT_CURRENCY_FORMAT", message: `"${value}" is not an ISO 4217 code like EUR.` }
-          : cited === null
+          : cited === null || rs
             ? null
             : currencyIssue(value, cited);
       }
+      if (rs && !problem && cited !== null) {
+        const reading = kind === "decimal" ? jsonDecimal(cited)
+          : kind === "date" ? rsDate(cited)
+          : path.endsWith(".itemNumber") ? jsonDecimal(cited)
+          : cited;
+        if (value !== reading) problem = {
+          code: "EXT_QUOTE_MISMATCH",
+          message: `"${value}" does not match the Revenue Service JSON value "${cited}".`,
+        };
+      }
+      if (rs && page !== null) {
+        issues.push({ code: "EXT_PAGE", path, message: "A Revenue Service JSON citation has no page. Write null." });
+      } else if (declaration && !rs && page === null) {
+        issues.push({ code: "EXT_PAGE", path, message: "Give the page of the customs declaration where the quote is printed." });
+      }
+      if (declaration && (cited === null || (rs ? page !== null : page === null || page < 1))) unusable.add(field);
       if (problem) {
         issues.push({ code: problem.code, path, message: problem.message });
         unusable.add(field);

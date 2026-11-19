@@ -4,6 +4,10 @@ import { basename, dirname, extname, join, resolve } from "node:path";
 import { annotateDocuments, checkNotes, checkQuotes, type Marking, type MarkResult, type QuoteCheck } from "@logisticshub/annotate";
 import {
   buildReport,
+  fetchRegistry,
+  readRegistry,
+  registryJson,
+  shapeIssues,
   checkDocuments,
   decodeText,
   ioProblem,
@@ -128,6 +132,8 @@ export interface RunOptions {
   /** Most model calls in flight at once (default 4). */
   concurrency?: number;
   log?: (line: string) => void;
+  registryFile?: string;
+  fetchRegistry?: boolean;
 }
 
 export interface RunResult {
@@ -171,6 +177,8 @@ function unwritable(dir: string): string | null {
 
 export async function runCheck(options: RunOptions): Promise<RunResult> {
   const log = options.log ?? (() => {});
+  if (options.registryFile !== undefined && options.fetchRegistry) throw new UsageError("Use either --registry or --fetch-registry.");
+  let registry = options.registryFile === undefined ? undefined : readRegistry(resolve(options.registryFile));
   const outDir = options.outDir === undefined ? null : resolve(options.outDir);
   const written: string[] = [];
   const write = (name: string, data: string | Uint8Array) => {
@@ -201,6 +209,9 @@ export async function runCheck(options: RunOptions): Promise<RunResult> {
     throw new UsageError(`An extraction.json is checked on its own; got ${inputs.length} inputs. To mark the PDFs it cites, give their folder with --pdf-dir.`);
   }
   const jsonPath = jsonInputs.length === 1 ? resolve(jsonInputs[0]!) : null;
+  if (options.fetchRegistry && outDir && jsonPath === join(outDir, "registry.json")) {
+    throw new UsageError("The registry snapshot and extraction must use different paths.");
+  }
   if (options.pdfDir !== undefined && options.extraction === undefined && !jsonPath) {
     throw new UsageError("--pdf-dir goes with an extraction.json: it names the folder of the PDFs the extraction cites. Document files given as inputs need no --pdf-dir.");
   }
@@ -278,7 +289,12 @@ export async function runCheck(options: RunOptions): Promise<RunResult> {
     readPdf = (name) => byName.get(name) ?? null;
   }
 
-  let result: CheckResult = checkDocuments(input);
+  if (options.fetchRegistry && outDir && shapeIssues(input).length === 0) {
+    const snapshot = await fetchRegistry(input, log);
+    write("registry.json", registryJson(snapshot));
+    registry = readRegistry(join(outDir, "registry.json"));
+  }
+  let result: CheckResult = checkDocuments(input, registry ? { registry } : {});
   if (problems.length > 0) {
     const extractionIssues = [...problems, ...result.extractionIssues];
     // With no document left to check, the run reads as an unreadable extraction, not as "no problems".

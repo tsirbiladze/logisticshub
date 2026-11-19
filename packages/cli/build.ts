@@ -1,8 +1,8 @@
 /**
  * Bundles the CLI and MCP server into dist/logisticshub.mjs (no runtime
- * dependencies), with dist/THIRD-PARTY-NOTICES.txt for the bundled packages.
+ * dependencies), with the nomenclature data and the bundled packages’ notices.
  */
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { thirdPartyNotices } from "./notices.ts";
@@ -28,5 +28,6 @@ const { metafile } = await build({
     js: `#!/usr/bin/env node\n// logisticshub ${version} · MIT · https://github.com/tsirbiladze/logisticshub · bundled packages and their licenses: THIRD-PARTY-NOTICES.txt\nimport { createRequire as __lhCreateRequire } from "node:module"; const require = __lhCreateRequire(import.meta.url);`,
   },
 });
+copyFileSync(here("../core/src/hs-nomenclature.json.gz"), here("dist/hs-nomenclature.json.gz"));
 writeFileSync(here("dist/THIRD-PARTY-NOTICES.txt"), thirdPartyNotices(metafile, `logisticshub ${version} (dist/logisticshub.mjs)`));
-console.log(`✓ logisticshub ${version} → dist/logisticshub.mjs, dist/THIRD-PARTY-NOTICES.txt`);
+console.log(`✓ logisticshub ${version} → dist/logisticshub.mjs, dist/hs-nomenclature.json.gz, dist/THIRD-PARTY-NOTICES.txt`);

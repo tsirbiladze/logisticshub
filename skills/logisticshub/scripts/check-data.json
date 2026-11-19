@@ -1,6 +1,184 @@
 {
   "version": "1.0.0",
-  "schemaVersion": "2",
+  "georgiaCountries": [
+    "ge",
+    "geo",
+    "georgia",
+    "საქართველო",
+    "грузия",
+    "gürcistan"
+  ],
+  "countries": {
+    "AM": [
+      "Armenia",
+      "სომხეთი",
+      "Армения",
+      "Ermenistan"
+    ],
+    "AZ": [
+      "Azerbaijan",
+      "აზერბაიჯანი",
+      "Азербайджан",
+      "Azerbaycan"
+    ],
+    "BG": [
+      "Bulgaria",
+      "ბულგარეთი",
+      "Болгария",
+      "Bulgaristan"
+    ],
+    "CN": [
+      "China",
+      "ჩინეთი",
+      "Китай",
+      "Çin"
+    ],
+    "DE": [
+      "Germany",
+      "გერმანია",
+      "Германия",
+      "Almanya"
+    ],
+    "FR": [
+      "France",
+      "საფრანგეთი",
+      "Франция",
+      "Fransa"
+    ],
+    "GB": [
+      "United Kingdom",
+      "გაერთიანებული სამეფო",
+      "Великобритания",
+      "Birleşik Krallık"
+    ],
+    "GE": [
+      "Georgia",
+      "საქართველო",
+      "Грузия",
+      "Gürcistan"
+    ],
+    "IL": [
+      "Israel",
+      "ისრაელი",
+      "Израиль",
+      "İsrail"
+    ],
+    "IN": [
+      "India",
+      "ინდოეთი",
+      "Индия",
+      "Hindistan"
+    ],
+    "IR": [
+      "Iran",
+      "ირანი",
+      "Иран",
+      "İran"
+    ],
+    "IT": [
+      "Italy",
+      "იტალია",
+      "Италия",
+      "İtalya"
+    ],
+    "JP": [
+      "Japan",
+      "იაპონია",
+      "Япония",
+      "Japonya"
+    ],
+    "KG": [
+      "Kyrgyzstan",
+      "ყირგიზეთი",
+      "Киргизия",
+      "Кыргызстан",
+      "Kırgızistan"
+    ],
+    "KZ": [
+      "Kazakhstan",
+      "ყაზახეთი",
+      "Казахстан",
+      "Kazakistan"
+    ],
+    "NL": [
+      "Netherlands",
+      "ნიდერლანდები",
+      "Нидерланды",
+      "Hollanda"
+    ],
+    "PL": [
+      "Poland",
+      "პოლონეთი",
+      "Польша",
+      "Polonya"
+    ],
+    "RO": [
+      "Romania",
+      "რუმინეთი",
+      "Румыния",
+      "Romanya"
+    ],
+    "RU": [
+      "Russia",
+      "რუსეთი",
+      "Россия",
+      "Rusya"
+    ],
+    "TR": [
+      "Turkey",
+      "Türkiye",
+      "თურქეთი",
+      "Турция"
+    ],
+    "UA": [
+      "Ukraine",
+      "უკრაინა",
+      "Украина",
+      "Ukrayna"
+    ],
+    "US": [
+      "United States",
+      "United States of America",
+      "USA",
+      "აშშ",
+      "США",
+      "Amerika Birleşik Devletleri",
+      "ABD"
+    ],
+    "UZ": [
+      "Uzbekistan",
+      "უზბეკეთი",
+      "Узбекистан",
+      "Özbekistan"
+    ]
+  },
+  "rsFields": {
+    "header": {
+      "CustomsCode": "customsOfficeCode",
+      "CustomsName": "customsOfficeName",
+      "Regime": "regime",
+      "RegistrationNumber": "number",
+      "AssessmentNumber": "assessmentNumber",
+      "SenderCountryCode": "countryOfDispatch",
+      "DestinationCountryCode": "countryOfDestination"
+    },
+    "item": {
+      "HSCode": "hsCode",
+      "CustomsProcedure": "procedure",
+      "OriginCountryCode": "countryOfOrigin",
+      "GoodsDescription": "description",
+      "SupplementaryUnit": "supplementaryUnit"
+    },
+    "numeric": {
+      "ItemNumber": "itemNumber",
+      "BruttoWeight": "grossWeightKg",
+      "NettoWeight": "netWeightKg",
+      "SupplementaryQuantity": "supplementaryQuantity",
+      "ValueInGEL": "rsValueInGel"
+    }
+  },
+  "hsLookupLimit": 20,
+  "schemaVersion": "3",
   "reportVersion": "1",
   "languages": [
     "en",
@@ -24,7 +202,18 @@
     "INC-02",
     "INC-03",
     "CMR-01",
-    "DOC-01"
+    "DOC-01",
+    "HS-01",
+    "PTY-02",
+    "TAX-01",
+    "TAX-02",
+    "TAX-03",
+    "DEC-01",
+    "DEC-02",
+    "DEC-03",
+    "DEC-04",
+    "DEC-05",
+    "DEC-06"
   ],
   "ruleTitles": {
     "en": {
@@ -43,7 +232,18 @@
       "INC-02": "Incoterms and transport mode",
       "INC-03": "Insurance under CIF/CIP",
       "CMR-01": "CMR required particulars",
-      "DOC-01": "Complete document set"
+      "DOC-01": "Complete document set",
+      "HS-01": "HS code in the Georgian nomenclature",
+      "PTY-02": "Same tax identification number",
+      "TAX-01": "Taxpayer name",
+      "TAX-02": "VAT payer status",
+      "TAX-03": "Revenue Service reply",
+      "DEC-01": "Declaration parties",
+      "DEC-02": "Declaration HS codes",
+      "DEC-03": "Declaration weights",
+      "DEC-04": "Declaration packages",
+      "DEC-05": "Declaration invoice value",
+      "DEC-06": "Declared origin"
     },
     "ka": {
       "AMT-01": "თანხა სიტყვიერად = თანხა ციფრებით",
@@ -61,7 +261,18 @@
       "INC-02": "Incoterms და ტრანსპორტის სახე",
       "INC-03": "დაზღვევა CIF/CIP პირობით",
       "CMR-01": "CMR-ის სავალდებულო მონაცემები",
-      "DOC-01": "დოკუმენტების სრული ნაკრები"
+      "DOC-01": "დოკუმენტების სრული ნაკრები",
+      "HS-01": "HS კოდი საქართველოს სასაქონლო ნომენკლატურაში",
+      "PTY-02": "ერთი და იგივე საიდენტიფიკაციო ნომერი",
+      "TAX-01": "გადამხდელის სახელი",
+      "TAX-02": "დღგ-ის გადამხდელის სტატუსი",
+      "TAX-03": "შემოსავლების სამსახურის პასუხი",
+      "DEC-01": "დეკლარაციის მხარეები",
+      "DEC-02": "დეკლარაციის HS კოდები",
+      "DEC-03": "დეკლარაციის წონები",
+      "DEC-04": "დეკლარაციის შეფუთვები",
+      "DEC-05": "დეკლარაციის ფაქტურული ღირებულება",
+      "DEC-06": "დეკლარირებული წარმოშობა"
     },
     "ru": {
       "AMT-01": "Сумма прописью = сумма цифрами",
@@ -79,7 +290,18 @@
       "INC-02": "Инкотермс и вид транспорта",
       "INC-03": "Страхование при CIF/CIP",
       "CMR-01": "Обязательные реквизиты CMR",
-      "DOC-01": "Полный комплект документов"
+      "DOC-01": "Полный комплект документов",
+      "HS-01": "Код ТН ВЭД в грузинской номенклатуре",
+      "PTY-02": "Один и тот же налоговый номер",
+      "TAX-01": "Название налогоплательщика",
+      "TAX-02": "Статус плательщика НДС",
+      "TAX-03": "Ответ Службы доходов",
+      "DEC-01": "Стороны декларации",
+      "DEC-02": "Коды ТН ВЭД декларации",
+      "DEC-03": "Вес в декларации",
+      "DEC-04": "Грузовые места в декларации",
+      "DEC-05": "Фактурная стоимость в декларации",
+      "DEC-06": "Заявленное происхождение"
     },
     "tr": {
       "AMT-01": "Yazıyla tutar = rakamla tutar",
@@ -97,9 +319,107 @@
       "INC-02": "Incoterms ve taşıma şekli",
       "INC-03": "CIF/CIP'te sigorta",
       "CMR-01": "CMR zorunlu bilgileri",
-      "DOC-01": "Eksiksiz belge seti"
+      "DOC-01": "Eksiksiz belge seti",
+      "HS-01": "Gürcistan nomenklatüründeki HS kodu",
+      "PTY-02": "Aynı vergi kimlik numarası",
+      "TAX-01": "Mükellef adı",
+      "TAX-02": "KDV mükellefiyeti durumu",
+      "TAX-03": "Gelir İdaresinin yanıtı",
+      "DEC-01": "Beyanname tarafları",
+      "DEC-02": "Beyanname HS kodları",
+      "DEC-03": "Beyanname ağırlıkları",
+      "DEC-04": "Beyanname kap sayısı",
+      "DEC-05": "Beyanname fatura kıymeti",
+      "DEC-06": "Beyan edilen menşe"
     }
   },
+  "registryFields": [
+    "FullName",
+    "Status",
+    "RegisteredSubject",
+    "StartDate",
+    "VatPayer",
+    "Mortgage",
+    "Sequestration",
+    "AdditionalStatus",
+    "NonResident"
+  ],
+  "registryLabels": {
+    "en": [
+      "Revenue Service registry",
+      "Source",
+      "Party",
+      "Snapshot time (UTC)",
+      "Could not be checked",
+      "Reply status",
+      "Reply message",
+      "Full name",
+      "Status",
+      "Registered subject",
+      "Identification code assigned",
+      "VAT payer",
+      "Mortgage",
+      "Sequestration",
+      "Additional status",
+      "Non-resident"
+    ],
+    "ka": [
+      "შემოსავლების სამსახურის რეესტრი",
+      "წყარო",
+      "მხარე",
+      "ჩანაწერის დრო (UTC)",
+      "შემოწმება ვერ მოხერხდა",
+      "პასუხის კოდი",
+      "პასუხის ტექსტი",
+      "სრული სახელი",
+      "სტატუსი",
+      "რეგისტრირებული სუბიექტი",
+      "საიდენტიფიკაციო კოდის მინიჭება",
+      "დღგ-ის გადამხდელი",
+      "გირავნობა ან იპოთეკა",
+      "ყადაღა",
+      "დამატებითი სტატუსი",
+      "არარეზიდენტი"
+    ],
+    "ru": [
+      "Реестр Службы доходов",
+      "Источник",
+      "Сторона",
+      "Время запроса (UTC)",
+      "Не удалось проверить",
+      "Код ответа",
+      "Сообщение",
+      "Полное название",
+      "Статус",
+      "Зарегистрированный субъект",
+      "Дата присвоения кода",
+      "Плательщик НДС",
+      "Залог или ипотека",
+      "Арест имущества",
+      "Дополнительный статус",
+      "Нерезидент"
+    ],
+    "tr": [
+      "Gelir İdaresi sicili",
+      "Kaynak",
+      "Taraf",
+      "Sorgu zamanı (UTC)",
+      "Kontrol edilemedi",
+      "Yanıt kodu",
+      "Yanıt mesajı",
+      "Tam ad",
+      "Durum",
+      "Kayıtlı kişi veya kuruluş",
+      "Kimlik kodu verilme tarihi",
+      "KDV mükellefi",
+      "Rehin veya ipotek",
+      "Haciz",
+      "Ek durum",
+      "Yerleşik olmayan"
+    ]
+  },
+  "registrySource": "https://xdata.rs.ge/TaxPayer/RSPublicInfo",
+  "registryVersion": "1",
   "ruleChecks": {
     "en": {
       "AMT-01": "Read the amount in words on the document and compare it with the figures; one of the two has to be corrected.",
@@ -117,7 +437,18 @@
       "INC-02": "Ask the parties whether they meant the rule for any mode of transport: FCA for FOB or FAS, CPT for CFR, CIP for CIF.",
       "INC-03": "Ask the seller for the insurance policy or certificate, or find out where the insurance is charged.",
       "CMR-01": "Have the missing particular entered in the CMR before the goods leave.",
-      "DOC-01": "Add the missing document and run the check again. Where there are several documents of one type, see whether the right one was compared."
+      "DOC-01": "Add the missing document and run the check again. Where there are several documents of one type, see whether the right one was compared.",
+      "HS-01": "Verify the printed code and consult the applicable nomenclature edition for the date of the invoice.",
+      "PTY-02": "Verify the printed identification numbers against the originals.",
+      "TAX-01": "Verify the company code and the registered name.",
+      "TAX-02": "Verify the seller’s VAT status on the invoice date.",
+      "TAX-03": "Verify the company code and read the Revenue Service’s reply.",
+      "DEC-01": "Verify the exporter and importer against the seller and buyer on the invoice.",
+      "DEC-02": "Check box 33, the invoice codes and the nomenclature edition in force on the registration date.",
+      "DEC-03": "Compare the item weights in boxes 35 and 38 with the shipment totals in kg.",
+      "DEC-04": "Check box 6 and verify which packing method each document counts.",
+      "DEC-05": "Compare boxes 22 and 42 with the invoice totals and currency.",
+      "DEC-06": "Verify the origin on the invoice and in box 34a."
     },
     "ka": {
       "AMT-01": "წაიკითხე დოკუმენტში სიტყვიერად დაწერილი თანხა და ციფრებს შეადარე: ერთ-ერთი გასასწორებელია.",
@@ -135,7 +466,18 @@
       "INC-02": "ჰკითხე მხარეებს, ხომ არ გულისხმობდნენ ნებისმიერი ტრანსპორტისთვის განკუთვნილ პირობას: FOB-ის ან FAS-ის ნაცვლად FCA-ს, CFR-ის ნაცვლად CPT-ს, CIF-ის ნაცვლად CIP-ს.",
       "INC-03": "გამყიდველს დაზღვევის პოლისი ან სერტიფიკატი მოსთხოვე, ან გაარკვიე, სად არის გათვალისწინებული დაზღვევის თანხა.",
       "CMR-01": "ტვირთის გაგზავნამდე ნაკლული მონაცემი CMR-ში ჩააწერინე.",
-      "DOC-01": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი. თუ ერთი სახის რამდენიმე დოკუმენტია, ნახე, სწორი შედარდა თუ არა."
+      "DOC-01": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი. თუ ერთი სახის რამდენიმე დოკუმენტია, ნახე, სწორი შედარდა თუ არა.",
+      "HS-01": "შეამოწმე დაბეჭდილი კოდი და ინვოისის თარიღისთვის მოქმედი ნომენკლატურის გამოცემა.",
+      "PTY-02": "გადაამოწმე დაბეჭდილი საიდენტიფიკაციო ნომრები დედნებში.",
+      "TAX-01": "გადაამოწმე კომპანიის კოდი და რეგისტრირებული სახელი.",
+      "TAX-02": "გადაამოწმე გამყიდველის დღგ-ის სტატუსი ინვოისის თარიღისთვის.",
+      "TAX-03": "გადაამოწმე კომპანიის კოდი და წაიკითხე შემოსავლების სამსახურის პასუხი.",
+      "DEC-01": "შეადარე ექსპორტიორი და იმპორტიორი ინვოისის გამყიდველსა და მყიდველს.",
+      "DEC-02": "შეამოწმე გრაფა 33, ინვოისის კოდები და რეგისტრაციის დღეს მოქმედი ნომენკლატურა.",
+      "DEC-03": "შეადარე გრაფების 35 და 38 წონები ტვირთის ჯამებს კილოგრამებში.",
+      "DEC-04": "შეამოწმე გრაფა 6 და გადაამოწმე, რა ტიპის შეფუთვას ითვლის თითოეული დოკუმენტი.",
+      "DEC-05": "შეადარე გრაფები 22 და 42 ინვოისების ჯამებსა და ვალუტას.",
+      "DEC-06": "გადაამოწმე წარმოშობა ინვოისსა და გრაფა 34ა-ში."
     },
     "ru": {
       "AMT-01": "Прочитайте сумму прописью в документе и сравните её с цифрами: одно из двух нужно исправить.",
@@ -153,7 +495,18 @@
       "INC-02": "Уточните у сторон, не имелось ли в виду условие для любого вида транспорта: FCA вместо FOB или FAS, CPT вместо CFR, CIP вместо CIF.",
       "INC-03": "Запросите у продавца страховой полис или сертификат либо выясните, где учтена сумма страхования.",
       "CMR-01": "Попросите внести недостающие сведения в CMR до отправки груза.",
-      "DOC-01": "Добавьте недостающий документ и запустите проверку снова. Если документов одного вида несколько, посмотрите, тот ли был взят для сверки."
+      "DOC-01": "Добавьте недостающий документ и запустите проверку снова. Если документов одного вида несколько, посмотрите, тот ли был взят для сверки.",
+      "HS-01": "Проверьте напечатанный код и редакцию номенклатуры, действовавшую на дату инвойса.",
+      "PTY-02": "Сверьте напечатанные идентификационные номера с оригиналами.",
+      "TAX-01": "Проверьте код компании и её зарегистрированное название.",
+      "TAX-02": "Проверьте статус продавца на дату инвойса.",
+      "TAX-03": "Проверьте код компании и прочитайте ответ Службы доходов.",
+      "DEC-01": "Сверьте экспортёра и импортёра с продавцом и покупателем в инвойсе.",
+      "DEC-02": "Проверьте графу 33, коды инвойсов и редакцию номенклатуры на дату регистрации.",
+      "DEC-03": "Сверьте вес товаров в графах 35 и 38 с общим весом груза в кг.",
+      "DEC-04": "Проверьте графу 6 и вид упаковки, который учитывает каждый документ.",
+      "DEC-05": "Сверьте графы 22 и 42 с итогами и валютой инвойсов.",
+      "DEC-06": "Сверьте происхождение в инвойсе и в графе 34а."
     },
     "tr": {
       "AMT-01": "Belgedeki yazıyla tutarı okuyup rakamlarla karşılaştırın: ikisinden biri düzeltilmeli.",
@@ -171,7 +524,18 @@
       "INC-02": "Taraflara, her taşıma şekline uygun kuralı kastedip kastetmediklerini sorun: FOB veya FAS yerine FCA, CFR yerine CPT, CIF yerine CIP.",
       "INC-03": "Satıcıdan sigorta poliçesini veya sertifikasını isteyin ya da sigorta bedelinin nerede yer aldığını öğrenin.",
       "CMR-01": "Eksik bilgiyi eşya yola çıkmadan önce CMR'ye yazdırın.",
-      "DOC-01": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın. Aynı türden birden fazla belge varsa karşılaştırmada doğru belgenin kullanılıp kullanılmadığına bakın."
+      "DOC-01": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın. Aynı türden birden fazla belge varsa karşılaştırmada doğru belgenin kullanılıp kullanılmadığına bakın.",
+      "HS-01": "Basılı kodu ve fatura tarihinde geçerli nomenklatür metnini kontrol edin.",
+      "PTY-02": "Basılı kimlik numaralarını asıl belgelerle karşılaştırın.",
+      "TAX-01": "Şirket kodunu ve kayıtlı adı kontrol edin.",
+      "TAX-02": "Satıcının fatura tarihindeki KDV durumunu kontrol edin.",
+      "TAX-03": "Şirket kodunu kontrol edin ve Gelir İdaresinin yanıtını okuyun.",
+      "DEC-01": "İhracatçı ve ithalatçıyı faturadaki satıcı ve alıcıyla karşılaştırın.",
+      "DEC-02": "33. kutuyu, fatura kodlarını ve tescil tarihinde geçerli nomenklatürü kontrol edin.",
+      "DEC-03": "35 ve 38. kutulardaki ağırlıkları sevkiyatın kg cinsinden toplamlarıyla karşılaştırın.",
+      "DEC-04": "6. kutuyu ve her belgenin saydığı ambalaj türünü kontrol edin.",
+      "DEC-05": "22 ve 42. kutuları fatura toplamları ve para birimiyle karşılaştırın.",
+      "DEC-06": "Fatura ve 34a kutusundaki menşei doğrulayın."
     }
   },
   "keyChecks": {
@@ -179,37 +543,69 @@
       "AMT-01.currency": "Look at the currency the amount in words names and at the currency of the document: one of the two has to be corrected.",
       "AMT-01.unreadable": "Read the amount in words on the document yourself and compare it with the figures: the checker could not read it, so it was not compared with them.",
       "REF-01.cmr-missing-document": "Have the document entered among the documents attached to the CMR (box 5), or see whether it is listed there under another number.",
+      "REF-01.declaration-missing-invoice": "Check the invoice number against box 44 on the declaration.",
+      "DATE-01.invoice-after-declaration": "Verify the invoice date and the date the declaration was registered.",
       "INC-01.unknown": "Look at the delivery terms on the document: the rule may be misspelled or come from an older edition of Incoterms (DAF, DES, DEQ, DDU, DAT). Have it written as an Incoterms 2020 code.",
       "DOC-01.missing": "Add the missing document and run the check again.",
-      "DOC-01.multiple": "See whether the first of them is the one that belongs to this shipment: the other documents were compared with the first one only."
+      "DOC-01.multiple": "See whether the first of them is the one that belongs to this shipment: the other documents were compared with the first one only.",
+      "DOC-01.multiple-invoices-declaration": "Verify that each invoice belongs to this shipment and appears only once in the set.",
+      "HS-01.unreadable": "Read the HS code on the invoice and check the extraction against it."
     },
     "ka": {
       "AMT-01.currency": "ნახე, რომელი ვალუტა წერია სიტყვიერ თანხაში და რომელია დოკუმენტის ვალუტა: ერთ-ერთი გასასწორებელია.",
       "AMT-01.unreadable": "დოკუმენტში სიტყვიერად დაწერილი თანხა თვითონ წაიკითხე და ციფრებს შეადარე: შემმოწმებელმა ის ვერ წაიკითხა, ამიტომ ციფრებთან არ შეუდარებია.",
       "REF-01.cmr-missing-document": "ეს დოკუმენტი CMR-ის თანდართული დოკუმენტების სიაში (გრაფა 5) ჩააწერინე, ან ნახე, ხომ არ არის იქ სხვა ნომრით მითითებული.",
+      "REF-01.declaration-missing-invoice": "შეადარე ინვოისის ნომერი დეკლარაციის გრაფა 44-ს.",
+      "DATE-01.invoice-after-declaration": "გადაამოწმე ინვოისის თარიღი და დეკლარაციის რეგისტრაციის თარიღი.",
       "INC-01.unknown": "ნახე მიწოდების პირობა დოკუმენტში: შესაძლოა, შეცდომით წერია ან Incoterms-ის ძველი გამოცემიდანაა (DAF, DES, DEQ, DDU, DAT). Incoterms 2020-ის კოდით ჩააწერინე.",
       "DOC-01.missing": "ნაკლული დოკუმენტი დაამატე და შემოწმება თავიდან გაუშვი.",
-      "DOC-01.multiple": "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა."
+      "DOC-01.multiple": "ნახე, მათგან პირველი ნამდვილად ამ ტვირთის დოკუმენტია თუ არა: დანარჩენი დოკუმენტები მხოლოდ პირველს შედარდა.",
+      "DOC-01.multiple-invoices-declaration": "გადაამოწმე, რომ ყველა ინვოისი ამ ტვირთს ეკუთვნის და ნაკრებში ერთხელაა ჩასმული.",
+      "HS-01.unreadable": "წაიკითხე HS კოდი ინვოისში და ამოკითხულ მონაცემს შეადარე."
     },
     "ru": {
       "AMT-01.currency": "Посмотрите, какая валюта названа в сумме прописью и какова валюта документа: одно из двух нужно исправить.",
       "AMT-01.unreadable": "Прочитайте сумму прописью в документе сами и сравните её с цифрами: программа не смогла её прочитать, поэтому с цифрами она не сравнивалась.",
       "REF-01.cmr-missing-document": "Попросите внести этот документ в графу 5 CMR (прилагаемые документы) или посмотрите, не указан ли он там под другим номером.",
+      "REF-01.declaration-missing-invoice": "Сверьте номер инвойса с графой 44 декларации.",
+      "DATE-01.invoice-after-declaration": "Проверьте дату инвойса и дату регистрации декларации.",
       "INC-01.unknown": "Посмотрите условие поставки в документе: возможно, в нём опечатка или оно взято из старой редакции Инкотермс (DAF, DES, DEQ, DDU, DAT). Попросите указать его кодом Инкотермс 2020.",
       "DOC-01.missing": "Добавьте недостающий документ и запустите проверку снова.",
-      "DOC-01.multiple": "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым."
+      "DOC-01.multiple": "Посмотрите, относится ли первый из них к этой поставке: остальные документы сверялись только с первым.",
+      "DOC-01.multiple-invoices-declaration": "Убедитесь, что каждый инвойс относится к этой поставке и включён один раз.",
+      "HS-01.unreadable": "Прочитайте код ТН ВЭД в инвойсе и сверьте его с извлечённым значением."
     },
     "tr": {
       "AMT-01.currency": "Yazıyla tutarda geçen dövize ve belgenin dövizine bakın: ikisinden biri düzeltilmeli.",
       "AMT-01.unreadable": "Belgedeki yazıyla tutarı kendiniz okuyup rakamlarla karşılaştırın: program bu tutarı okuyamadı, bu yüzden rakamlarla karşılaştırılmadı.",
       "REF-01.cmr-missing-document": "Bu belgeyi CMR'nin ekli belgeler kutusuna (kutu 5) yazdırın ya da orada başka bir numarayla geçip geçmediğine bakın.",
+      "REF-01.declaration-missing-invoice": "Fatura numarasını beyannamenin 44. kutusuyla karşılaştırın.",
+      "DATE-01.invoice-after-declaration": "Fatura tarihini ve beyannamenin tescil tarihini doğrulayın.",
       "INC-01.unknown": "Belgedeki teslim şekline bakın: yanlış yazılmış ya da Incoterms'in eski bir sürümünden alınmış olabilir (DAF, DES, DEQ, DDU, DAT). Incoterms 2020 koduyla yazdırın.",
       "DOC-01.missing": "Eksik belgeyi ekleyip kontrolü yeniden çalıştırın.",
-      "DOC-01.multiple": "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı."
+      "DOC-01.multiple": "Bunlardan ilkinin bu sevkiyata ait olup olmadığına bakın: diğer belgeler yalnızca ilkiyle karşılaştırıldı.",
+      "DOC-01.multiple-invoices-declaration": "Her faturanın bu sevkiyata ait olduğunu ve sette bir kez yer aldığını doğrulayın.",
+      "HS-01.unreadable": "Faturadaki HS kodunu okuyup çıkarılan değerle karşılaştırın."
     }
   },
   "fieldLabels": {
     "en": {
+      "customs_declaration:number": "registration number",
+      "customs_declaration:date": "registration date",
+      "customs_declaration:currency": "invoice currency (box 22)",
+      "customs_declaration:totalPackages": "total packages (box 6)",
+      "customs_declaration:attachedDocuments": "attached document (box 44)",
+      "exporter.taxId": "exporter tax ID (box 2)",
+      "exporter.name": "exporter (box 2)",
+      "importer.taxId": "importer tax ID (box 8)",
+      "importer.name": "importer (box 8)",
+      "items.hsCode": "HS code (box 33)",
+      "items.countryOfOrigin": "origin (box 34a)",
+      "countryOfOrigin": "country of origin",
+      "items.grossWeightKg": "gross weight (box 35)",
+      "items.netWeightKg": "net weight (box 38)",
+      "items.invoiceValue": "invoice value (box 42)",
+      "totalInvoiceAmount": "invoice total (box 22)",
       "number": "number",
       "date": "date",
       "cmr:date": "date the CMR was made out",
@@ -225,6 +621,7 @@
       "otherCharges": "other charge",
       "tax": "tax",
       "lines.model": "item code",
+      "lines.hsCode": "HS code",
       "lines.quantity": "quantity",
       "lines.unitPrice": "unit price",
       "lines.lineTotal": "total",
@@ -244,6 +641,12 @@
       "contractRef.date": "contract date",
       "attachedDocuments": "attached document",
       "seller.name": "seller",
+      "seller.taxId": "tax identification number",
+      "buyer.taxId": "tax identification number",
+      "consignee.taxId": "tax identification number",
+      "carrier.taxId": "tax identification number",
+      "sender.taxId": "tax identification number",
+      "shipper.taxId": "tax identification number",
       "buyer.name": "buyer",
       "consignee.name": "consignee",
       "shipper.name": "shipper",
@@ -251,6 +654,22 @@
       "incoterm.code": "Incoterms rule"
     },
     "ka": {
+      "customs_declaration:number": "რეგისტრაციის ნომერი",
+      "customs_declaration:date": "რეგისტრაციის თარიღი",
+      "customs_declaration:currency": "ინვოისის ვალუტა (გრაფა 22)",
+      "customs_declaration:totalPackages": "შეფუთვების ჯამი (გრაფა 6)",
+      "customs_declaration:attachedDocuments": "თანდართული დოკუმენტი (გრაფა 44)",
+      "exporter.taxId": "ექსპორტიორის საიდენტიფიკაციო ნომერი (გრაფა 2)",
+      "exporter.name": "ექსპორტიორი (გრაფა 2)",
+      "importer.taxId": "იმპორტიორის საიდენტიფიკაციო ნომერი (გრაფა 8)",
+      "importer.name": "იმპორტიორი (გრაფა 8)",
+      "items.hsCode": "HS კოდი (გრაფა 33)",
+      "items.countryOfOrigin": "წარმოშობა (გრაფა 34ა)",
+      "countryOfOrigin": "წარმოშობის ქვეყანა",
+      "items.grossWeightKg": "ბრუტო წონა (გრაფა 35)",
+      "items.netWeightKg": "ნეტო წონა (გრაფა 38)",
+      "items.invoiceValue": "ფაქტურული ღირებულება (გრაფა 42)",
+      "totalInvoiceAmount": "ინვოისის ჯამი (გრაფა 22)",
       "number": "ნომერი",
       "date": "თარიღი",
       "cmr:date": "შედგენის თარიღი",
@@ -266,6 +685,7 @@
       "otherCharges": "დამატებითი ხარჯი",
       "tax": "გადასახადი",
       "lines.model": "მოდელი",
+      "lines.hsCode": "HS კოდი",
       "lines.quantity": "რაოდენობა",
       "lines.unitPrice": "ერთეულის ფასი",
       "lines.lineTotal": "ჯამი",
@@ -285,6 +705,12 @@
       "contractRef.date": "ხელშეკრულების თარიღი",
       "attachedDocuments": "თანდართული დოკუმენტი",
       "seller.name": "გამყიდველი",
+      "seller.taxId": "საიდენტიფიკაციო ნომერი",
+      "buyer.taxId": "საიდენტიფიკაციო ნომერი",
+      "consignee.taxId": "საიდენტიფიკაციო ნომერი",
+      "carrier.taxId": "საიდენტიფიკაციო ნომერი",
+      "sender.taxId": "საიდენტიფიკაციო ნომერი",
+      "shipper.taxId": "საიდენტიფიკაციო ნომერი",
       "buyer.name": "მყიდველი",
       "consignee.name": "მიმღები",
       "shipper.name": "გამგზავნი",
@@ -292,6 +718,22 @@
       "incoterm.code": "Incoterms პირობა"
     },
     "ru": {
+      "customs_declaration:number": "регистрационный номер",
+      "customs_declaration:date": "дата регистрации",
+      "customs_declaration:currency": "валюта инвойса (графа 22)",
+      "customs_declaration:totalPackages": "число мест (графа 6)",
+      "customs_declaration:attachedDocuments": "приложенный документ (графа 44)",
+      "exporter.taxId": "идентификатор экспортёра (графа 2)",
+      "exporter.name": "экспортёр (графа 2)",
+      "importer.taxId": "идентификатор импортёра (графа 8)",
+      "importer.name": "импортёр (графа 8)",
+      "items.hsCode": "код ТН ВЭД (графа 33)",
+      "items.countryOfOrigin": "происхождение (графа 34а)",
+      "countryOfOrigin": "страна происхождения",
+      "items.grossWeightKg": "вес брутто (графа 35)",
+      "items.netWeightKg": "вес нетто (графа 38)",
+      "items.invoiceValue": "фактурная стоимость (графа 42)",
+      "totalInvoiceAmount": "итог инвойса (графа 22)",
       "number": "номер",
       "date": "дата",
       "cmr:date": "дата составления",
@@ -307,6 +749,7 @@
       "otherCharges": "дополнительный расход",
       "tax": "налог",
       "lines.model": "артикул",
+      "lines.hsCode": "код ТН ВЭД",
       "lines.quantity": "количество",
       "lines.unitPrice": "цена",
       "lines.lineTotal": "сумма",
@@ -326,6 +769,12 @@
       "contractRef.date": "дата договора",
       "attachedDocuments": "прилагаемый документ",
       "seller.name": "продавец",
+      "seller.taxId": "налоговый номер",
+      "buyer.taxId": "налоговый номер",
+      "consignee.taxId": "налоговый номер",
+      "carrier.taxId": "налоговый номер",
+      "sender.taxId": "налоговый номер",
+      "shipper.taxId": "налоговый номер",
       "buyer.name": "покупатель",
       "consignee.name": "грузополучатель",
       "shipper.name": "грузоотправитель",
@@ -333,6 +782,22 @@
       "incoterm.code": "условие Инкотермс"
     },
     "tr": {
+      "customs_declaration:number": "tescil numarası",
+      "customs_declaration:date": "tescil tarihi",
+      "customs_declaration:currency": "fatura para birimi (kutu 22)",
+      "customs_declaration:totalPackages": "toplam kap (kutu 6)",
+      "customs_declaration:attachedDocuments": "ekli belge (kutu 44)",
+      "exporter.taxId": "ihracatçı vergi numarası (kutu 2)",
+      "exporter.name": "ihracatçı (kutu 2)",
+      "importer.taxId": "ithalatçı vergi numarası (kutu 8)",
+      "importer.name": "ithalatçı (kutu 8)",
+      "items.hsCode": "HS kodu (kutu 33)",
+      "items.countryOfOrigin": "menşe (kutu 34a)",
+      "countryOfOrigin": "menşe ülke",
+      "items.grossWeightKg": "brüt ağırlık (kutu 35)",
+      "items.netWeightKg": "net ağırlık (kutu 38)",
+      "items.invoiceValue": "fatura kıymeti (kutu 42)",
+      "totalInvoiceAmount": "fatura toplamı (kutu 22)",
       "number": "numara",
       "date": "tarih",
       "cmr:date": "düzenlenme tarihi",
@@ -348,6 +813,7 @@
       "otherCharges": "diğer masraf",
       "tax": "vergi",
       "lines.model": "ürün kodu",
+      "lines.hsCode": "HS kodu",
       "lines.quantity": "miktar",
       "lines.unitPrice": "birim fiyat",
       "lines.lineTotal": "tutar",
@@ -367,6 +833,12 @@
       "contractRef.date": "sözleşme tarihi",
       "attachedDocuments": "ekli belge",
       "seller.name": "satıcı",
+      "seller.taxId": "vergi kimlik numarası",
+      "buyer.taxId": "vergi kimlik numarası",
+      "consignee.taxId": "vergi kimlik numarası",
+      "carrier.taxId": "vergi kimlik numarası",
+      "sender.taxId": "vergi kimlik numarası",
+      "shipper.taxId": "vergi kimlik numarası",
       "buyer.name": "alıcı",
       "consignee.name": "alıcı (teslim alan)",
       "shipper.name": "gönderici",
@@ -405,7 +877,35 @@
       "INC-03.no-insurance": "Under {code} the seller insures the goods, but the documents show neither an insurance policy nor an insurance charge.",
       "CMR-01.missing": "CMR is missing Art. 6(1)({item}): {particular}.",
       "DOC-01.missing": "Missing document: {document}.",
-      "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one."
+      "DOC-01.multiple": "{count} {docs} of type {document}; cross-checks use the first one.",
+      "DOC-01.multiple-invoices-declaration": "{count} {docs} of type {document}. The declaration checks use all invoices for HS prefixes, currency and totals.",
+      "HS-01.unreadable": "Line {line}: the HS code could not be read.",
+      "HS-01.unknown-subheading": "Line {line}: subheading {subheading} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified.",
+      "HS-01.unknown-subheading-heading": "Line {line}: subheading {subheading} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: {heading} · {description}",
+      "HS-01.unknown-national": "Line {line}: national code {code} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under {subheading}: {neighbours}",
+      "PTY-02.unreadable": "The tax identification number for “{name}” could not be read.",
+      "PTY-02.number": "The tax identification number for “{name}” differs: “{a}” and “{b}”.",
+      "TAX-01.name": "The printed name “{printed}” differs from “{registered}” in the Revenue Service snapshot dated {snapshotDate}.",
+      "TAX-02.vat": "The invoice adds tax, and the Revenue Service lists {code} as not a VAT payer at {checkedAt}. This status is from the snapshot time, not the invoice date.",
+      "TAX-03.reply": "Revenue Service reply for {code}: “{reply}”",
+      "REF-01.declaration-missing-invoice": "The customs declaration's attached documents (box 44) do not list invoice {number}.",
+      "DATE-01.invoice-after-declaration": "Invoice date {invoice} is after the declaration's registration date {registration}.",
+      "DEC-01.tax-id": "For the {role}, the invoice gives tax ID {invoice}, and the declaration gives {declaration}.",
+      "DEC-01.name": "For the {role}, the invoice names {invoice}, and the declaration names {declaration}.",
+      "DEC-02.unreadable": "Item {line}: the HS code could not be read as an 11-digit national code.",
+      "DEC-02.invoice-prefix": "Invoice line {line}: code {code} has no matching six-digit prefix on the declaration.",
+      "DEC-02.declaration-prefix": "Declared item {line}: code {code} has no matching six-digit prefix on the invoices.",
+      "DEC-03.gross": "The declared items total {found} gross, and {documentIn} the gross total is {expected}.",
+      "DEC-03.net": "The declared items total {found} net, and {documentIn} the net total is {expected}.",
+      "DEC-04.packages": "The declaration gives {found} packages, and {documentIn} the count is {expected}.",
+      "DEC-05.currency": "Box 22 gives currency {found}, and the invoices use {expected}.",
+      "DEC-05.invoice-total": "Box 22 gives {found}, and the invoice total is {expected}.",
+      "DEC-05.item-total": "Box 42 values add up to {found}, and box 22 gives {expected}.",
+      "DEC-06.origin": "Item {line} gives origin {declaration}, and the invoice gives {invoice}.",
+      "DEC-06.unestablished": "Item {line}: box 34a gives code 999 (origin not established).",
+      "DEC-02.unknown-national": "Item {line}: national code {code} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Codes under {subheading}: {neighbours}",
+      "DEC-02.unknown-national-heading": "Item {line}: national code {code} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified. Nearest heading: {heading} · {description}",
+      "DEC-02.unknown-national-alone": "Item {line}: national code {code} is absent from the Georgian nomenclature (Order No. 21, original text). Later amendments were not verified."
     },
     "ka": {
       "AMT-01.mismatch": "სიტყვიერად წერია {wordsAmount}, ციფრებით კი {amount}.",
@@ -437,7 +937,35 @@
       "INC-03.no-insurance": "{code} პირობით ტვირთს გამყიდველი აზღვევს, დოკუმენტებში კი არც დაზღვევის პოლისია და არც დაზღვევის თანხა.",
       "CMR-01.missing": "CMR-ს აკლია მუხ. 6(1)({item}): {particular}.",
       "DOC-01.missing": "აკლია დოკუმენტი: {document}.",
-      "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება."
+      "DOC-01.multiple": "{document}: {count} {docs}; შედარებისას პირველი გამოიყენება.",
+      "DOC-01.multiple-invoices-declaration": "{document}: {count} {docs}. დეკლარაციასთან შედარებისას ყველა ინვოისის HS კოდების პირველი ექვსი ციფრი, ვალუტა და ჯამი მოწმდება.",
+      "HS-01.unreadable": "სტრიქონი {line}: HS კოდი ვერ იკითხება.",
+      "HS-01.unknown-subheading": "სტრიქონი {line}: სასაქონლო სუბპოზიცია {subheading} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა.",
+      "HS-01.unknown-subheading-heading": "სტრიქონი {line}: სასაქონლო სუბპოზიცია {subheading} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. უახლოესი სასაქონლო პოზიცია: {heading} · {description}",
+      "HS-01.unknown-national": "სტრიქონი {line}: ეროვნული კოდი {code} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. კოდები {subheading}-ის ფარგლებში: {neighbours}",
+      "PTY-02.unreadable": "„{name}“: საიდენტიფიკაციო ნომერი ვერ იკითხება.",
+      "PTY-02.number": "„{name}“: საიდენტიფიკაციო ნომერი განსხვავდება: „{a}“ და „{b}“.",
+      "TAX-01.name": "დაბეჭდილი სახელი „{printed}“ განსხვავდება შემოსავლების სამსახურის {snapshotDate}-ის ჩანაწერში მითითებული სახელისგან „{registered}“.",
+      "TAX-02.vat": "ინვოისში გადასახადი დარიცხულია, შემოსავლების სამსახურის ჩანაწერით კი {code} არ არის დღგ-ის გადამხდელი {checkedAt} მომენტისთვის. სტატუსი ჩანაწერის დროს ასახავს და არა ინვოისის თარიღს.",
+      "TAX-03.reply": "შემოსავლების სამსახურის პასუხი {code} კოდზე: „{reply}“",
+      "REF-01.declaration-missing-invoice": "საბაჟო დეკლარაციის თანდართულ დოკუმენტებში (გრაფა 44) ინვოისი {number} არ არის მითითებული.",
+      "DATE-01.invoice-after-declaration": "ინვოისის თარიღი ({invoice}) დეკლარაციის რეგისტრაციის თარიღზე ({registration}) გვიანია.",
+      "DEC-01.tax-id": "{role}: ინვოისში საიდენტიფიკაციო ნომერია {invoice}, დეკლარაციაში კი წერია {declaration}.",
+      "DEC-01.name": "{role}: ინვოისში წერია {invoice}, დეკლარაციაში კი {declaration}.",
+      "DEC-02.unreadable": "საქონელი {line}: HS კოდი 11-ნიშნა ეროვნულ კოდად ვერ იკითხება.",
+      "DEC-02.invoice-prefix": "ინვოისის სტრიქონი {line}: კოდის {code} პირველი ექვსი ციფრი დეკლარაციის არცერთ კოდს არ ემთხვევა.",
+      "DEC-02.declaration-prefix": "დეკლარაციის საქონელი {line}: კოდის {code} პირველი ექვსი ციფრი ინვოისების არცერთ კოდს არ ემთხვევა.",
+      "DEC-03.gross": "დეკლარირებული საქონლის საერთო ბრუტო წონაა {found}, {documentIn} კი {expected}.",
+      "DEC-03.net": "დეკლარირებული საქონლის საერთო ნეტო წონაა {found}, {documentIn} კი {expected}.",
+      "DEC-04.packages": "დეკლარაციაში შეფუთვების რაოდენობაა {found}, {documentIn} კი {expected}.",
+      "DEC-05.currency": "გრაფა 22-ში ვალუტაა {found}, ინვოისებში კი {expected}.",
+      "DEC-05.invoice-total": "გრაფა 22-ში თანხაა {found}, ინვოისის ჯამი კი {expected}.",
+      "DEC-05.item-total": "გრაფა 42-ში თანხების ჯამია {found}, გრაფა 22-ში კი {expected} წერია.",
+      "DEC-06.origin": "საქონელი {line}: დეკლარაციაში წარმოშობაა {declaration}, ინვოისში კი {invoice}.",
+      "DEC-06.unestablished": "საქონელი {line}: გრაფა 34ა-ში წერია კოდი 999 (წარმოშობა დაუდგენელია).",
+      "DEC-02.unknown-national": "საქონელი {line}: ეროვნული კოდი {code} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. კოდები {subheading}-ის ფარგლებში: {neighbours}",
+      "DEC-02.unknown-national-heading": "საქონელი {line}: ეროვნული კოდი {code} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა. უახლოესი სასაქონლო პოზიცია: {heading} · {description}",
+      "DEC-02.unknown-national-alone": "საქონელი {line}: ეროვნული კოდი {code} საქართველოს სასაქონლო ნომენკლატურაში (№21 ბრძანების პირვანდელ ტექსტში) არ არის. შემდგომი ცვლილებები არ შემოწმებულა."
     },
     "ru": {
       "AMT-01.mismatch": "Прописью указано {wordsAmount}, а цифрами — {amount}.",
@@ -469,7 +997,35 @@
       "INC-03.no-insurance": "По условию {code} груз страхует продавец, но в документах нет ни страхового полиса, ни суммы страхования.",
       "CMR-01.missing": "В CMR нет реквизита ст. 6(1)({item}): {particular}.",
       "DOC-01.missing": "Нет документа: {document}.",
-      "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый."
+      "DOC-01.multiple": "{document}: {count} {docs}; при сверке используется первый.",
+      "DOC-01.multiple-invoices-declaration": "{document}: {count} {docs}. При сверке с декларацией учитываются префиксы кодов ТН ВЭД, валюта и суммы всех инвойсов.",
+      "HS-01.unreadable": "Строка {line}: не удалось прочитать код ТН ВЭД.",
+      "HS-01.unknown-subheading": "Строка {line}: субпозиции {subheading} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись.",
+      "HS-01.unknown-subheading-heading": "Строка {line}: субпозиции {subheading} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: {heading} · {description}",
+      "HS-01.unknown-national": "Строка {line}: национального кода {code} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции {subheading}: {neighbours}",
+      "PTY-02.unreadable": "Не удалось прочитать налоговый номер стороны «{name}».",
+      "PTY-02.number": "Налоговый номер стороны «{name}» различается: «{a}» и «{b}».",
+      "TAX-01.name": "Напечатанное название «{printed}» отличается от названия «{registered}» в данных Службы доходов от {snapshotDate}.",
+      "TAX-02.vat": "В инвойсе начислен налог, а по данным Службы доходов на {checkedAt} код {code} не является плательщиком НДС. Статус указан на момент запроса, а не на дату инвойса.",
+      "TAX-03.reply": "Ответ Службы доходов для кода {code}: «{reply}»",
+      "REF-01.declaration-missing-invoice": "В перечне приложенных документов таможенной декларации (графа 44) не указан инвойс {number}.",
+      "DATE-01.invoice-after-declaration": "Дата инвойса ({invoice}) позже даты регистрации декларации ({registration}).",
+      "DEC-01.tax-id": "Для стороны «{role}» в инвойсе указан идентификационный номер {invoice}, а в декларации — {declaration}.",
+      "DEC-01.name": "Для стороны «{role}» в инвойсе указано имя {invoice}, а в декларации — {declaration}.",
+      "DEC-02.unreadable": "Товар {line}: не удалось прочитать 11-значный национальный код ТН ВЭД.",
+      "DEC-02.invoice-prefix": "Строка инвойса {line}: для кода {code} не найден совпадающий шестизначный префикс в декларации.",
+      "DEC-02.declaration-prefix": "Товар декларации {line}: для кода {code} не найден совпадающий шестизначный префикс в инвойсах.",
+      "DEC-03.gross": "Общий вес брутто заявленных товаров — {found}, а {documentIn} — {expected}.",
+      "DEC-03.net": "Общий вес нетто заявленных товаров — {found}, а {documentIn} — {expected}.",
+      "DEC-04.packages": "В декларации {found} грузовых мест, а {documentIn} — {expected}.",
+      "DEC-05.currency": "В графе 22 указана валюта {found}, а в инвойсах — {expected}.",
+      "DEC-05.invoice-total": "В графе 22 указана сумма {found}, а итог инвойса — {expected}.",
+      "DEC-05.item-total": "Сумма значений графы 42 составляет {found}, а в графе 22 указано {expected}.",
+      "DEC-06.origin": "Товар {line}: в декларации указано происхождение {declaration}, а в инвойсе — {invoice}.",
+      "DEC-06.unestablished": "Товар {line}: в графе 34а указан код 999 (происхождение не установлено).",
+      "DEC-02.unknown-national": "Товар {line}: национального кода {code} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Коды в субпозиции {subheading}: {neighbours}",
+      "DEC-02.unknown-national-heading": "Товар {line}: национального кода {code} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись. Ближайшая позиция: {heading} · {description}",
+      "DEC-02.unknown-national-alone": "Товар {line}: национального кода {code} нет в грузинской номенклатуре (приказ № 21, первоначальная редакция). Последующие изменения не проверялись."
     },
     "tr": {
       "AMT-01.mismatch": "Yazıyla {wordsAmount} yazıyor, rakamla tutar ise {amount}.",
@@ -501,7 +1057,35 @@
       "INC-03.no-insurance": "{code} teslim şeklinde sigortayı satıcı yaptırır, ancak belgeler arasında ne sigorta poliçesi ne de sigorta bedeli var.",
       "CMR-01.missing": "CMR'de Madde 6(1)({item}) eksik: {particular}.",
       "DOC-01.missing": "Eksik belge: {document}.",
-      "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır."
+      "DOC-01.multiple": "{document}: {count} {docs}; karşılaştırmada ilki kullanılır.",
+      "DOC-01.multiple-invoices-declaration": "{document}: {count} {docs}. Beyannameyle karşılaştırmada tüm faturaların HS kodu önekleri, para birimi ve toplamları kullanılır.",
+      "HS-01.unreadable": "Satır {line}: HS kodu okunamadı.",
+      "HS-01.unknown-subheading": "Satır {line}: {subheading} alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı.",
+      "HS-01.unknown-subheading-heading": "Satır {line}: {subheading} alt pozisyonu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. En yakın pozisyon: {heading} · {description}",
+      "HS-01.unknown-national": "Satır {line}: {code} ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. {subheading} alt pozisyonundaki kodlar: {neighbours}",
+      "PTY-02.unreadable": "“{name}” için vergi kimlik numarası okunamadı.",
+      "PTY-02.number": "“{name}” için vergi kimlik numarası farklı: “{a}” ve “{b}”.",
+      "TAX-01.name": "Basılı “{printed}” adı, Gelir İdaresinin {snapshotDate} tarihli kaydındaki “{registered}” adından farklı.",
+      "TAX-02.vat": "Faturada vergi eklenmiş, ancak Gelir İdaresi {code} kodunu {checkedAt} itibarıyla KDV mükellefi olarak göstermiyor. Bu durum fatura tarihini değil, sorgulama anını yansıtır.",
+      "TAX-03.reply": "{code} için Gelir İdaresinin yanıtı: “{reply}”",
+      "REF-01.declaration-missing-invoice": "Gümrük beyannamesinin ekli belgeleri (kutu 44) {number} numaralı faturayı içermiyor.",
+      "DATE-01.invoice-after-declaration": "Fatura tarihi ({invoice}) beyannamenin tescil tarihinden ({registration}) sonra.",
+      "DEC-01.tax-id": "{role} için faturada vergi numarası {invoice}, beyannamede ise {declaration}.",
+      "DEC-01.name": "{role} için faturada {invoice}, beyannamede ise {declaration} yazıyor.",
+      "DEC-02.unreadable": "Kalem {line}: HS kodu 11 haneli ulusal kod olarak okunamadı.",
+      "DEC-02.invoice-prefix": "Faturanın {line}. satırı: {code} kodunun ilk altı hanesi beyannamede bulunamadı.",
+      "DEC-02.declaration-prefix": "Beyannamenin {line}. kalemi: {code} kodunun ilk altı hanesi faturalarda bulunamadı.",
+      "DEC-03.gross": "Beyan edilen kalemlerin toplam brüt ağırlığı {found}, {documentIn} ise {expected}.",
+      "DEC-03.net": "Beyan edilen kalemlerin toplam net ağırlığı {found}, {documentIn} ise {expected}.",
+      "DEC-04.packages": "Beyannamede {found} kap, {documentIn} ise {expected} kap yazıyor.",
+      "DEC-05.currency": "22. kutuda para birimi {found}, faturalarda ise {expected}.",
+      "DEC-05.invoice-total": "22. kutuda tutar {found}, fatura toplamı ise {expected}.",
+      "DEC-05.item-total": "42. kutudaki tutarların toplamı {found}, 22. kutudaki tutar ise {expected}.",
+      "DEC-06.origin": "Kalem {line}: beyannamede menşe {declaration}, faturada ise {invoice}.",
+      "DEC-06.unestablished": "Kalem {line}: 34a kutusunda 999 kodu (menşe belirlenemedi) yazıyor.",
+      "DEC-02.unknown-national": "Kalem {line}: {code} ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. {subheading} alt pozisyonundaki kodlar: {neighbours}",
+      "DEC-02.unknown-national-heading": "Kalem {line}: {code} ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı. En yakın pozisyon: {heading} · {description}",
+      "DEC-02.unknown-national-alone": "Kalem {line}: {code} ulusal kodu Gürcistan eşya nomenklatüründe (21 sayılı emrin ilk metni) yer almıyor. Sonraki değişiklikler doğrulanmadı."
     }
   },
   "dateParams": {
@@ -520,6 +1104,10 @@
     "DATE-01.invoice-after-shipment": [
       "invoice",
       "shipment"
+    ],
+    "DATE-01.invoice-after-declaration": [
+      "invoice",
+      "registration"
     ]
   },
   "numberParams": {
@@ -566,6 +1154,26 @@
     },
     "WGT-02.net": {
       "values": "kg"
+    },
+    "DEC-03.gross": {
+      "found": "kg",
+      "expected": "kg"
+    },
+    "DEC-03.net": {
+      "found": "kg",
+      "expected": "kg"
+    },
+    "DEC-04.packages": {
+      "found": "number",
+      "expected": "number"
+    },
+    "DEC-05.invoice-total": {
+      "found": "money",
+      "expected": "money"
+    },
+    "DEC-05.item-total": {
+      "found": "money",
+      "expected": "money"
     }
   },
   "cmrParts": {
@@ -611,6 +1219,7 @@
         "packing_list": "packing list",
         "cmr": "CMR",
         "contract": "contract",
+        "customs_declaration": "customs declaration",
         "other": "document"
       },
       "docIn": {
@@ -618,6 +1227,7 @@
         "packing_list": "in the packing list",
         "cmr": "in the CMR",
         "contract": "in the contract",
+        "customs_declaration": "in the customs declaration",
         "other": "in the document"
       },
       "metric": {
@@ -690,7 +1300,8 @@
         "many": "documents"
       },
       "total": "total",
-      "line": "line"
+      "line": "line",
+      "item": "item"
     },
     "ka": {
       "number": {
@@ -703,6 +1314,7 @@
         "packing_list": "შეფუთვის ფურცელი",
         "cmr": "CMR",
         "contract": "ხელშეკრულება",
+        "customs_declaration": "საბაჟო დეკლარაცია",
         "other": "დოკუმენტი"
       },
       "docIn": {
@@ -710,6 +1322,7 @@
         "packing_list": "შეფუთვის ფურცელში",
         "cmr": "CMR-ში",
         "contract": "ხელშეკრულებაში",
+        "customs_declaration": "საბაჟო დეკლარაციაში",
         "other": "დოკუმენტში"
       },
       "metric": {
@@ -769,7 +1382,8 @@
         "many": "დოკუმენტი"
       },
       "total": "ჯამი",
-      "line": "სტრიქონი"
+      "line": "სტრიქონი",
+      "item": "საქონელი"
     },
     "ru": {
       "number": {
@@ -782,6 +1396,7 @@
         "packing_list": "упаковочный лист",
         "cmr": "CMR",
         "contract": "договор",
+        "customs_declaration": "таможенная декларация",
         "other": "документ"
       },
       "docIn": {
@@ -789,6 +1404,7 @@
         "packing_list": "в упаковочном листе",
         "cmr": "в CMR",
         "contract": "в договоре",
+        "customs_declaration": "в таможенной декларации",
         "other": "в документе"
       },
       "metric": {
@@ -848,7 +1464,8 @@
         "many": "документов"
       },
       "total": "итого",
-      "line": "строка"
+      "line": "строка",
+      "item": "товар"
     },
     "tr": {
       "number": {
@@ -861,6 +1478,7 @@
         "packing_list": "çeki listesi",
         "cmr": "CMR",
         "contract": "sözleşme",
+        "customs_declaration": "gümrük beyannamesi",
         "other": "belge"
       },
       "docIn": {
@@ -868,6 +1486,7 @@
         "packing_list": "çeki listesinde",
         "cmr": "CMR'de",
         "contract": "sözleşmede",
+        "customs_declaration": "gümrük beyannamesinde",
         "other": "belgede"
       },
       "metric": {
@@ -927,7 +1546,8 @@
         "many": "belge"
       },
       "total": "toplam",
-      "line": "satır"
+      "line": "satır",
+      "item": "kalem"
     }
   },
   "ui": {
@@ -951,6 +1571,8 @@
       "error": "Error",
       "warning": "Warning",
       "generatedBy": "Generated by Logisticshub",
+      "notes": "Notes",
+      "declarationSource": "Revenue Service JSON supplied as input. Quotes are JSON values. The checker skips PDF quote lookup and marking for this source.",
       "quote": [
         "“",
         "”"
@@ -976,6 +1598,8 @@
       "error": "შეცდომა",
       "warning": "გაფრთხილება",
       "generatedBy": "შექმნილია Logisticshub-ით",
+      "notes": "შენიშვნები",
+      "declarationSource": "წყაროა შემოსავლების სამსახურის JSON ფაილი. ციტატები JSON-ის მნიშვნელობებია და მათთვის PDF-ში ძიება და მონიშვნა არ ტარდება.",
       "quote": [
         "„",
         "“"
@@ -1001,6 +1625,8 @@
       "error": "Ошибка",
       "warning": "Предупреждение",
       "generatedBy": "Создано в Logisticshub",
+      "notes": "Примечания",
+      "declarationSource": "Источник — предоставленный JSON Службы доходов. Цитаты взяты из значений JSON, поиск в PDF и разметка для этого источника не выполняются.",
       "quote": [
         "«",
         "»"
@@ -1026,6 +1652,8 @@
       "error": "Hata",
       "warning": "Uyarı",
       "generatedBy": "Logisticshub ile oluşturuldu",
+      "notes": "Notlar",
+      "declarationSource": "Kaynak, sağlanan Gelir İdaresi JSON dosyasıdır. Alıntılar JSON değerleridir. Bu kaynak için PDF araması ve işaretleme yapılmaz.",
       "quote": [
         "“",
         "”"

@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "DEC-06",
+    "severity": "warning",
+    "key": "DEC-06.origin",
+    "params": {
+      "line": "1",
+      "invoice": "თურქეთი",
+      "declaration": "DE"
+    }
+  }
+]

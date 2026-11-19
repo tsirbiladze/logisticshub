@@ -6,7 +6,7 @@
  *   logisticshub schema
  *   logisticshub mcp
  */
-import { REPORT_LANGUAGES, extractionJsonSchema, ioProblem, type ReportFormat, type ReportLanguage } from "@logisticshub/core";
+import { declarationCommand, DECLARATION_USAGE, RegistryInputError, registryCommand, REPORT_LANGUAGES, extractionJsonSchema, hsLookupOutput, ioProblem, type ReportFormat, type ReportLanguage } from "@logisticshub/core";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./mcp.ts";
 import { DEFAULT_MODEL, ModelConfigError, resolveModel } from "./models.ts";
@@ -15,11 +15,15 @@ import { DOCUMENT_TYPES_TEXT, NothingChecked, OutputError, parseFormats, runChec
 declare const __VERSION__: string;
 const VERSION = typeof __VERSION__ === "string" ? __VERSION__ : "dev";
 
-const USAGE = `logisticshub ${VERSION}: cross-check a shipment's trade documents (invoice, packing list, CMR, contract)
+const USAGE = `logisticshub ${VERSION}: cross-check a shipment's trade documents (invoice, packing list, CMR, contract and optional Georgian customs declaration)
 
 Usage:
   logisticshub check <files or folder> [options]   read the documents with an AI model, then check them
   logisticshub check extraction.json [options]     check an extraction you already have (no model, no key)
+  logisticshub ${DECLARATION_USAGE}
+  logisticshub hs <code or Georgian words> [--json] [--limit <n>]  search the saved Georgian nomenclature
+  logisticshub taxpayer <code> [--json]           look up one 9-digit Georgian company code
+  logisticshub registry <extraction.json> [-o registry.json]  fetch a registry snapshot
   logisticshub schema                              print the JSON Schema of extraction.json
   logisticshub mcp                                 run as an MCP server (stdio)
 
@@ -37,10 +41,16 @@ Options:
   --pdf-dir <dir>         with an extraction.json: the folder of the PDFs it cites
                           (default: the extraction.json's folder)
   --format <md,json,html> report formats to write (default: all three)
+  --registry <file>      read a saved registry snapshot without connecting
+  --fetch-registry       fetch a snapshot into --out/registry.json, then check
+                          (sends up to 20 company codes to xdata.rs.ge)
   --no-annotate           do not read the PDFs after the extraction: no marked copies,
                           no quote looked up
   -h, --help              this text
   -v, --version           the version
+
+HS lookup uses Order No. 21 of 2024-01-26 (publication 0, original text).
+Later amendments were not verified. Results are limited to 20 by default.
 
 Keys: ANTHROPIC_API_KEY, OPENAI_API_KEY or OPENROUTER_API_KEY, for the provider of --model.
 
@@ -58,7 +68,7 @@ Exit codes:
      usable, or a file was left out (a model call failed, or its extraction
      still breaks the schema)
   2  nothing was checked: a bad option, a missing key, an input that cannot be
-     read or is not JSON, no document the model could read, or an output
+     read or is not JSON, a malformed registry snapshot, no document the model could read, or an output
      folder that cannot be written. One line on stderr says which.`;
 
 /** A wrong command line: the message and how to call the program. */
@@ -90,6 +100,8 @@ async function check(args: string[]) {
   let formats: ReportFormat[] | undefined;
   let pdfDir: string | undefined;
   let annotate = true;
+  let registryFile: string | undefined;
+  let fetchRegistry = false;
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]!;
     const next = () => args[++i] ?? stop(`Missing value for ${arg}.`);
@@ -107,6 +119,8 @@ async function check(args: string[]) {
     else if (arg === "--model") model = next();
     else if (arg === "--pdf-dir") pdfDir = next();
     else if (arg === "--format") formats = usage(() => parseFormats(next()));
+    else if (arg === "--registry") registryFile = next();
+    else if (arg === "--fetch-registry") fetchRegistry = true;
     else if (arg === "--no-annotate") annotate = false;
     else if (arg.startsWith("-")) fail(`Unknown option ${arg}.`);
     else inputs.push(arg);
@@ -117,6 +131,8 @@ async function check(args: string[]) {
     const run = await runCheck({
       inputs,
       outDir: out,
+      ...(registryFile !== undefined ? { registryFile } : {}),
+      fetchRegistry,
       annotate,
       ...(lang ? { language: lang } : {}),
       ...(formats ? { formats } : {}),
@@ -130,7 +146,7 @@ async function check(args: string[]) {
     process.exitCode = run.result.ok && run.complete ? 0 : 1;
   } catch (error) {
     if (error instanceof OutputError) stop(`${error.message} Give --out a folder that can be written to.`);
-    if (error instanceof ModelConfigError || error instanceof NothingChecked) stop(error.message);
+    if (error instanceof ModelConfigError || error instanceof NothingChecked || error instanceof RegistryInputError) stop(error.message);
     // Not expected: every known failure is one of the errors above.
     stop(`Unexpected error, nothing was checked: ${ioProblem(error)}`);
   }
@@ -140,6 +156,26 @@ async function main() {
   const [command, ...args] = process.argv.slice(2);
   if (!command || command === "--help" || command === "-h" || command === "help") return void process.stdout.write(`${USAGE}\n`);
   if (command === "--version" || command === "-v") return void process.stdout.write(`${VERSION}\n`);
+  if (command === "declaration-from-rs") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    try {
+      return void process.stdout.write(declarationCommand(args));
+    } catch (error) {
+      stop((error as Error).message);
+    }
+  }
+  if (command === "hs") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    return void process.stdout.write(`${usage(() => hsLookupOutput(args))}\n`);
+  }
+  if (command === "taxpayer" || command === "registry") {
+    if (args.includes("--help") || args.includes("-h")) return void process.stdout.write(`${USAGE}\n`);
+    try {
+      return void process.stdout.write(await registryCommand(command, args, (line) => process.stderr.write(`${line}\n`)));
+    } catch (error) {
+      stop(ioProblem(error));
+    }
+  }
   if (command === "schema") return void process.stdout.write(`${JSON.stringify(extractionJsonSchema(), null, 2)}\n`);
   if (command === "mcp") return void (await createServer(VERSION).connect(new StdioServerTransport()));
   if (command === "check") return check(args);

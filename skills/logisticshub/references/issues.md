@@ -4,18 +4,18 @@ Open this when the report lists `Extraction issues` or the script prints `Notes:
 
 ## Extraction issues
 
-Each line gives a field path, a code and what is wrong: `documents[1].lines[1].quantity (EXT_QUOTE_MISMATCH): …`. Paths count from 0: `documents[1].lines[1]` is the second line of the second document. A value with a format, quote-mismatch or percentage issue is kept out of every rule until it is fixed, so findings can be missing.
+Each line gives a field path, a code and what is wrong: `documents[1].lines[1].quantity (EXT_QUOTE_MISMATCH): …`. Paths count from 0: `documents[1].lines[1]` is the second line of the second document. A value with a format, quote-mismatch or percentage issue is kept out of every rule until it is fixed. Declaration facts also need a quote and a valid page citation for their source. Findings can be missing until those issues are fixed.
 
 | Code | Means | Fix |
 |---|---|---|
-| `EXT_SHAPE` | a key is missing or has the wrong type, or `schemaVersion` is not `"2"`; no rule ran, exit code 1 | write what the message says at that path |
+| `EXT_SHAPE` | a key is missing or has the wrong type, or `schemaVersion` is not `"3"`; no rule ran, exit code 1 | write what the message says at that path |
 | `EXT_DECIMAL_FORMAT` | a number that is not canonical (`13,300.00`, `1 880`, `15%`) | `13300.00` |
 | `EXT_DATE_FORMAT` | a date that is not a real `YYYY-MM-DD` | `2026-09-18` |
 | `EXT_CURRENCY_FORMAT` | a currency that is not a three-letter code (`€`, `usd`) | `EUR` |
 | `EXT_QUOTE_MISMATCH` | the value is not what its own quote reads; the message gives the reading (table below) | read the quote in the document again; correct the value, or the quote if you cited the wrong text |
 | `EXT_PERCENTAGE` | a rate (`5%`, `%18`) where an amount belongs | the printed amount, or null when only the rate is printed |
 | `EXT_UNCITED` | a value without a quote | add the quote and page, or make the fact null |
-| `EXT_PAGE` | a page below 1 | the page number counted from 1 |
+| `EXT_PAGE` | a page below 1, a missing declaration page, or a page on an RS JSON citation | the printed page number counted from 1, or null for RS JSON |
 | `EXT_DUPLICATE_ID` | two documents with one `id` | `invoice`, `invoice-2` |
 
 What an `EXT_QUOTE_MISMATCH` message says:
@@ -35,6 +35,8 @@ The check speaks only where the quote can be read beyond doubt (`rules.md`, "Bef
 **One issue is not yours to fix: a document that really prints numbers in both conventions** (`2.4` kg and `1.500` for 1500 pieces). The message then names the number that shows the document's convention (`as in "2.4"`). Look at both numbers in the document once more. When your value is what the document means, keep it: changing it to the reading in the message would make a false finding. The issue stays in the report and takes no correction round. Tell the user which document prints numbers in two ways, with both quotes; which value you read; and that the checker left this field out of its rules, so that number was compared with nothing and is theirs to check by hand.
 
 ## Notes
+
+The reports name saved Revenue Service JSON sources separately. Keep the original response with the extraction. Its quotes have no PDF page to search or mark.
 
 `Notes:` follow `Files:`. They come from reading the PDFs, so `check.py` prints none, and they never change the exit code. `<file>` is a `sourceFile`.
 

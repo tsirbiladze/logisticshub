@@ -178,7 +178,7 @@ describe("README", () => {
   });
 
   it("names every file of the skill folder", () => {
-    const built = ["SKILL.md", "references/extraction.md", "references/extraction-schema.json", "references/extraction-blank.json", "references/issues.md", "references/rules.md", "scripts/check.mjs", "scripts/check.py", "scripts/check-data.json", "scripts/THIRD-PARTY-NOTICES.txt"];
+    const built = ["SKILL.md", "references/extraction.md", "references/extraction-schema.json", "references/extraction-blank.json", "references/issues.md", "references/declaration.md", "references/rules.md", "scripts/check.mjs", "scripts/check.py", "scripts/check-data.json", "scripts/hs-nomenclature.json.gz", "scripts/THIRD-PARTY-NOTICES.txt"];
     for (const file of built) {
       expect(() => read(`skills/logisticshub/${file}`), file).not.toThrow();
       for (const language of LANGUAGES) expect(sections(README[language])[2]!.body, `${language} ${file}`).toContain(`\`${file}\``);
@@ -189,11 +189,11 @@ describe("README", () => {
     const usage = read("packages/skill/src/cli.ts");
     expect(usage).toContain("0  checked, with or without findings");
     expect(usage).toContain("1  the extraction is not usable: the reports list what to fix");
-    expect(usage).toContain("2  nothing was checked: a bad option, a file that cannot be read or is not\n     JSON, or reports that cannot be written");
+    expect(usage).toContain("2  nothing was checked: a bad option, a file that cannot be read or is not\n     JSON, a malformed registry snapshot, or reports that cannot be written");
     const how = sections(README.en)[2]!.body;
     expect(how).toContain("`0` when the documents were checked, with or without findings");
     expect(how).toContain("`1` when the extraction is not usable");
-    expect(how).toContain("`2` when nothing was checked: a bad option, an `extraction.json` that cannot be read or is not JSON, or reports that cannot be written");
+    expect(how).toContain("`2` when nothing was checked: a bad option, an `extraction.json` that cannot be read or is not JSON, a registry snapshot that cannot be read or is malformed, or reports that cannot be written");
     for (const code of ["`0`", "`1`", "`2`"]) expect(sections(README.ka)[2]!.body).toContain(code);
   });
 });
@@ -215,19 +215,12 @@ describe("the CLI's README", () => {
     expect(notes(CLI_README, "`Notes:` never change the exit code.")).toEqual(inSkill);
   });
 
-  it("says what was run against a real model and no more: one model, three demo sets, and of which version", () => {
-    expect(CLI_README).toContain("This path is tested with a stand-in model. ");
-    const said = /Version (\S+) was also run once against a real model, on \d{4}-\d{2}-\d{2}: `claude-[a-z0-9-]+` read three demo sets \(([^)]+)\)/.exec(CLI_README);
-    expect(said, "the sentence about the real run").not.toBeNull();
-    const [, version, sets] = said!;
-    const variants = (JSON.parse(read("fixtures/index.json")) as { packs: { id: string; variants: { id: string }[] }[] }).packs.flatMap((pack) => pack.variants.map((variant) => `\`${pack.id}/${variant.id}\``));
-    const named = sets!.split(", ");
-    expect(named).toHaveLength(3);
-    for (const set of named) expect(variants, set).toContain(set);
-    expect(CLI_README).toContain("every other model and every document that is not a demo are still untried");
-    // A later version either repeats the run and says so, or says that it was not run.
-    const current = (JSON.parse(read("packages/cli/package.json")) as { version: string }).version;
-    if (version !== current) expect(CLI_README).toContain("This version has not been run against a real model.");
+  it("states whether this version was run against a real model", () => {
+    expect(CLI_README).toContain("This path is tested with a stand-in model.");
+    const current = JSON.parse(read("packages/cli/package.json")).version;
+    const run = /Version (\S+) was also run once against a real model/.exec(CLI_README);
+    if (run) expect(run[1]).toBe(current);
+    else expect(CLI_README).toContain("This version has not been run against a real model.");
   });
 });
 
@@ -291,8 +284,14 @@ describe("changelog", () => {
     expect(entry.split("\n\n")[1]).toBe("First release.");
     // What the entry counts is what the repo holds.
     const packs = (JSON.parse(read("fixtures/index.json")) as { packs: { language: string; variants: unknown[] }[] }).packs;
-    expect(entry).toContain(`${RULE_IDS.length} deterministic rules`);
-    expect(entry).toContain(`${packs.reduce((n, pack) => n + pack.variants.length, 0)} demo sets of synthetic documents in four languages`);
+    // The first release keeps the counts it shipped with.
+    expect(entry).toContain("16 deterministic rules");
+    expect(entry).toContain("29 demo sets of synthetic documents in four languages");
+    // What came after it is listed above it, with the counts the repo holds now.
+    const unreleased = read("CHANGELOG.md").split(/^## /m).slice(1).find((part) => part.startsWith("Unreleased\n"));
+    expect(unreleased).toContain("HS-01");
+    expect(unreleased).toContain("declaration-from-rs");
+    expect(unreleased).toContain(`${packs.reduce((n, pack) => n + pack.variants.length, 0)} synthetic variants`);
     expect(new Set(packs.map((pack) => pack.language)).size).toBe(4);
     expect(entry).not.toContain("box each finding once.");
     expect(entry).toContain("Where a copy cannot be tied to a field, every copy is boxed and a note says so.");

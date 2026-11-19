@@ -11,6 +11,7 @@ import {
   cmrSchema,
   commercialInvoiceSchema,
   contractSchema,
+  customsDeclarationSchema,
   DOCUMENT_TYPES,
   extractionSchema,
   languageSchema,
@@ -110,6 +111,7 @@ const DOCUMENT_SCHEMAS = {
   packing_list: packingListSchema,
   cmr: cmrSchema,
   contract: contractSchema,
+  customs_declaration: customsDeclarationSchema,
   other: otherDocumentSchema,
 } as const;
 

@@ -16,6 +16,7 @@ import {
   PACKING_KINDS,
   parseAmountInWords,
   parseJson,
+  readRegistry,
   REPORT_LANGUAGES,
   renderHtml,
   renderJson,
@@ -45,9 +46,11 @@ function node(...args: string[]) {
 }
 
 const index = JSON.parse(readFileSync(join(ROOT, "fixtures/index.json"), "utf8")) as {
-  packs: { id: string; variants: { id: string }[] }[];
+  packs: { id: string; variants: { id: string; registry?: string }[] }[];
 };
-const fixtures = index.packs.flatMap((p) => p.variants.map((v) => `${p.id}/${v.id}`));
+const fixtureVariants = index.packs.flatMap((p) => p.variants.map((v) => [`${p.id}/${v.id}`, v] as const));
+const fixtures = fixtureVariants.map(([path]) => path);
+const registryFiles = new Map<string, string>(fixtureVariants.filter(([, v]) => v.registry).map(([path, v]) => [path, join(ROOT, "fixtures", path, v.registry!)]));
 
 /** Inputs beyond the fixtures: unreadable shapes and per-field format issues. */
 function brokenInputs(): [string, unknown][] {
@@ -149,6 +152,15 @@ function regressionInputs(): [string, unknown][] {
       Object.assign(line, { quantity: cite("250"), packages: cite("25"), netWeightKg: cite("200"), grossWeightKg: cite("230"), volumeM3: cite("1.5") });
     });
   return [
+    [
+      "hs-from-consignee",
+      variant("ka-office-furniture", ({ commercial_invoice: inv }) => {
+        inv!.buyer.country = cite(null);
+        inv!.consignee.country = cite("GÜRCİSTAN");
+        inv!.lines[0].hsCode = cite("94O3 10");
+        inv!.lines[1].hsCode = cite("9999 99");
+      }),
+    ],
     ["split-model", splitModel("150")],
     ["split-model-mismatch", splitModel("100")],
     [
@@ -454,6 +466,46 @@ describe("Python port: the interpreter", () => {
 });
 
 describe.skipIf(!python)("Python port", () => {
+  it("looks up the same Georgian entries in both installed scripts", () => {
+    for (const args of [
+      ["9403 30 110 00"],
+      ["საწერი  მაგიდ".toUpperCase(), "--json", "--limit", "3"],
+      ["999999", "--json"],
+    ]) {
+      const [a, b] = [node("hs", ...args), py("hs", ...args)];
+      expect(a.status).toBe(0);
+      expect(b.status).toBe(0);
+      expect(b.stderr).toBe("");
+      expect(b.stdout).toBe(a.stdout);
+    }
+  });
+
+  it("converts, selects and appends exact Revenue Service JSON in both scripts", () => {
+    const dir = mkdtempSync(join(tmpdir(), "lh-py-rs-"));
+    const fixture = join(ROOT, "fixtures/ka-office-furniture/declaration-rs-clean");
+    const response = readFileSync(join(fixture, "rs-response.json"), "utf8").replace("40582.96", "9007199254740993.00000000120");
+    const input = join(dir, "rs-response.json");
+    const base = join(dir, "base.json");
+    writeFileSync(input, response);
+    const extraction = JSON.parse(readFileSync(join(fixture, "extraction.json"), "utf8"));
+    extraction.documents.pop();
+    writeFileSync(base, JSON.stringify(extraction));
+    const args = ["declaration-from-rs", input, "--registration", "C-DEMO-2041", "--append", base];
+    const a = node(...args);
+    const b = py(...args);
+    expect([a.status, b.status, a.stderr, b.stderr]).toEqual([0, 0, "", ""]);
+    expect(b.stdout).toBe(a.stdout);
+    const result = JSON.parse(b.stdout);
+    expect(result.documents[4].items[0].rsValueInGel).toEqual({
+      value: "9007199254740993.00000000120", quote: "9007199254740993.00000000120", page: null,
+    });
+    expect(checkDocuments(result).findings).toEqual([]);
+    writeFileSync(input, response.replace('"ID": 0', '"ID": -1306'));
+    for (const run of [node(...args), py(...args)]) {
+      expect([run.status, run.stdout, run.stderr]).toEqual([2, "", "Revenue Service STATUS.ID is -1306.\n"]);
+    }
+  });
+
   it("prints the same JSON Schema", () => {
     const ts = JSON.parse(readFileSync(join(ROOT, "skills/logisticshub/references/extraction-schema.json"), "utf8"));
     expect(JSON.parse(py("--schema").stdout)).toEqual(ts);
@@ -465,7 +517,12 @@ describe.skipIf(!python)("Python port", () => {
     expect(JSON.parse(run.stdout)).toEqual({ incotermNames: INCOTERM_NAMES, legalFormPhrases: LEGAL_FORM_PHRASES, packingKinds: PACKING_KINDS });
   });
 
+  const rsDiscrepancy = JSON.parse(readFileSync(join(ROOT, "fixtures/ka-office-furniture/declaration-rs-clean/extraction.json"), "utf8"));
+  rsDiscrepancy.documents[4].items[0].grossWeightKg = { value: "1205.000", quote: "1205.000", page: null };
+  rsDiscrepancy.documents[4].items[0].countryOfOrigin = { value: "999", quote: "999", page: null };
+
   const cases = [
+    ["declaration-json-with-findings", rsDiscrepancy] as [string, unknown],
     ...fixtures.map((path) => [path, JSON.parse(readFileSync(join(ROOT, `fixtures/${path}/extraction.json`), "utf8"))] as [string, unknown]),
     ...brokenInputs(),
     ...shapeInputs(),
@@ -476,16 +533,32 @@ describe.skipIf(!python)("Python port", () => {
     const dir = mkdtempSync(join(tmpdir(), "lh-py-"));
     const file = join(dir, "extraction.json");
     writeFileSync(file, JSON.stringify(input));
-    const result = checkDocuments(input);
+    const registryFile = registryFiles.get(name);
+    const registryArgs = registryFile ? ["--registry", registryFile] : [];
+    const result = checkDocuments(input, registryFile ? { registry: readRegistry(registryFile) } : {});
+    const fixtureVariant = fixtureVariants.some(([path]) => path === name);
+    if (fixtureVariant) {
+      const expected = JSON.parse(readFileSync(join(ROOT, "fixtures", name, "expected.json"), "utf8"));
+      expect(result.findings.map(({ rule, severity, key, params }) => ({ rule, severity, key, params }))).toEqual(expected);
+    }
     for (const language of REPORT_LANGUAGES) {
       const out = join(dir, language);
-      const run = py(file, "--lang", language, "--out", out);
+      const run = py(file, "--lang", language, "--out", out, ...registryArgs);
       expect(run.stderr, `${name} ${language}`).toBe("");
       expect(run.status, `${name} ${language} exit`).toBe(result.ok ? 0 : 1);
       const view = buildReport(result, language);
       expect(readFileSync(join(out, "report.md"), "utf8"), `${name} ${language} md`).toBe(renderMarkdown(view));
       expect(readFileSync(join(out, "report.json"), "utf8"), `${name} ${language} json`).toBe(renderJson(result, view));
       expect(readFileSync(join(out, "report.html"), "utf8"), `${name} ${language} html`).toBe(renderHtml(view));
+      if (fixtureVariant) {
+        const nodeOut = join(dir, `node-${language}`);
+        const built = node(file, "--lang", language, "--out", nodeOut, "--no-annotate", ...registryArgs);
+        expect(built.status).toBe(0);
+        for (const format of ["md", "json", "html"]) {
+          const filename = `report.${format}`;
+          expect(readFileSync(join(nodeOut, filename))).toEqual(readFileSync(join(out, filename)));
+        }
+      }
     }
   });
 
@@ -504,7 +577,7 @@ describe.skipIf(!python)("Python port", () => {
       const md = readFileSync(join(dir, "py", "report.md"), "utf8");
       expect(md.replace(/\\([\\`*_[\]<>|~])/g, "$1").trimEnd()).toBe(report(b).trimEnd());
     }
-    if (name === "shape-unknown-type") expect(py(file, "--out", join(dir, "py")).stdout).toContain('Unknown type "bill_of_lading". Use commercial_invoice, packing_list, cmr, contract or other.');
+    if (name === "shape-unknown-type") expect(py(file, "--out", join(dir, "py")).stdout).toContain('Unknown type "bill_of_lading". Use commercial_invoice, packing_list, cmr, contract, customs_declaration or other.');
   });
 
   it("tells an extraction of the wrong shape apart from one with findings", () => {
@@ -532,6 +605,15 @@ describe.skipIf(!python)("Python port", () => {
       expect(b.status).toBe(a.status);
       return b;
     };
+
+    it("a malformed registry snapshot", () => {
+      const dir = scratch();
+      const path = join(dir, "registry.json");
+      writeFileSync(path, '{"schemaVersion":"1","entries":[]}');
+      const run = same(clean, "--registry", path, "--out", dir);
+      expect(run).toMatchObject({ status: 2, stdout: "" });
+      expect(run.stderr).toContain("Invalid registry snapshot");
+    });
 
     it("an output folder that cannot be made or written to", () => {
       const dir = scratch();

@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "DEC-05",
+    "severity": "error",
+    "key": "DEC-05.invoice-total",
+    "params": {
+      "expected": "13300.00",
+      "found": "13301.00"
+    }
+  }
+]
